@@ -72,6 +72,7 @@ class CohortManager {
         this.cohorts = new Map();
         this.currentYear = undefined;
         this.years = new Set();
+        this.boleColor = new THREE.Color(0x664228);
     }
 
     addData(data) {
@@ -82,7 +83,13 @@ class CohortManager {
         this.years.add(data.Year);
     }
 
+    getCohortByInstanceId(instanceId) {
+        const cohortIDs = [...this.cohorts.keys()];
+        return this.cohorts.get(cohortIDs[instanceId])
+    }
+
     initVis() {
+        this.cohortMeshes = new THREE.Group();
         // Setup instancing mesh
         const cohortIDs = [...this.cohorts.keys()];
         const cylinderElements = cohortIDs.map((id, i) => {
@@ -95,6 +102,7 @@ class CohortManager {
         });
         const geometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
         this.cylinders = drawInstances(geometry, cylinderElements, THREE.MeshLambertMaterial)
+        this.cohortMeshes.add(this.cylinders);
     }
 
     setYear(year) {
@@ -123,7 +131,7 @@ class CohortManager {
                     data.Height,
                     data.Diam
                 ),
-                color: new THREE.Color(0x664228)
+                color: this.boleColor
             }
         });
         updateAllInstances(this.cylinders, cylinderElements);

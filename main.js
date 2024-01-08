@@ -4,6 +4,9 @@ import {CohortManager} from './src/Cohort.js';
 
 let camera, scene, renderer, controls;
 
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
 const cohortManager = new CohortManager();
 
 init();
@@ -69,8 +72,8 @@ function init() {
 
             // Setup visualisation
             cohortManager.initVis();
-            cohortManager.setYear(1904)
-            scene.add(cohortManager.cylinders);
+            cohortManager.setYear(1904);
+            scene.add(cohortManager.cohortMeshes);
 
             // Keybindings
             document.onkeydown = (keyEvent)=>{
@@ -80,12 +83,35 @@ function init() {
                     default:
                         break;
                 }
-
             }
+
+            window.addEventListener('mousedown', event => {
+                // calculate pointer position in normalized device coordinates
+                // (-1 to +1) for both components
+                pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+                pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+                // update the picking ray with the camera and pointer position
+                raycaster.setFromCamera(pointer, camera);
+                // calculate objects intersecting the picking ray
+                const intersection = raycaster.intersectObject(cohortManager.cylinders);
+                if (intersection.length > 0) {
+                    const instanceId = intersection[0].instanceId;
+                    cohortManager.cylinders.setColorAt(instanceId, new THREE.Color(0xff4228));
+                    cohortManager.cylinders.instanceColor.needsUpdate = true;
+                    const cohortData = cohortManager.getCohortByInstanceId(instanceId);
+                    console.log(JSON.stringify({
+                        ...cohortData.timeSteps.get(cohortManager.currentYear),
+                        yearOfBirth: cohortData.yearOfBirth,
+                        yearOfDeath: cohortData.yearOfDeath,
+
+                    }))
+                    render();
+                }
+            });
+            render();
         })
 
         document.getElementById("fileUploadContainer").style.display = "None";
-       render();
     }
 
 }

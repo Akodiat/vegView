@@ -65,7 +65,8 @@ function updateAllInstances(mesh, elements) {
         mesh.setMatrixAt(i, matrix);
         mesh.setColorAt(i, elements[i].color);
     }
-    mesh.instanceMatrix.needsUpdate  = true;
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.instanceColor.needsUpdate = true;
 }
 
 export {drawParticles, drawInstances, updateAllInstances};
