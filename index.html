@@ -11,10 +11,21 @@
 		<html data-theme="light"></html>
 	</head>
 	<body style="margin: 0">
-		<div id="fileUploadContainer" class="container-fluid" style="position: absolute; bottom: 0;">
-			<article class="grid">
+		<div id="fileUploadContainer" class="container" style="position: absolute; bottom: 0;">
+			<article>
 				<label for="fileInput">Upload data here:</label>
 				<input type="file" id="fileInput" accept="out"/>
+			</article>
+		</div>
+		<div id="cohortInfoContainer" style="position: fixed; display: none;">
+			<article>
+				<h1>Cohort info</h1>
+				<figure>
+					<table role="grid">
+						<tbody id="cohortInfoTable">
+						</tbody>
+					</table>
+				</figure>
 			</article>
 		</div>
 		<div id="container"></div>

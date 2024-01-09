@@ -54,7 +54,7 @@ class CohortTimestep {
     constructor(data) {
         for(let property in data) {
             this[property] = data[property];
-         }
+        }
     }
 }
 
@@ -73,6 +73,8 @@ class CohortManager {
         this.currentYear = undefined;
         this.years = new Set();
         this.boleColor = new THREE.Color(0x664228);
+        this.selectedColor = new THREE.Color(0xff4228);
+        this.selectedCohort = undefined;
     }
 
     addData(data) {
@@ -86,6 +88,15 @@ class CohortManager {
     getCohortByInstanceId(instanceId) {
         const cohortIDs = [...this.cohorts.keys()];
         return this.cohorts.get(cohortIDs[instanceId])
+    }
+
+    getSelectedCohortData() {
+        const cohort = this.getCohortByInstanceId(this.selectedCohort);
+        return {
+            ...cohort.timeSteps.get(this.currentYear),
+            yearOfBirth: cohort.yearOfBirth,
+            yearOfDeath: cohort.yearOfDeath,
+        }
     }
 
     initVis() {
@@ -136,6 +147,22 @@ class CohortManager {
         });
         updateAllInstances(this.cylinders, cylinderElements);
         this.currentYear = year
+    }
+
+    selectCohort(instanceId) {
+        if (instanceId === this.selectedCohort) {
+            // Already selected
+            return
+        }
+
+        // Clear current selection
+        this.cylinders.setColorAt(this.selectedCohort, this.boleColor);
+        // Mark new selection
+        if (instanceId !== undefined) {
+            this.cylinders.setColorAt(instanceId, this.selectedColor);
+        }
+        this.cylinders.instanceColor.needsUpdate = true;
+        this.selectedCohort = instanceId;
     }
 
     nextYear() {

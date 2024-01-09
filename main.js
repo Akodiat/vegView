@@ -85,7 +85,7 @@ function init() {
                 }
             }
 
-            window.addEventListener('mousedown', event => {
+            window.addEventListener('dblclick', event => {
                 // calculate pointer position in normalized device coordinates
                 // (-1 to +1) for both components
                 pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -95,18 +95,23 @@ function init() {
                 // calculate objects intersecting the picking ray
                 const intersection = raycaster.intersectObject(cohortManager.cylinders);
                 if (intersection.length > 0) {
+                    // Select clicked cohort
                     const instanceId = intersection[0].instanceId;
-                    cohortManager.cylinders.setColorAt(instanceId, new THREE.Color(0xff4228));
-                    cohortManager.cylinders.instanceColor.needsUpdate = true;
-                    const cohortData = cohortManager.getCohortByInstanceId(instanceId);
-                    console.log(JSON.stringify({
-                        ...cohortData.timeSteps.get(cohortManager.currentYear),
-                        yearOfBirth: cohortData.yearOfBirth,
-                        yearOfDeath: cohortData.yearOfDeath,
+                    cohortManager.selectCohort(instanceId)
 
-                    }))
-                    render();
+                    // Display cohort info table
+                    const cohortData = cohortManager.getSelectedCohortData()
+                    const cohortInfoTable = document.getElementById("cohortInfoTable");
+                    for(let property in cohortData) {
+                        cohortInfoTable.innerHTML+=`<tr><th scope="row">${property}</th><td>${cohortData[property]}</td></tr>`;
+                    }
+                    document.getElementById("cohortInfoContainer").style.display = "block";
+                } else {
+                    // Clear selection and hide info table
+                    cohortManager.selectCohort(undefined)
+                    document.getElementById("cohortInfoContainer").style.display = "none";
                 }
+                render();
             });
             render();
         })
