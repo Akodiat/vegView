@@ -142,11 +142,29 @@ class CohortManager {
                     data.Height,
                     data.Diam
                 ),
-                color: this.boleColor
+                color: i === this.selectedCohort ? this.selectedColor : this.boleColor
             }
         });
         updateAllInstances(this.cylinders, cylinderElements);
-        this.currentYear = year
+
+        this.currentYear = year;
+        this.drawCohortInfo();
+    }
+
+    drawCohortInfo() {
+        if (this.selectedCohort === undefined) {
+            // Hide cohort info table
+            document.getElementById("cohortInfoContainer").style.display = "none";
+        } else {
+            // Create new cohort info table
+            const cohortData = this.getSelectedCohortData()
+            const cohortInfoTable = document.getElementById("cohortInfoTable");
+            cohortInfoTable.innerHTML = "";
+            for(let property in cohortData) {
+                cohortInfoTable.innerHTML+=`<tr><th scope="row">${property}</th><td>${cohortData[property]}</td></tr>`;
+            }
+            document.getElementById("cohortInfoContainer").style.display = "block";
+        }
     }
 
     selectCohort(instanceId) {

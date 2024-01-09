@@ -98,19 +98,11 @@ function init() {
                     // Select clicked cohort
                     const instanceId = intersection[0].instanceId;
                     cohortManager.selectCohort(instanceId)
-
-                    // Display cohort info table
-                    const cohortData = cohortManager.getSelectedCohortData()
-                    const cohortInfoTable = document.getElementById("cohortInfoTable");
-                    for(let property in cohortData) {
-                        cohortInfoTable.innerHTML+=`<tr><th scope="row">${property}</th><td>${cohortData[property]}</td></tr>`;
-                    }
-                    document.getElementById("cohortInfoContainer").style.display = "block";
                 } else {
-                    // Clear selection and hide info table
+                    // Clear selection
                     cohortManager.selectCohort(undefined)
-                    document.getElementById("cohortInfoContainer").style.display = "none";
                 }
+                cohortManager.drawCohortInfo();
                 render();
             });
             render();
