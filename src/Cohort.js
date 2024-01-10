@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import {drawInstances, updateAllInstances} from "./draw.js";
 
+const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
+const crownGeometry = new THREE.CylinderGeometry(.5, .5, 1, 16);
+
 class Cohort {
     constructor() {
         // Store all timesteps in a map from year to CohortTimestep
@@ -67,14 +70,31 @@ function idFromData(data) {
     return `${data.SID}:${data.PID}:${data.IID}`
 }
 
+function createEmptyElem() {
+    return {
+        position: new THREE.Vector3(),
+        quaternion: new THREE.Quaternion(),
+        scale: new THREE.Vector3(),
+        color: new THREE.Color()
+    }
+}
+
 class CohortManager {
+    cohorts;
+    currentYear;
+    years;
+    boleColor;
+    selectedColor;
+    selectedCohort;
+    cohortMeshes;
     constructor() {
         this.cohorts = new Map();
         this.currentYear = undefined;
         this.years = new Set();
-        this.boleColor = new THREE.Color(0x664228);
-        this.selectedColor = new THREE.Color(0xff4228);
         this.selectedCohort = undefined;
+        this.boleColor = new THREE.Color(0x664228);
+        this.crownColor = new THREE.Color(0x426628);
+        this.selectedColor = new THREE.Color(0xff4228);
     }
 
     addData(data) {
@@ -103,49 +123,58 @@ class CohortManager {
         this.cohortMeshes = new THREE.Group();
         // Setup instancing mesh
         const cohortIDs = [...this.cohorts.keys()];
-        const cylinderElements = cohortIDs.map((id, i) => {
-            return {
-                position: new THREE.Vector3(),
-                quaternion: new THREE.Quaternion(),
-                scale: new THREE.Vector3(),
-                color: new THREE.Color()
-            }
-        });
-        const geometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
-        this.cylinders = drawInstances(geometry, cylinderElements, THREE.MeshLambertMaterial)
-        this.cohortMeshes.add(this.cylinders);
+        const boleElems = cohortIDs.map(()=>createEmptyElem());
+        const crownElems = cohortIDs.map(()=>createEmptyElem());
+        this.instancedBoles = drawInstances(boleGeometry, boleElems, THREE.MeshLambertMaterial);
+        this.instancedCrowns = drawInstances(crownGeometry, crownElems, THREE.MeshLambertMaterial);
+        this.cohortMeshes.add(this.instancedBoles);
+        this.cohortMeshes.add(this.instancedCrowns);
     }
 
     setYear(year) {
         console.log(`Showing year ${year}`)
         const cohortIDs = [...this.cohorts.keys()];
-        const cylinderElements = cohortIDs.map((id, i)=>{
+        const boleElems = [];
+        const crownElems = [];
+        cohortIDs.forEach((id, i)=>{
             // Don't show anything if cohort doesn't exist that year
             if (!this.cohorts.get(id).timeSteps.has(year)) {
-                return {
-                    position: new THREE.Vector3(),
+                boleElems.push(createEmptyElem())
+                crownElems.push(createEmptyElem())
+            } else {
+                // Update from data
+                const data = this.cohorts.get(id).timeSteps.get(year);
+                boleElems.push({
+                    position: new THREE.Vector3(
+                        // TODO: update positioning
+                        i, data.Height/2, data.PID
+                    ),
                     quaternion: new THREE.Quaternion(),
-                    scale: new THREE.Vector3(),
-                    color: new THREE.Color()
-                }
-            }
-            // Update from data
-            const data = this.cohorts.get(id).timeSteps.get(year);
-            return {
-                position: new THREE.Vector3(
-                    // TODO: update positioning
-                    i, data.Height/2, data.PID
-                ),
-                quaternion: new THREE.Quaternion(),
-                scale: new THREE.Vector3(
-                    data.Diam,
-                    data.Height,
-                    data.Diam
-                ),
-                color: i === this.selectedCohort ? this.selectedColor : this.boleColor
+                    scale: new THREE.Vector3(
+                        data.Diam,
+                        data.Height,
+                        data.Diam
+                    ),
+                    color: i === this.selectedCohort ? this.selectedColor : this.boleColor
+                })
+                const crownRadius = Math.sqrt(data.CrownA/Math.PI);
+                crownElems.push({
+                    position: new THREE.Vector3(
+                        // TODO: update positioning
+                        i, data.Height-(data.Boleht/2), data.PID
+                    ),
+                    quaternion: new THREE.Quaternion(),
+                    scale: new THREE.Vector3(
+                        crownRadius,
+                        data.Boleht,
+                        crownRadius
+                    ),
+                    color: i === this.selectedCohort ? this.selectedColor : this.crownColor
+                })
             }
         });
-        updateAllInstances(this.cylinders, cylinderElements);
+        updateAllInstances(this.instancedBoles, boleElems);
+        updateAllInstances(this.instancedCrowns, crownElems);
 
         this.currentYear = year;
         this.drawCohortInfo();
@@ -174,12 +203,15 @@ class CohortManager {
         }
 
         // Clear current selection
-        this.cylinders.setColorAt(this.selectedCohort, this.boleColor);
+        this.instancedBoles.setColorAt(this.selectedCohort, this.boleColor);
+        this.instancedCrowns.setColorAt(this.selectedCohort, this.crownColor);
         // Mark new selection
         if (instanceId !== undefined) {
-            this.cylinders.setColorAt(instanceId, this.selectedColor);
+            this.instancedBoles.setColorAt(instanceId, this.selectedColor);
+            this.instancedCrowns.setColorAt(instanceId, this.selectedColor);
         }
-        this.cylinders.instanceColor.needsUpdate = true;
+        this.instancedBoles.instanceColor.needsUpdate = true;
+        this.instancedCrowns.instanceColor.needsUpdate = true;
         this.selectedCohort = instanceId;
     }
 

@@ -93,7 +93,7 @@ function init() {
                 // update the picking ray with the camera and pointer position
                 raycaster.setFromCamera(pointer, camera);
                 // calculate objects intersecting the picking ray
-                const intersection = raycaster.intersectObject(cohortManager.cylinders);
+                const intersection = raycaster.intersectObject(cohortManager.cohortMeshes);
                 if (intersection.length > 0) {
                     // Select clicked cohort
                     const instanceId = intersection[0].instanceId;
