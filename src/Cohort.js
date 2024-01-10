@@ -148,7 +148,7 @@ class CohortManager {
                 boleElems.push({
                     position: new THREE.Vector3(
                         // TODO: update positioning
-                        xpos, data.Height/2, data.PID * 5
+                        xpos, data.Height/2, -data.PID * 5
                     ),
                     quaternion: new THREE.Quaternion(),
                     scale: new THREE.Vector3(
@@ -162,7 +162,7 @@ class CohortManager {
                 crownElems.push({
                     position: new THREE.Vector3(
                         // TODO: update positioning
-                        xpos, data.Height-(data.Boleht/2), data.PID * 5
+                        xpos, data.Height-(data.Boleht/2), -data.PID * 5
                     ),
                     quaternion: new THREE.Quaternion(),
                     scale: new THREE.Vector3(

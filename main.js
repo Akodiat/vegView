@@ -53,87 +53,113 @@ function init() {
     render();
 
     const fileInput = document.getElementById("fileInput");
-    fileInput.onchange = event => {
-        fileInput.files[0].text().then(text=>{
-            // Helper function to parse whitespace-separated values from line
-            const getVals = l => l.split(" ").filter(c=>c!=="");
+    fileInput.onchange = () => loadFile(fileInput.files[0]);
 
-            // Proces header and lines;
-            const lines = text.split(/[\r\n]+/);
-            const header = getVals(lines[0]);
-            let minYear = Infinity;
-            let maxYear = -Infinity
-            for (const line of lines.slice(1)) {
-                if (line !== "") {
-                    const lineVals = getVals(line);
-                    let item = {};
-                    header.forEach((h, i) => item[h] = parseFloat(lineVals[i]))
-                    cohortManager.addData(item);
-
-                    minYear = Math.min(minYear, item.Year)
-                    maxYear = Math.max(maxYear, item.Year)
+    // The browser remembers the last input, so this is a shortcut to just
+    // load whatever is in the fileInput without going through the Open
+    // file dialog. (Just press Enter)
+    document.onkeydown = (keyEvent)=>{
+        switch (keyEvent.code) {
+            case "Enter":
+                if (fileInput.files.length > 0) {
+                    loadFile(fileInput.files[0]);
+                    keyEvent.preventDefault();
                 }
-            }
-
-            // Setup timeline range slider
-            const timeline = document.getElementById("timeline");
-            const timelineYearLabel = document.getElementById("timelineYearLabel");
-            timeline.min = minYear;
-            timeline.max = maxYear;
-
-            // Start at the first year in the range
-            timeline.value = minYear;
-            timelineYearLabel.innerHTML = timeline.value;
-
-            // Update year when the timeline is manipulated
-            timeline.oninput = () => {
-                timelineYearLabel.innerHTML = timeline.value;
-                cohortManager.setYear(timeline.valueAsNumber);
-                render()
-            }
-
-            // Setup visualisation
-            cohortManager.initVis();
-            cohortManager.setYear(minYear);
-            scene.add(cohortManager.cohortMeshes);
-
-            // Keybindings
-            document.onkeydown = (keyEvent)=>{
-                switch (keyEvent.code) {
-                    case "ArrowLeft": cohortManager.prevYear(); render(); break;
-                    case "ArrowRight": cohortManager.nextYear(); render(); break;
-                    default:
-                        break;
-                }
-            }
-
-            window.addEventListener('dblclick', event => {
-                // calculate pointer position in normalized device coordinates
-                // (-1 to +1) for both components
-                pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-                pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-                // update the picking ray with the camera and pointer position
-                raycaster.setFromCamera(pointer, camera);
-                // calculate objects intersecting the picking ray
-                const intersection = raycaster.intersectObject(cohortManager.cohortMeshes);
-                if (intersection.length > 0) {
-                    // Select clicked cohort
-                    const instanceId = intersection[0].instanceId;
-                    cohortManager.selectCohort(instanceId)
-                } else {
-                    // Clear selection
-                    cohortManager.selectCohort(undefined)
-                }
-                cohortManager.drawCohortInfo();
-                render();
-            });
-            render();
-        })
-
-        document.getElementById("fileUploadContainer").style.display = "none";
-        document.getElementById("timelineContainer").style.display = "block";
+                break;
+            default:
+                break;
+        }
     }
+}
 
+function loadFile(file) {
+    file.text().then(text=>{
+        // Helper function to parse whitespace-separated values from line
+        const getVals = l => l.split(" ").filter(c=>c!=="");
+
+        // Proces header and lines;
+        const lines = text.split(/[\r\n]+/);
+        const header = getVals(lines[0]);
+        let minYear = Infinity;
+        let maxYear = -Infinity
+        for (const line of lines.slice(1)) {
+            if (line !== "") {
+                const lineVals = getVals(line);
+                let item = {};
+                header.forEach((h, i) => item[h] = parseFloat(lineVals[i]))
+                cohortManager.addData(item);
+
+                minYear = Math.min(minYear, item.Year)
+                maxYear = Math.max(maxYear, item.Year)
+            }
+        }
+
+        // Setup timeline range slider
+        const timeline = document.getElementById("timeline");
+        const timelineYearLabel = document.getElementById("timelineYearLabel");
+        timeline.min = minYear;
+        timeline.max = maxYear;
+
+        // Start at the first year in the range
+        timeline.value = minYear;
+        timelineYearLabel.innerHTML = timeline.value;
+
+        // Update year when the timeline is manipulated
+        timeline.oninput = () => {
+            timelineYearLabel.innerHTML = timeline.value;
+            cohortManager.setYear(timeline.valueAsNumber);
+            render()
+        }
+
+        // Setup visualisation
+        cohortManager.initVis();
+        cohortManager.setYear(minYear);
+        scene.add(cohortManager.cohortMeshes);
+
+        // New keybindings, for when the data is loaded
+        document.onkeydown = (keyEvent)=>{
+            switch (keyEvent.code) {
+                case "ArrowLeft":
+                    cohortManager.prevYear();
+                    render();
+                    timeline.value = cohortManager.currentYear;
+                    timelineYearLabel.innerHTML = cohortManager.currentYear;
+                    break;
+                case "ArrowRight":
+                    cohortManager.nextYear(); render();
+                    timeline.value = cohortManager.currentYear;
+                    timelineYearLabel.innerHTML = cohortManager.currentYear;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        window.addEventListener('dblclick', event => {
+            // calculate pointer position in normalized device coordinates
+            // (-1 to +1) for both components
+            pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+            pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+            // update the picking ray with the camera and pointer position
+            raycaster.setFromCamera(pointer, camera);
+            // calculate objects intersecting the picking ray
+            const intersection = raycaster.intersectObject(cohortManager.cohortMeshes);
+            if (intersection.length > 0) {
+                // Select clicked cohort
+                const instanceId = intersection[0].instanceId;
+                cohortManager.selectCohort(instanceId)
+            } else {
+                // Clear selection
+                cohortManager.selectCohort(undefined)
+            }
+            cohortManager.drawCohortInfo();
+            render();
+        });
+        render();
+    })
+
+    document.getElementById("fileUploadContainer").style.display = "none";
+    document.getElementById("timelineContainer").style.display = "block";
 }
 
 function onWindowResize() {
