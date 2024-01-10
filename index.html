@@ -22,7 +22,9 @@
 	</head>
 	<body style="margin: 0">
 		<div id="fileUploadContainer" class="container-fluid" style="position: absolute;">
-			<article>
+			<article
+			data-tooltip="Browse and select a vegetation structure output file to load"
+			data-placement="bottom">
 				<h1>Vegetation model viewer</h1>
 				<label for="fileInput">Upload data here:
 					<input type="file" id="fileInput" accept=".out"/>
@@ -40,7 +42,9 @@
 				</figure>
 			</article>
 		</div>
-		<div id="timelineContainer" class="container-fluid" style="position: fixed; bottom: 0; display: none;">
+		<div id="timelineContainer" class="container-fluid"
+			style="position: fixed; bottom: 0; display: none;"
+		>
 			<label for="timeline" style="text-align: right;">Current year:
 				<span id="timelineYearLabel">1992</span>
 				<input type="range" min="0" max="100" value="50" id="timeline">
