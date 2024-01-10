@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {drawInstances, updateAllInstances} from "./draw.js";
 
 const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
-const crownGeometry = new THREE.CylinderGeometry(.5, .5, 1, 16);
+const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
 
 class Cohort {
     constructor() {

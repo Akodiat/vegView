@@ -58,21 +58,43 @@ function init() {
             // Helper function to parse whitespace-separated values from line
             const getVals = l => l.split(" ").filter(c=>c!=="");
 
-            // Proces header and lines
+            // Proces header and lines;
             const lines = text.split(/[\r\n]+/);
             const header = getVals(lines[0]);
+            let minYear = Infinity;
+            let maxYear = -Infinity
             for (const line of lines.slice(1)) {
                 if (line !== "") {
                     const lineVals = getVals(line);
                     let item = {};
                     header.forEach((h, i) => item[h] = parseFloat(lineVals[i]))
                     cohortManager.addData(item);
+
+                    minYear = Math.min(minYear, item.Year)
+                    maxYear = Math.max(maxYear, item.Year)
                 }
+            }
+
+            // Setup timeline range slider
+            const timeline = document.getElementById("timeline");
+            const timelineYearLabel = document.getElementById("timelineYearLabel");
+            timeline.min = minYear;
+            timeline.max = maxYear;
+
+            // Start at the first year in the range
+            timeline.value = minYear;
+            timelineYearLabel.innerHTML = timeline.value;
+
+            // Update year when the timeline is manipulated
+            timeline.oninput = () => {
+                timelineYearLabel.innerHTML = timeline.value;
+                cohortManager.setYear(timeline.valueAsNumber);
+                render()
             }
 
             // Setup visualisation
             cohortManager.initVis();
-            cohortManager.setYear(1904);
+            cohortManager.setYear(minYear);
             scene.add(cohortManager.cohortMeshes);
 
             // Keybindings
@@ -108,7 +130,8 @@ function init() {
             render();
         })
 
-        document.getElementById("fileUploadContainer").style.display = "None";
+        document.getElementById("fileUploadContainer").style.display = "none";
+        document.getElementById("timelineContainer").style.display = "block";
     }
 
 }

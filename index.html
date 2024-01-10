@@ -9,7 +9,7 @@
 			#cohortInfoTable {
 				display: block;
 				width: 100%;
-				height: calc(100vh - 200px);
+				height: calc(100vh - 380px);
 				overflow-y: auto;
 				overflow-x: clip;
 			}
@@ -32,13 +32,19 @@
 		<div id="cohortInfoContainer" style="position: fixed; display: none;">
 			<article>
 				<h2>Cohort info</h2>
-				<figure>
-					<table role="grid">
+				<figure style="margin-bottom: 0;">
+					<table role="grid" style="margin-bottom: 0;">
 						<tbody id="cohortInfoTable">
 						</tbody>
 					</table>
 				</figure>
 			</article>
+		</div>
+		<div id="timelineContainer" class="container-fluid" style="position: fixed; bottom: 0; display: none;">
+			<label for="timeline" style="text-align: right;">Current year:
+				<span id="timelineYearLabel">1992</span>
+				<input type="range" min="0" max="100" value="50" id="timeline">
+			</label>
 		</div>
 		<div id="container"></div>
 
