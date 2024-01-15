@@ -5,6 +5,10 @@
 
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
 
+		<script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.2"></script>
+
 		<style>
 			#cohortInfoTable {
 				display: block;
@@ -12,6 +16,9 @@
 				max-height: calc(100vh - 380px);
 				overflow-y: auto;
 				overflow-x: clip;
+			}
+			.vega-bindings {
+				display: none;
 			}
 		</style>
 
@@ -45,6 +52,10 @@
 		<div id="timelineContainer" class="container-fluid"
 			style="position: fixed; bottom: 0; display: none;"
 		>
+			<details open style="display: contents;">
+				<summary>Example plot</summary>
+				<div id="plot" style="width: 100%; display: flex;"></div>
+			</details>
 			<label for="timeline" style="text-align: right;">Current year:
 				<span id="timelineYearLabel">1992</span>
 				<input type="range" min="0" max="100" value="50" id="timeline">

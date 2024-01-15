@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {MapControls} from './libs/OrbitControls.js';
 import {CohortManager} from './src/Cohort.js';
+import {VegaPlotter} from './src/plot.js';
 
 let camera, scene, renderer, controls;
 
@@ -134,6 +135,9 @@ function loadFile(file) {
                     break;
             }
         }
+
+        const plotter = new VegaPlotter(cohortManager.cohorts);
+        plotter.plotPatchHeight();
 
         window.addEventListener('dblclick', event => {
             // calculate pointer position in normalized device coordinates
