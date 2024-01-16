@@ -137,7 +137,19 @@ function loadFile(file) {
         }
 
         const plotter = new VegaPlotter(cohortManager.cohorts);
-        plotter.plotPatchHeight();
+        plotter.timePlot();
+
+        const yFieldSelect = document.getElementById("yFieldSelect");
+        const aggregateSelect = document.getElementById("aggregateSelect");
+        const colorFieldSelect = document.getElementById("colorFieldSelect");
+        const updatePlot = () => {
+            plotter.timePlot(
+                yFieldSelect.value,
+                aggregateSelect.value,
+                colorFieldSelect.value
+            );
+        }
+        yFieldSelect.onchange = aggregateSelect.onchange = colorFieldSelect.onchange = updatePlot;
 
         window.addEventListener('dblclick', event => {
             // calculate pointer position in normalized device coordinates

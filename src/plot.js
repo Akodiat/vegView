@@ -4,7 +4,7 @@ class VegaPlotter {
         this.data = [...cohorts.values()].flatMap(c=>[...c.timeSteps.values()])
     }
 
-    plotPatchHeight() {
+    timePlot(yField="Height", aggregate='average', colorField='PID') {
         // Assign the specification to a local variable vlSpec.
         const vlSpec = {
             $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -15,12 +15,9 @@ class VegaPlotter {
             mark: 'line',
             encoding: {
                 y: {
-                    aggregate: 'average',
-                    field: 'Height',
-                    type: 'quantitative',
-                    axis: {
-                        title: 'Average tree height'
-                    }
+                    aggregate: aggregate,
+                    field: yField,
+                    type: 'quantitative'
                 },
                 x: {
                     field: 'Year',
@@ -29,11 +26,14 @@ class VegaPlotter {
                         title: ""
                     }
                 },
-                color: {field: 'PID', type: 'nominal'},
+                color: {field: colorField, type: 'nominal'},
                 tooltip: [
-                    {aggregate: 'average', field: 'Height', type: 'quantitative'},
+                    {aggregate: aggregate,
+                        field: yField,
+                        type: 'quantitative',
+                    },
                     {field: 'Year', type: 'quantitative'},
-                    {field: 'PID', type: 'nominal'}
+                    {field: colorField, type: 'nominal'}
                 ],
             }
         };

@@ -53,7 +53,39 @@
 			style="position: fixed; bottom: 0; display: none;"
 		>
 			<details open style="display: contents;">
-				<summary>Example plot</summary>
+				<summary title="Plot"></summary>
+				<div class="grid">
+					<label for="yFieldSelect">Property
+						<select id="yFieldSelect">
+							<option value="Height" selected>Height of tree</option>
+							<option value="Diam">Diameter of stem</option>
+							<option value="Cmass">Total C mass of cohort</option>
+							<option value="Age">Age of cohort</option>
+							<option value="CrownA">Crown area</option>
+							<option value="GPPns">Gross Primary Production with N stress</option>
+							<option value="GPPno">Gross Primary Production with no stress</option>
+							<option value="GPP">Gross Primary Production</option>
+							<option value="Cmass">Total C mass of cohort</option>
+							<option value="Cmass">Total C mass of cohort</option>
+						</select>
+					</label>
+					<label for="aggregateSelect">Aggregation
+						<select id="aggregateSelect">
+							<option value="average" selected>Average</option>
+							<option value="median" selected>Median</option>
+							<option value="max">Max</option>
+							<option value="min">Min</option>
+							<option>None</option>
+						</select>
+					</label>
+					<label for="colorFieldSelect">Group by
+						<select id="colorFieldSelect">
+							<option value="PID" selected>Patch ID</option>
+							<option value="IID">Cohort ID</option>
+							<option value="PFT">Plant Functional Type ID</option>
+						</select>
+					</label>
+				</div>
 				<div id="plot" style="width: 100%; display: flex;"></div>
 			</details>
 			<label for="timeline" style="text-align: right;">Current year:
