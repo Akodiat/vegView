@@ -1,0 +1,222 @@
+import * as THREE from 'three';
+import {updateInstance} from "./draw.js";
+import {Patch} from './Patch.js';
+import {Cohort, CohortTimestep, idFromData} from './Cohort.js';
+import {emptyElem} from './utils.js';
+
+class PatchManager {
+    currentYear;
+    years;
+    boleColor;
+    selectedColor;
+    selectedCohort;
+    cohortMeshes;
+    constructor() {
+        this.patches = new Map();
+        this.currentYear = undefined;
+        this.years = new Set();
+        this.selectedCohort = undefined;
+        this.boleColor = new THREE.Color(0x664228);
+        this.crownColor = new THREE.Color(0x426628);
+        this.selectedColor = new THREE.Color(0xff4228);
+        this.patchMargins = 1.2;
+    }
+
+    addData(data) {
+        // Add patch data
+        if (!this.patches.has(data.PID)) {
+            this.patches.set(data.PID, new Patch(data.PID, data.Px, data.Py, data.Pheight));
+        }
+        const patch = this.patches.get(data.PID);
+
+        // Add cohort data
+        if (!patch.cohorts.has(idFromData(data))) {
+            patch.cohorts.set(idFromData(data), new Cohort(data));
+        }
+        patch.cohorts.get(idFromData(data)).addStep(new CohortTimestep(data));
+
+        // Keep track of the set of all years.
+        this.years.add(data.Year);
+    }
+
+
+    initVis(year) {
+        this.cohortMeshes = new THREE.Group();
+        // Setup instancing meshes for each cohort
+        for (const patch of this.patches.values()) {
+            patch.initTreePositions(year);
+            patch.patchMeshes = new THREE.Group();
+            for (const cohort of patch.cohorts.values()) {
+                cohort.initVis()
+                patch.patchMeshes.add(cohort.treeMeshes);
+            }
+            this.cohortMeshes.add(patch.patchMeshes)
+        }
+    }
+
+    calcPatchesCentre() {
+        const com = new THREE.Vector3();
+        for (const patch of this.patches.values()) {
+            com.add(new THREE.Vector3(
+                patch.Px * patch.sideLength * this.patchMargins,
+                0,
+                patch.Py * patch.sideLength * this.patchMargins
+                ));
+            }
+            return com.divideScalar(this.patches.size);
+    }
+
+    setYear(year) {
+        console.log(`Showing year ${year}`);
+
+        // Temporary matrix to reuse for efficiency
+        const mTemp = new THREE.Matrix4();
+
+        for (const patch of this.patches.values()) {
+            patch.updateTreePositions(year);
+            for (const cohort of patch.cohorts.values()) {
+                if (cohort.isGrass || !cohort.timeSteps.has(year)) {
+                    cohort.treeMeshes.visible = false;
+                    continue;
+                }
+                cohort.treeMeshes.visible = true;
+                const cohortData = cohort.timeSteps.get(year);
+                const nTrees = cohortData.DensI * cohort.maxTreeCount;
+                for (let iTree=0; iTree<cohort.maxTreeCount; iTree++) {
+                    if (iTree >= nTrees) {
+                        updateInstance(cohort.instancedBoles, emptyElem, iTree, mTemp);
+                        updateInstance(cohort.instancedCrowns, emptyElem, iTree, mTemp);
+                        continue;
+                    }
+                    const p = cohortData.positions.get(iTree);
+                    const xpos = patch.Px * patch.sideLength * this.patchMargins + p.x;
+                    const ypos = patch.Py * patch.sideLength * this.patchMargins + p.y;
+
+                    const boleElem = {
+                        position: new THREE.Vector3(
+                            xpos,
+                            patch.Pheight + cohortData.Height/2,
+                            ypos
+                            ),
+                            quaternion: new THREE.Quaternion(),
+                            scale: new THREE.Vector3(
+                            cohortData.Diam,
+                            cohortData.Height,
+                            cohortData.Diam
+                            ),
+                            color: this.boleColor //i === this.selectedCohort ? this.selectedColor : this.boleColor
+                        }
+                    const crownRadius = Math.sqrt(cohortData.CrownA/Math.PI);
+                    updateInstance(cohort.instancedBoles, boleElem, iTree, mTemp);
+
+                    const crownElem = {
+                        position: new THREE.Vector3(
+                            xpos,
+                            patch.Pheight + cohortData.Height-(cohortData.Boleht/2),
+                            ypos
+                        ),
+                        quaternion: new THREE.Quaternion(),
+                        scale: new THREE.Vector3(
+                            crownRadius,
+                            cohortData.Boleht,
+                            crownRadius
+                            ),
+                            color: this.crownColor // i === this.selectedCohort ? this.selectedColor : this.crownColor
+                    }
+                    updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
+                }
+            }
+        }
+
+        this.currentYear = year;
+        this.drawCohortInfo();
+    }
+
+    drawCohortInfo() {
+        if (this.selectedCohort === undefined) {
+            // Hide cohort info table
+            document.getElementById("cohortInfoContainer").style.display = "none";
+        } else {
+            // Create new cohort info table
+            const cohortData = this.getSelectedCohortData()
+            const cohortInfoTable = document.getElementById("cohortInfoTable");
+            cohortInfoTable.innerHTML = "";
+            for(let property in cohortData) {
+                cohortInfoTable.innerHTML+=`<tr><th scope="row">${property}</th><td>${cohortData[property]}</td></tr>`;
+            }
+            document.getElementById("cohortInfoContainer").style.display = "block";
+        }
+    }
+
+    getCohortByInstanceId(instanceId) {
+        const cohortIDs = [...this.cohorts.keys()];
+        return this.cohorts.get(cohortIDs[instanceId])
+    }
+
+    getSelectedCohortData() {
+        const cohort = this.getCohortByInstanceId(this.selectedCohort);
+        return {
+            ...cohort.timeSteps.get(this.currentYear),
+            yearOfBirth: cohort.yearOfBirth,
+            yearOfDeath: cohort.yearOfDeath,
+        }
+    }
+
+    getCohortById(cohortId) {
+        for (const patch of this.patches.values()) {
+            if (patch.cohorts.has(cohortId)) {
+                return patch.cohorts.get(cohortId)
+            }
+        }
+    }
+
+    selectCohort(cohortId, instanceId) {
+        if (cohortId === this.selectedCohortId) {
+            // Already selected
+            return
+        }
+
+        const cohort = this.getCohortById(cohortId);
+
+        // Clear current selection
+        cohort.instancedBoles.setColorAt(this.selectedInstance, this.boleColor);
+        cohort.instancedCrowns.setColorAt(this.selectedInstance, this.crownColor);
+        // Mark new selection
+        if (instanceId !== undefined) {
+            cohort.instancedBoles.setColorAt(instanceId, this.selectedColor);
+            cohort.instancedCrowns.setColorAt(instanceId, this.selectedColor);
+        }
+        cohort.instancedBoles.instanceColor.needsUpdate = true;
+        cohort.instancedCrowns.instanceColor.needsUpdate = true;
+        this.selectedInstance = instanceId;
+        this.selectedCohortId = cohortId;
+    }
+
+    nextYear() {
+        // Skip years we don't have data for
+        const max = Math.max(...this.years);
+        while(!this.years.has(++this.currentYear)) {
+            // Make sure we dont overshoot the last year
+            if (this.currentYear > max) {
+                this.currentYear = max;
+                break
+            }
+        }
+        this.setYear(this.currentYear);
+    }
+
+    prevYear() {
+        // Skip years we don't have data for
+        const min = Math.min(...this.years);
+        while(!this.years.has(--this.currentYear)) {
+            // Make sure we dont overshoot the first year
+            if (this.currentYear < min) {
+                this.currentYear = min;
+                break
+            }
+        }
+        this.setYear(this.currentYear);
+    }
+}
+
+export {PatchManager}

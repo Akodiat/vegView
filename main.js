@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {MapControls} from './libs/OrbitControls.js';
-import {CohortManager} from './src/Cohort.js';
+import {PatchManager} from './src/PatchManager.js';
 import {VegaPlotter} from './src/plot.js';
 
 let camera, scene, renderer, controls;
@@ -8,7 +8,7 @@ let camera, scene, renderer, controls;
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
-const cohortManager = new CohortManager();
+const patchManager = new PatchManager();
 
 init();
 render();
@@ -88,7 +88,7 @@ function loadFile(file) {
                 const lineVals = getVals(line);
                 let item = {};
                 header.forEach((h, i) => item[h] = parseFloat(lineVals[i]))
-                cohortManager.addData(item);
+                patchManager.addData(item);
 
                 minYear = Math.min(minYear, item.Year)
                 maxYear = Math.max(maxYear, item.Year)
@@ -108,38 +108,38 @@ function loadFile(file) {
         // Update year when the timeline is manipulated
         timeline.oninput = () => {
             timelineYearLabel.innerHTML = timeline.value;
-            cohortManager.setYear(timeline.valueAsNumber);
+            patchManager.setYear(timeline.valueAsNumber);
             render()
         }
 
         // Setup visualisation
-        cohortManager.initVis(minYear);
-        cohortManager.setYear(minYear);
-        scene.add(cohortManager.cohortMeshes);
+        patchManager.initVis(minYear);
+        patchManager.setYear(minYear);
+        scene.add(patchManager.cohortMeshes);
 
-        controls.target.copy(cohortManager.calcPatchesCentre());
+        controls.target.copy(patchManager.calcPatchesCentre());
         controls.update();
 
         // New keybindings, for when the data is loaded
         document.onkeydown = (keyEvent)=>{
             switch (keyEvent.code) {
                 case "ArrowLeft":
-                    cohortManager.prevYear();
+                    patchManager.prevYear();
                     render();
-                    timeline.value = cohortManager.currentYear;
-                    timelineYearLabel.innerHTML = cohortManager.currentYear;
+                    timeline.value = patchManager.currentYear;
+                    timelineYearLabel.innerHTML = patchManager.currentYear;
                     break;
                 case "ArrowRight":
-                    cohortManager.nextYear(); render();
-                    timeline.value = cohortManager.currentYear;
-                    timelineYearLabel.innerHTML = cohortManager.currentYear;
+                    patchManager.nextYear(); render();
+                    timeline.value = patchManager.currentYear;
+                    timelineYearLabel.innerHTML = patchManager.currentYear;
                     break;
                 default:
                     break;
             }
         }
 
-        const plotter = new VegaPlotter(cohortManager.patches);
+        const plotter = new VegaPlotter(patchManager.patches);
         plotter.timePlot();
 
         const yFieldSelect = document.getElementById("yFieldSelect");
@@ -162,19 +162,19 @@ function loadFile(file) {
             // update the picking ray with the camera and pointer position
             raycaster.setFromCamera(pointer, camera);
             // calculate objects intersecting the picking ray
-            const intersection = raycaster.intersectObject(cohortManager.cohortMeshes);
+            const intersection = raycaster.intersectObject(patchManager.cohortMeshes);
             if (intersection.length > 0) {
                 // Select clicked cohort
                 const clicked = intersection[0];
-                cohortManager.selectCohort(
+                patchManager.selectCohort(
                     clicked.cohortId,
                     clicked.instanceId
                 );
             } else {
                 // Clear selection
-                cohortManager.selectCohort(undefined)
+                patchManager.selectCohort(undefined)
             }
-            cohortManager.drawCohortInfo();
+            patchManager.drawCohortInfo();
             render();
         });
         render();
