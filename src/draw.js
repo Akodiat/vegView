@@ -69,4 +69,17 @@ function updateAllInstances(mesh, elements) {
     mesh.instanceColor.needsUpdate = true;
 }
 
-export {drawParticles, drawInstances, updateAllInstances};
+function updateInstance(mesh, element, instanceId, matrix = new THREE.Matrix4()) {
+    matrix.compose(
+        element.position,
+        element.quaternion,
+        element.scale
+    );
+    mesh.setMatrixAt(instanceId, matrix);
+    mesh.setColorAt(instanceId, element.color);
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.instanceColor.needsUpdate = true;
+}
+
+
+export {drawParticles, drawInstances, updateAllInstances, updateInstance};

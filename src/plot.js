@@ -1,7 +1,12 @@
 class VegaPlotter {
-    constructor(cohorts) {
+    constructor(patches) {
         // Flatten data to a list of datapoints
-        this.data = [...cohorts.values()].flatMap(c=>[...c.timeSteps.values()])
+        this.data = [];
+        for (const patch of patches.values()) {
+            for (const cohort of patch.cohorts.values()) {
+                this.data.push(...cohort.timeSteps.values());
+            }
+        }
     }
 
     timePlot(yField="Height", aggregate='average', colorField='PID') {

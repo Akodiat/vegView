@@ -113,9 +113,12 @@ function loadFile(file) {
         }
 
         // Setup visualisation
-        cohortManager.initVis();
+        cohortManager.initVis(minYear);
         cohortManager.setYear(minYear);
         scene.add(cohortManager.cohortMeshes);
+
+        controls.target.copy(cohortManager.calcPatchesCentre());
+        controls.update();
 
         // New keybindings, for when the data is loaded
         document.onkeydown = (keyEvent)=>{
@@ -136,7 +139,7 @@ function loadFile(file) {
             }
         }
 
-        const plotter = new VegaPlotter(cohortManager.cohorts);
+        const plotter = new VegaPlotter(cohortManager.patches);
         plotter.timePlot();
 
         const yFieldSelect = document.getElementById("yFieldSelect");
@@ -162,8 +165,11 @@ function loadFile(file) {
             const intersection = raycaster.intersectObject(cohortManager.cohortMeshes);
             if (intersection.length > 0) {
                 // Select clicked cohort
-                const instanceId = intersection[0].instanceId;
-                cohortManager.selectCohort(instanceId)
+                const clicked = intersection[0];
+                cohortManager.selectCohort(
+                    clicked.cohortId,
+                    clicked.instanceId
+                );
             } else {
                 // Clear selection
                 cohortManager.selectCohort(undefined)
