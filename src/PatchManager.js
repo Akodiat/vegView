@@ -20,6 +20,18 @@ class PatchManager {
         this.crownColor = new THREE.Color(0x426628);
         this.selectedColor = new THREE.Color(0xff4228);
         this.patchMargins = 1.2;
+        this.pftColors = [
+            [102, 102, 240], // BNE
+            [254, 254, 101], // BINE
+            [254, 178, 101], // BNS
+            [179, 179, 179], // TeNE
+            [117, 254, 101], // TeBS
+            [254, 237, 167], // IBS
+            [ 99,  99,  99], // TeBE
+            [101, 193, 254], // TrBE
+            [254, 208, 162], // TrIBE
+            [240, 102, 255], // TrBR
+        ].map(c=> new THREE.Color(`rgb(${c.join(',')})`))
     }
 
     addData(data) {
@@ -120,9 +132,11 @@ class PatchManager {
                             crownRadius,
                             cohortData.Boleht,
                             crownRadius
-                            ),
-                            color: this.crownColor // i === this.selectedCohort ? this.selectedColor : this.crownColor
+                        ),
+                        color: this.pftColors[cohortData.PFT].clone() // i === this.selectedCohort ? this.selectedColor : this.crownColor
+                        //color: new THREE.Color(102, 102, 240)
                     }
+                    console.assert(crownElem.color.isColor, "Not color")
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
                 }
             }
