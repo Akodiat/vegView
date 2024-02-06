@@ -10,7 +10,7 @@ class PatchManager {
     boleColor;
     selectedColor;
     selectedCohort;
-    cohortMeshes;
+    patchMeshes;
     constructor() {
         this.patches = new Map();
         this.currentYear = undefined;
@@ -37,7 +37,7 @@ class PatchManager {
     addData(data) {
         // Add patch data
         if (!this.patches.has(data.PID)) {
-            this.patches.set(data.PID, new Patch(data.PID, data.Px, data.Py, data.Pheight));
+            this.patches.set(data.PID, new Patch(data.PID, data.Px, data.Py, data.Pheight, this.patchMargins));
         }
         const patch = this.patches.get(data.PID);
 
@@ -53,16 +53,19 @@ class PatchManager {
 
 
     initVis(year) {
-        this.cohortMeshes = new THREE.Group();
+        this.patchMeshes = new THREE.Group();
         // Setup instancing meshes for each cohort
         for (const patch of this.patches.values()) {
             patch.initTreePositions(year);
-            patch.patchMeshes = new THREE.Group();
+            patch.meshes = new THREE.Group();
+            patch.cohortMeshes = new THREE.Group();
             for (const cohort of patch.cohorts.values()) {
                 cohort.initVis()
-                patch.patchMeshes.add(cohort.treeMeshes);
+                patch.cohortMeshes.add(cohort.treeMeshes);
             }
-            this.cohortMeshes.add(patch.patchMeshes)
+            patch.meshes.add(patch.cohortMeshes);
+            patch.meshes.add(patch.grassMesh);
+            this.patchMeshes.add(patch.meshes);
         }
     }
 
@@ -70,9 +73,9 @@ class PatchManager {
         const com = new THREE.Vector3();
         for (const patch of this.patches.values()) {
             com.add(new THREE.Vector3(
-                patch.Px * patch.sideLength * this.patchMargins,
+                patch.Px * patch.sideLength * this.patchMargins - patch.sideLength/2,
                 0,
-                patch.Py * patch.sideLength * this.patchMargins
+                patch.Py * patch.sideLength * this.patchMargins - patch.sideLength/2
                 ));
             }
             return com.divideScalar(this.patches.size);
@@ -86,9 +89,13 @@ class PatchManager {
 
         for (const patch of this.patches.values()) {
             patch.updateTreePositions(year);
+            let grassyPatch = false;
             for (const cohort of patch.cohorts.values()) {
                 if (cohort.isGrass || !cohort.timeSteps.has(year)) {
                     cohort.treeMeshes.visible = false;
+                    if (cohort.isGrass) {
+                        grassyPatch = true;
+                    }
                     continue;
                 }
                 cohort.treeMeshes.visible = true;
@@ -101,8 +108,8 @@ class PatchManager {
                         continue;
                     }
                     const p = cohortData.positions.get(iTree);
-                    const xpos = patch.Px * patch.sideLength * this.patchMargins + p.x;
-                    const ypos = patch.Py * patch.sideLength * this.patchMargins + p.y;
+                    const xpos = patch.Px * patch.sideLength * this.patchMargins - patch.sideLength + p.x;
+                    const ypos = patch.Py * patch.sideLength * this.patchMargins - patch.sideLength + p.y;
 
                     const boleElem = {
                         position: new THREE.Vector3(
@@ -134,11 +141,13 @@ class PatchManager {
                             crownRadius
                         ),
                         color: this.pftColors[cohortData.PFT].clone() // i === this.selectedCohort ? this.selectedColor : this.crownColor
-                        //color: new THREE.Color(102, 102, 240)
                     }
                     console.assert(crownElem.color.isColor, "Not color")
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
                 }
+            }
+            patch.grassMesh.visible = true;
+            if (grassyPatch) {
             }
         }
 

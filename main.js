@@ -32,13 +32,12 @@ function init() {
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(2, 2, 10);
 
-    // Setup lights
-    const hemiLight = new THREE.HemisphereLight();
+    // Setup hemisphere and ambient lights
+    // Directional light is setup later, when we know where to point it
+    const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
     scene.add(hemiLight);
-
-    const dirLight = new THREE.DirectionalLight(0xffffff, 3);
-    dirLight.position.set(5, 5, 5);
-    scene.add(dirLight);
+    const ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+    scene.add(ambientLight);
 
     // Add x-y-z axis indicator
     const axesHelper = new THREE.AxesHelper(5);
@@ -115,10 +114,18 @@ function loadFile(file) {
         // Setup visualisation
         patchManager.initVis(minYear);
         patchManager.setYear(minYear);
-        scene.add(patchManager.cohortMeshes);
+        scene.add(patchManager.patchMeshes);
 
-        controls.target.copy(patchManager.calcPatchesCentre());
+        const patchesCentre = patchManager.calcPatchesCentre();
+        controls.target.copy(patchesCentre);
         controls.update();
+
+        // Setup directional light and point it at centre.
+        const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+        dirLight.position.set(0, 100, 0);
+        dirLight.target.position.copy(patchesCentre);
+        scene.add(dirLight);
+        scene.add(dirLight.target);
 
         // New keybindings, for when the data is loaded
         document.onkeydown = (keyEvent)=>{
@@ -162,7 +169,7 @@ function loadFile(file) {
             // update the picking ray with the camera and pointer position
             raycaster.setFromCamera(pointer, camera);
             // calculate objects intersecting the picking ray
-            const intersection = raycaster.intersectObject(patchManager.cohortMeshes);
+            const intersection = raycaster.intersectObject(patchManager.patchMeshes);
             if (intersection.length > 0) {
                 // Select clicked cohort
                 const clicked = intersection[0];

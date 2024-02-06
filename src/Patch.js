@@ -19,7 +19,7 @@ class PatchCell extends THREE.Vector2 {
 }
 
 class Patch {
-    constructor(PID, Px, Py, Pheight) {
+    constructor(PID, Px, Py, Pheight, margin = 1) {
         this.PID = PID;
         this.Px = Px;
         this.Py = Py;
@@ -34,6 +34,23 @@ class Patch {
         this.allowedOverlap = 0.5; // Allow 50% overlap
 
         this.positionedYears = new Set();
+
+
+        const minGrassThickness = 1;
+        const grassGeometry = new THREE.BoxGeometry(
+            this.sideLength,
+            this.Pheight + minGrassThickness,
+            this.sideLength
+        );
+
+        const grassColor = new THREE.Color(0x75ff66);
+        const grassMaterial = new THREE.MeshLambertMaterial({color: grassColor});
+        this.grassMesh = new THREE.Mesh(grassGeometry, grassMaterial);
+        this.grassMesh.position.set(
+            this.Px * this.sideLength * margin - this.sideLength/2,
+            this.Pheight / 2 - minGrassThickness/2,
+            this.Py * this.sideLength * margin - this.sideLength/2
+        );
     }
 
     initTreePositions(year) {
