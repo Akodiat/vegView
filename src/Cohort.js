@@ -55,6 +55,11 @@ class Cohort {
         this.instancedCrowns.cohortId = idFromData(this);
         this.treeMeshes.add(this.instancedBoles);
         this.treeMeshes.add(this.instancedCrowns);
+
+        this.instancedBoles.castShadow = true;
+        this.instancedBoles.receiveShadow = true;
+        this.instancedCrowns.castShadow = true;
+        this.instancedCrowns.receiveShadow = true;
     }
 }
 

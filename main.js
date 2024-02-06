@@ -23,6 +23,7 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.shadowMap.enabled = true;
     const container = document.getElementById('container');
     container.appendChild(renderer.domElement);
 
@@ -34,9 +35,10 @@ function init() {
 
     // Setup hemisphere and ambient lights
     // Directional light is setup later, when we know where to point it
-    const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
+    const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.75);
     scene.add(hemiLight);
-    const ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+
+    const ambientLight = new THREE.AmbientLight( 0x404040, 1); // soft white light
     scene.add(ambientLight);
 
     // Add x-y-z axis indicator
@@ -121,11 +123,26 @@ function loadFile(file) {
         controls.update();
 
         // Setup directional light and point it at centre.
-        const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 2);
         dirLight.position.set(0, 100, 0);
         dirLight.target.position.copy(patchesCentre);
+        dirLight.castShadow = true;
+
+        dirLight.shadow.camera.near = 10;
+        dirLight.shadow.camera.far = 200;
+        dirLight.shadow.camera.left = -100;
+        dirLight.shadow.camera.right = 100;
+        dirLight.shadow.camera.top = 100;
+        dirLight.shadow.camera.bottom = -100;
+
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.radius = 2;
         scene.add(dirLight);
         scene.add(dirLight.target);
+
+        //const cameraHelper = new THREE.CameraHelper(dirLight.shadow.camera);
+        //scene.add(cameraHelper);
 
         // New keybindings, for when the data is loaded
         document.onkeydown = (keyEvent)=>{

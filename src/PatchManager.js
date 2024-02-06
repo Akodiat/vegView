@@ -16,7 +16,7 @@ class PatchManager {
         this.currentYear = undefined;
         this.years = new Set();
         this.selectedCohort = undefined;
-        this.boleColor = new THREE.Color(0x664228);
+        this.boleColor = new THREE.Color(0x8c654a);
         this.crownColor = new THREE.Color(0x426628);
         this.selectedColor = new THREE.Color(0xff4228);
         this.patchMargins = 1.2;

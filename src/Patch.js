@@ -44,7 +44,7 @@ class Patch {
         );
 
         this.noGrassColor = new THREE.Color(0x664228)
-        this.grassColor = new THREE.Color(0x75ff66);
+        this.grassColor = new THREE.Color(0x95c639);
         const grassMaterial = new THREE.MeshLambertMaterial({color: this.grassColor});
         this.grassMesh = new THREE.Mesh(grassGeometry, grassMaterial);
         this.grassMesh.position.set(
@@ -52,6 +52,7 @@ class Patch {
             this.Pheight / 2 - minGrassThickness/2,
             this.Py * this.sideLength * margin - this.sideLength/2
         );
+        this.grassMesh.receiveShadow = true;
     }
 
     initTreePositions(year) {
