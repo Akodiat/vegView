@@ -146,9 +146,9 @@ class PatchManager {
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
                 }
             }
-            patch.grassMesh.visible = true;
-            if (grassyPatch) {
-            }
+
+            // Paint grass or not
+            patch.grassMesh.material.color = grassyPatch ? patch.grassColor : patch.noGrassColor
         }
 
         this.currentYear = year;

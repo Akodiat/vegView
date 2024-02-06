@@ -43,8 +43,9 @@ class Patch {
             this.sideLength
         );
 
-        const grassColor = new THREE.Color(0x75ff66);
-        const grassMaterial = new THREE.MeshLambertMaterial({color: grassColor});
+        this.noGrassColor = new THREE.Color(0x664228)
+        this.grassColor = new THREE.Color(0x75ff66);
+        const grassMaterial = new THREE.MeshLambertMaterial({color: this.grassColor});
         this.grassMesh = new THREE.Mesh(grassGeometry, grassMaterial);
         this.grassMesh.position.set(
             this.Px * this.sideLength * margin - this.sideLength/2,
