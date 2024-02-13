@@ -7,7 +7,7 @@ import {TreeMesh} from './TreeMesh.js';
 
 const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
-const twigTexture = new THREE.TextureLoader().load('../assets/twig-1.png');
+const twigTexture = new THREE.TextureLoader().load('./assets/twig-1.png');
 
 const emissiveColorSelected = new THREE.Color(0x42d5ff);
 const emissiveColorUnselected = new THREE.Color(0x000000);
