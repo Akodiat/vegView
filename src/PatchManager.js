@@ -3,6 +3,11 @@ import {updateInstance} from "./draw.js";
 import {Patch} from './Patch.js';
 import {Cohort, CohortTimestep, idFromData} from './Cohort.js';
 import {emptyElem} from './utils.js';
+import {TreeMesh} from './TreeMesh.js';
+
+const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
+const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
+const twigTexture = new THREE.TextureLoader().load('../assets/twig-1.png');
 
 class PatchManager {
     currentYear;
@@ -100,6 +105,26 @@ class PatchManager {
                 }
                 cohort.treeMeshes.visible = true;
                 const cohortData = cohort.timeSteps.get(year);
+
+                const crownRadius = Math.sqrt(cohortData.CrownA/Math.PI);
+                if (this.fancyTrees) {
+                    const treeMesh = new TreeMesh({
+                        segments: 6, levels: 2, treeSteps: 2,
+                        trunkLength: cohortData.Boleht,
+                        initalBranchLength: crownRadius,
+                        maxRadius: cohortData.Diam,
+                        twigScale: cohortData.Boleht / 5
+                    });
+                    cohort.instancedBoles.geometry = treeMesh.trunkMesh.geometry;
+                    cohort.instancedCrowns.geometry = treeMesh.twigsMesh.geometry;
+                    cohort.instancedCrowns.material.map = twigTexture;
+                } else {
+                    cohort.instancedBoles.geometry = boleGeometry;
+                    cohort.instancedCrowns.geometry = crownGeometry;
+                    cohort.instancedCrowns.material.map = undefined;
+                }
+                cohort.instancedCrowns.material.needsUpdate = true
+
                 const nTrees = cohortData.DensI * cohort.maxTreeCount;
                 for (let iTree=0; iTree<cohort.maxTreeCount; iTree++) {
                     if (iTree >= nTrees) {
@@ -114,31 +139,31 @@ class PatchManager {
                     const boleElem = {
                         position: new THREE.Vector3(
                             xpos,
-                            patch.Pheight + cohortData.Height/2,
+                            patch.Pheight + (this.fancyTrees? 0 : cohortData.Height/2),
                             ypos
                             ),
-                            quaternion: new THREE.Quaternion(),
-                            scale: new THREE.Vector3(
-                            cohortData.Diam,
-                            cohortData.Height,
-                            cohortData.Diam
-                            ),
-                            color: this.boleColor //i === this.selectedCohort ? this.selectedColor : this.boleColor
-                        }
-                    const crownRadius = Math.sqrt(cohortData.CrownA/Math.PI);
+                        // Give trees different rotations (relevant if fancy)
+                        quaternion: new THREE.Quaternion().setFromAxisAngle(cohort.instancedBoles.up, iTree),
+                        scale: new THREE.Vector3(
+                            this.fancyTrees? 1 : cohortData.Diam,
+                            this.fancyTrees? 1 : cohortData.Height,
+                            this.fancyTrees? 1 : cohortData.Diam
+                        ),
+                        color: this.boleColor //i === this.selectedCohort ? this.selectedColor : this.boleColor
+                    }
                     updateInstance(cohort.instancedBoles, boleElem, iTree, mTemp);
 
                     const crownElem = {
                         position: new THREE.Vector3(
                             xpos,
-                            patch.Pheight + cohortData.Height-(cohortData.Boleht/2),
+                            patch.Pheight + (this.fancyTrees? 0 : cohortData.Height-(cohortData.Boleht/2)),
                             ypos
                         ),
                         quaternion: new THREE.Quaternion(),
                         scale: new THREE.Vector3(
-                            crownRadius,
-                            cohortData.Boleht,
-                            crownRadius
+                            this.fancyTrees? 1 : crownRadius,
+                            this.fancyTrees? 1 : cohortData.Boleht,
+                            this.fancyTrees? 1 :crownRadius
                         ),
                         color: this.pftColors[cohortData.PFT].clone() // i === this.selectedCohort ? this.selectedColor : this.crownColor
                     }

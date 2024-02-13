@@ -20,6 +20,10 @@
 			.vega-bindings {
 				display: none;
 			}
+
+			#timelineContainer {
+				background-color: rgba(255, 255, 255, 0.808);
+			}
 		</style>
 
 		<meta charset="utf-8">
@@ -38,6 +42,14 @@
 				</label>
 			</article>
 		</div>
+		<div class="container-fluid" id="settingsContainer" style="position: absolute; display: none;">
+			<fieldset>
+				<label>
+				  <input id="fancyTrees" type="checkbox" role="switch" />
+				  Fancy trees
+				</label>
+			  </fieldset>
+		</div>
 		<div id="cohortInfoContainer" style="position: fixed; display: none;">
 			<article>
 				<h2>Cohort info</h2>
@@ -54,7 +66,7 @@
 		>
 			<details open style="display: contents;">
 				<summary title="Plot"></summary>
-				<div class="grid">
+				<div class="grid" style="display: flex;">
 					<label for="yFieldSelect">Property
 						<select id="yFieldSelect">
 							<option value="Height" selected>Height of tree</option>
@@ -107,6 +119,7 @@
 		</script>
 
 		<script src="libs/papaparse.min.js"></script>
+		<script src="libs/proctree.js"></script>
 		<script type="module" src="main.js"></script>
 	</body>
 </html>

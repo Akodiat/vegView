@@ -36,10 +36,9 @@ function drawParticles(positions, colors, size=10, sizeAttenuation = true, textu
  * @param {function(new:THREE.Material)} material Constructor for a THREE.Material (default THREE.MeshLambertMaterial)
  * @returns {THREE.InstancedMesh} Three.js Object containing the instanced objects
  */
-function drawInstances(geometry, elements, material = THREE.MeshLambertMaterial) {
+function drawInstances(geometry, elements, material) {
     const count = elements.length;
-    const mat =  new material();
-    const mesh = new THREE.InstancedMesh(geometry, mat, count);
+    const mesh = new THREE.InstancedMesh(geometry, material, count);
     const matrix = new THREE.Matrix4();
     for (let i=0; i < count; i++) {
         matrix.compose(

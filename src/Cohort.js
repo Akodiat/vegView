@@ -2,9 +2,6 @@ import * as THREE from 'three';
 import {drawInstances} from "./draw.js";
 import {emptyElem} from './utils.js';
 
-const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
-const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
-
 class Cohort {
     constructor(data) {
         this.SID = data.SID;
@@ -49,9 +46,24 @@ class Cohort {
         for (let iTree=0; iTree<this.maxTreeCount; iTree++) {
             elems.push(emptyElem);
         }
-        this.instancedBoles = drawInstances(boleGeometry, elems, THREE.MeshLambertMaterial);
+
+        this.instancedBoles = drawInstances(
+            undefined, elems,
+            new THREE.MeshStandardMaterial({
+                roughness: 1.0,
+                metalness: 0.0
+            })
+        );
         this.instancedBoles.cohortId = idFromData(this);
-        this.instancedCrowns = drawInstances(crownGeometry, elems, THREE.MeshLambertMaterial);
+
+        this.instancedCrowns = drawInstances(
+            undefined, elems,
+            new THREE.MeshStandardMaterial({
+                roughness: 1.0,
+                metalness: 0.0,
+                alphaTest: 0.9
+            })
+        );
         this.instancedCrowns.cohortId = idFromData(this);
         this.treeMeshes.add(this.instancedBoles);
         this.treeMeshes.add(this.instancedCrowns);

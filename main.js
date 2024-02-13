@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {MapControls} from './libs/OrbitControls.js';
 import {PatchManager} from './src/PatchManager.js';
 import {VegaPlotter} from './src/plot.js';
+import {TreeMesh} from './src/TreeMesh.js';
 
 let camera, scene, renderer, controls;
 
@@ -113,10 +114,19 @@ function loadFile(file) {
             render()
         }
 
+        const fancyTreeSwitch = document.getElementById("fancyTrees");
+        patchManager.fancyTrees = fancyTreeSwitch.checked;
+        fancyTreeSwitch.onchange = () => {
+            patchManager.fancyTrees = fancyTreeSwitch.checked;
+            patchManager.setYear(patchManager.currentYear);
+            render();
+        };
+
         // Setup visualisation
         patchManager.initVis(minYear);
         patchManager.setYear(minYear);
         scene.add(patchManager.patchMeshes);
+
 
         const patchesCentre = patchManager.calcPatchesCentre();
         controls.target.copy(patchesCentre);
@@ -206,6 +216,7 @@ function loadFile(file) {
 
     document.getElementById("fileUploadContainer").style.display = "none";
     document.getElementById("timelineContainer").style.display = "block";
+    document.getElementById("settingsContainer").style.display = "block";
 }
 
 function onWindowResize() {
