@@ -9,21 +9,20 @@ const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
 const twigTexture = new THREE.TextureLoader().load('../assets/twig-1.png');
 
+const emissiveColorSelected = new THREE.Color(0x42d5ff);
+const emissiveColorUnselected = new THREE.Color(0x000000);
+
 class PatchManager {
     currentYear;
     years;
     boleColor;
-    selectedColor;
-    selectedCohort;
     patchMeshes;
     constructor() {
         this.patches = new Map();
         this.currentYear = undefined;
         this.years = new Set();
-        this.selectedCohort = undefined;
         this.boleColor = new THREE.Color(0x8c654a);
         this.crownColor = new THREE.Color(0x426628);
-        this.selectedColor = new THREE.Color(0xff4228);
         this.patchMargins = 1.2;
         this.pftColors = [
             [102, 102, 240], // BNE
@@ -149,7 +148,7 @@ class PatchManager {
                             this.fancyTrees? 1 : cohortData.Height,
                             this.fancyTrees? 1 : cohortData.Diam
                         ),
-                        color: this.boleColor //i === this.selectedCohort ? this.selectedColor : this.boleColor
+                        color: this.boleColor
                     }
                     updateInstance(cohort.instancedBoles, boleElem, iTree, mTemp);
 
@@ -165,7 +164,7 @@ class PatchManager {
                             this.fancyTrees? 1 : cohortData.Boleht,
                             this.fancyTrees? 1 :crownRadius
                         ),
-                        color: this.pftColors[cohortData.PFT].clone() // i === this.selectedCohort ? this.selectedColor : this.crownColor
+                        color: this.pftColors[cohortData.PFT].clone()
                     }
                     console.assert(crownElem.color.isColor, "Not color")
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
@@ -181,7 +180,7 @@ class PatchManager {
     }
 
     drawCohortInfo() {
-        if (this.selectedCohort === undefined) {
+        if (this.selectedCohortId === undefined) {
             // Hide cohort info table
             document.getElementById("cohortInfoContainer").style.display = "none";
         } else {
@@ -202,7 +201,7 @@ class PatchManager {
     }
 
     getSelectedCohortData() {
-        const cohort = this.getCohortByInstanceId(this.selectedCohort);
+        const cohort = this.getCohortById(this.selectedCohortId);
         return {
             ...cohort.timeSteps.get(this.currentYear),
             yearOfBirth: cohort.yearOfBirth,
@@ -218,26 +217,28 @@ class PatchManager {
         }
     }
 
-    selectCohort(cohortId, instanceId) {
+    selectCohort(cohortId) {
+        console.log("Selected cohort "+cohortId)
         if (cohortId === this.selectedCohortId) {
             // Already selected
             return
         }
 
-        const cohort = this.getCohortById(cohortId);
 
         // Clear current selection
-        cohort.instancedBoles.setColorAt(this.selectedInstance, this.boleColor);
-        cohort.instancedCrowns.setColorAt(this.selectedInstance, this.crownColor);
-        // Mark new selection
-        if (instanceId !== undefined) {
-            cohort.instancedBoles.setColorAt(instanceId, this.selectedColor);
-            cohort.instancedCrowns.setColorAt(instanceId, this.selectedColor);
+        if (this.selectedCohortId !== undefined) {
+            const cohort = this.getCohortById(this.selectedCohortId);
+            cohort.instancedBoles.material.emissive = emissiveColorUnselected;
+            cohort.instancedCrowns.material.emissive = emissiveColorUnselected;
         }
-        cohort.instancedBoles.instanceColor.needsUpdate = true;
-        cohort.instancedCrowns.instanceColor.needsUpdate = true;
-        this.selectedInstance = instanceId;
-        this.selectedCohortId = cohortId;
+
+        // Mark new selection
+        if (cohortId !== undefined) {
+            const cohort = this.getCohortById(cohortId);
+            cohort.instancedBoles.material.emissive = emissiveColorSelected;
+            cohort.instancedCrowns.material.emissive = emissiveColorSelected;
+            this.selectedCohortId = cohortId;
+        }
     }
 
     nextYear() {

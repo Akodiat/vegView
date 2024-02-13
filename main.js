@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {MapControls} from './libs/OrbitControls.js';
 import {PatchManager} from './src/PatchManager.js';
 import {VegaPlotter} from './src/plot.js';
-import {TreeMesh} from './src/TreeMesh.js';
+import {getClosestNonTransparant} from './src/utils.js';
 
 let camera, scene, renderer, controls;
 
@@ -199,10 +199,9 @@ function loadFile(file) {
             const intersection = raycaster.intersectObject(patchManager.patchMeshes);
             if (intersection.length > 0) {
                 // Select clicked cohort
-                const clicked = intersection[0];
+                const closest = getClosestNonTransparant(intersection); //intersection[0]
                 patchManager.selectCohort(
-                    clicked.cohortId,
-                    clicked.instanceId
+                    closest.object.cohortId
                 );
             } else {
                 // Clear selection

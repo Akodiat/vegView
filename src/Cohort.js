@@ -7,6 +7,7 @@ class Cohort {
         this.SID = data.SID;
         this.PID = data.PID;
         this.IID = data.IID;
+        this.PFT = data.PFT;
 
         this.isGrass = (
             data.Pos === 0 &&
