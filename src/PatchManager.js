@@ -35,7 +35,9 @@ class PatchManager {
             [101, 193, 254], // TrBE
             [254, 208, 162], // TrIBE
             [240, 102, 255], // TrBR
-        ].map(c=> new THREE.Color(`rgb(${c.join(',')})`))
+        ].map(c=> new THREE.Color(`rgb(${c.join(',')})`));
+        this.minYear = Infinity;
+        this.maxYear = -Infinity
     }
 
     addData(data) {
@@ -53,6 +55,8 @@ class PatchManager {
 
         // Keep track of the set of all years.
         this.years.add(data.Year);
+        this.minYear = Math.min(this.minYear, data.Year);
+        this.maxYear = Math.max(this.maxYear, data.Year);
     }
 
 

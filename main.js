@@ -1,21 +1,17 @@
 import * as THREE from 'three';
 import {MapControls} from './libs/OrbitControls.js';
-import {PatchManager} from './src/PatchManager.js';
 import {VegaPlotter} from './src/plot.js';
 import {getClosestOpaque, exportGLTF} from './src/utils.js';
+import {loadVegetationStructure} from './src/loadData.js';
 
 let camera, scene, renderer, controls;
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
-const patchManager = new PatchManager();
-
 init();
-render();
 
 // Initialise scene
-
 function init() {
     // Setup renderer
     renderer = new THREE.WebGLRenderer({
@@ -55,8 +51,13 @@ function init() {
 
     render();
 
+    // Load data when file is uploaded
     const fileInput = document.getElementById("fileInput");
-    fileInput.onchange = () => loadFile(fileInput.files[0]);
+    fileInput.onchange = () => {
+        loadVegetationStructure(fileInput.files[0]).then(
+            patchManager=>onDataLoaded(patchManager)
+        );
+    }
 
     // The browser remembers the last input, so this is a shortcut to just
     // load whatever is in the fileInput without going through the Open
@@ -65,7 +66,9 @@ function init() {
         switch (keyEvent.code) {
             case "Enter":
                 if (fileInput.files.length > 0) {
-                    loadFile(fileInput.files[0]);
+                    loadVegetationStructure(fileInput.files[0]).then(
+                        patchManager=>onDataLoaded(patchManager)
+                    );
                     keyEvent.preventDefault();
                 }
                 break;
@@ -75,148 +78,128 @@ function init() {
     }
 }
 
-function loadFile(file) {
-    file.text().then(text=>{
-        // Helper function to parse whitespace-separated values from line
-        const getVals = l => l.split(" ").filter(c=>c!=="");
+function onDataLoaded(patchManager) {
 
-        // Proces header and lines;
-        const lines = text.split(/[\r\n]+/);
-        const header = getVals(lines[0]);
-        let minYear = Infinity;
-        let maxYear = -Infinity
-        for (const line of lines.slice(1)) {
-            if (line !== "") {
-                const lineVals = getVals(line);
-                let item = {};
-                header.forEach((h, i) => item[h] = parseFloat(lineVals[i]))
-                patchManager.addData(item);
+    // Setup timeline range slider
+    const timeline = document.getElementById("timeline");
+    const timelineYearLabel = document.getElementById("timelineYearLabel");
+    timeline.min = patchManager.minYear;
+    timeline.max = patchManager.maxYear;
 
-                minYear = Math.min(minYear, item.Year)
-                maxYear = Math.max(maxYear, item.Year)
-            }
-        }
+    // Start at the first year in the range
+    timeline.value = patchManager.minYear;
+    timelineYearLabel.innerHTML = timeline.value;
 
-        // Setup timeline range slider
-        const timeline = document.getElementById("timeline");
-        const timelineYearLabel = document.getElementById("timelineYearLabel");
-        timeline.min = minYear;
-        timeline.max = maxYear;
-
-        // Start at the first year in the range
-        timeline.value = minYear;
+    // Update year when the timeline is manipulated
+    timeline.oninput = () => {
         timelineYearLabel.innerHTML = timeline.value;
+        patchManager.setYear(timeline.valueAsNumber);
+        render()
+    }
 
-        // Update year when the timeline is manipulated
-        timeline.oninput = () => {
-            timelineYearLabel.innerHTML = timeline.value;
-            patchManager.setYear(timeline.valueAsNumber);
-            render()
-        }
-
-        const fancyTreeSwitch = document.getElementById("fancyTrees");
+    const fancyTreeSwitch = document.getElementById("fancyTrees");
+    patchManager.fancyTrees = fancyTreeSwitch.checked;
+    fancyTreeSwitch.onchange = () => {
         patchManager.fancyTrees = fancyTreeSwitch.checked;
-        fancyTreeSwitch.onchange = () => {
-            patchManager.fancyTrees = fancyTreeSwitch.checked;
-            patchManager.setYear(patchManager.currentYear);
-            render();
-        };
-
-        // Setup visualisation
-        patchManager.initVis(minYear);
-        patchManager.setYear(minYear);
-        scene.add(patchManager.patchMeshes);
-
-
-        const patchesCentre = patchManager.calcPatchesCentre();
-        controls.target.copy(patchesCentre);
-        controls.update();
-
-        // Setup directional light and point it at centre.
-        const dirLight = new THREE.DirectionalLight(0xffffff, 2);
-        dirLight.position.set(0, 100, 0);
-        dirLight.target.position.copy(patchesCentre);
-        dirLight.castShadow = true;
-
-        dirLight.shadow.camera.near = 10;
-        dirLight.shadow.camera.far = 200;
-        dirLight.shadow.camera.left = -100;
-        dirLight.shadow.camera.right = 100;
-        dirLight.shadow.camera.top = 100;
-        dirLight.shadow.camera.bottom = -100;
-
-        dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.radius = 2;
-        scene.add(dirLight);
-        scene.add(dirLight.target);
-
-        //const cameraHelper = new THREE.CameraHelper(dirLight.shadow.camera);
-        //scene.add(cameraHelper);
-
-        // New keybindings, for when the data is loaded
-        document.onkeydown = (keyEvent)=>{
-            switch (keyEvent.code) {
-                case "ArrowLeft":
-                    patchManager.prevYear();
-                    render();
-                    timeline.value = patchManager.currentYear;
-                    timelineYearLabel.innerHTML = patchManager.currentYear;
-                    break;
-                case "ArrowRight":
-                    patchManager.nextYear(); render();
-                    timeline.value = patchManager.currentYear;
-                    timelineYearLabel.innerHTML = patchManager.currentYear;
-                    break;
-                case "KeyE":
-                    if (keyEvent.ctrlKey) {
-                        exportGLTF(scene)
-                        keyEvent.preventDefault();
-                    }
-                default:
-                    break;
-            }
-        }
-
-        const plotter = new VegaPlotter(patchManager.patches);
-        plotter.timePlot();
-
-        const yFieldSelect = document.getElementById("yFieldSelect");
-        const aggregateSelect = document.getElementById("aggregateSelect");
-        const colorFieldSelect = document.getElementById("colorFieldSelect");
-        const updatePlot = () => {
-            plotter.timePlot(
-                yFieldSelect.value,
-                aggregateSelect.value,
-                colorFieldSelect.value
-            );
-        }
-        yFieldSelect.onchange = aggregateSelect.onchange = colorFieldSelect.onchange = updatePlot;
-
-        window.addEventListener('dblclick', event => {
-            // calculate pointer position in normalized device coordinates
-            // (-1 to +1) for both components
-            pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-            pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-            // update the picking ray with the camera and pointer position
-            raycaster.setFromCamera(pointer, camera);
-            // calculate objects intersecting the picking ray
-            const intersection = raycaster.intersectObject(patchManager.patchMeshes);
-            if (intersection.length > 0) {
-                // Select clicked cohort
-                const closest = getClosestOpaque(intersection); //intersection[0]
-                patchManager.selectCohort(
-                    closest.object.cohortId
-                );
-            } else {
-                // Clear selection
-                patchManager.selectCohort(undefined)
-            }
-            patchManager.drawCohortInfo();
-            render();
-        });
+        patchManager.setYear(patchManager.currentYear);
         render();
-    })
+    };
+
+    // Setup visualisation
+    patchManager.initVis(patchManager.minYear);
+    patchManager.setYear(patchManager.minYear);
+    scene.add(patchManager.patchMeshes);
+
+
+    const patchesCentre = patchManager.calcPatchesCentre();
+    controls.target.copy(patchesCentre);
+    controls.update();
+
+    // Setup directional light and point it at centre.
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+    dirLight.position.set(0, 100, 0);
+    dirLight.target.position.copy(patchesCentre);
+    dirLight.castShadow = true;
+
+    dirLight.shadow.camera.near = 10;
+    dirLight.shadow.camera.far = 200;
+    dirLight.shadow.camera.left = -100;
+    dirLight.shadow.camera.right = 100;
+    dirLight.shadow.camera.top = 100;
+    dirLight.shadow.camera.bottom = -100;
+
+    dirLight.shadow.mapSize.height = 2048;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.radius = 2;
+    scene.add(dirLight);
+    scene.add(dirLight.target);
+
+    //const cameraHelper = new THREE.CameraHelper(dirLight.shadow.camera);
+    //scene.add(cameraHelper);
+
+    // New keybindings, for when the data is loaded
+    document.onkeydown = (keyEvent)=>{
+        switch (keyEvent.code) {
+            case "ArrowLeft":
+                patchManager.prevYear();
+                render();
+                timeline.value = patchManager.currentYear;
+                timelineYearLabel.innerHTML = patchManager.currentYear;
+                break;
+            case "ArrowRight":
+                patchManager.nextYear(); render();
+                timeline.value = patchManager.currentYear;
+                timelineYearLabel.innerHTML = patchManager.currentYear;
+                break;
+            case "KeyE":
+                if (keyEvent.ctrlKey) {
+                    exportGLTF(scene)
+                    keyEvent.preventDefault();
+                }
+            default:
+                break;
+        }
+    }
+
+    // Setup plotting
+    const plotter = new VegaPlotter(patchManager.patches);
+    plotter.timePlot();
+    const yFieldSelect = document.getElementById("yFieldSelect");
+    const aggregateSelect = document.getElementById("aggregateSelect");
+    const colorFieldSelect = document.getElementById("colorFieldSelect");
+    const updatePlot = () => {
+        plotter.timePlot(
+            yFieldSelect.value,
+            aggregateSelect.value,
+            colorFieldSelect.value
+        );
+    }
+    yFieldSelect.onchange = aggregateSelect.onchange = colorFieldSelect.onchange = updatePlot;
+
+    // Select cohorts when clicked
+    window.addEventListener('dblclick', event => {
+        // calculate pointer position in normalized device coordinates
+        // (-1 to +1) for both components
+        pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        // update the picking ray with the camera and pointer position
+        raycaster.setFromCamera(pointer, camera);
+        // calculate objects intersecting the picking ray
+        const intersection = raycaster.intersectObject(patchManager.patchMeshes);
+        if (intersection.length > 0) {
+            // Select clicked cohort
+            const closest = getClosestOpaque(intersection); //intersection[0]
+            patchManager.selectCohort(
+                closest.object.cohortId
+            );
+        } else {
+            // Clear selection
+            patchManager.selectCohort(undefined)
+        }
+        patchManager.drawCohortInfo();
+        render();
+    });
+    render();
 
     document.getElementById("fileUploadContainer").style.display = "none";
     document.getElementById("timelineContainer").style.display = "block";
