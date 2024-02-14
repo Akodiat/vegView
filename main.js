@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {MapControls} from './libs/OrbitControls.js';
 import {PatchManager} from './src/PatchManager.js';
 import {VegaPlotter} from './src/plot.js';
-import {getClosestNonTransparant} from './src/utils.js';
+import {getClosestOpaque, exportGLTF} from './src/utils.js';
 
 let camera, scene, renderer, controls;
 
@@ -168,6 +168,11 @@ function loadFile(file) {
                     timeline.value = patchManager.currentYear;
                     timelineYearLabel.innerHTML = patchManager.currentYear;
                     break;
+                case "KeyE":
+                    if (keyEvent.ctrlKey) {
+                        exportGLTF(scene)
+                        keyEvent.preventDefault();
+                    }
                 default:
                     break;
             }
@@ -199,7 +204,7 @@ function loadFile(file) {
             const intersection = raycaster.intersectObject(patchManager.patchMeshes);
             if (intersection.length > 0) {
                 // Select clicked cohort
-                const closest = getClosestNonTransparant(intersection); //intersection[0]
+                const closest = getClosestOpaque(intersection); //intersection[0]
                 patchManager.selectCohort(
                     closest.object.cohortId
                 );

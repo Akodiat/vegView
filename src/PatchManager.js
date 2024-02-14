@@ -62,7 +62,9 @@ class PatchManager {
         for (const patch of this.patches.values()) {
             patch.initTreePositions(year);
             patch.meshes = new THREE.Group();
+            patch.meshes.name = `patch_${patch.PID}`
             patch.cohortMeshes = new THREE.Group();
+            patch.cohortMeshes.name = patch.meshes.name + "_cohortMeshes"
             for (const cohort of patch.cohorts.values()) {
                 cohort.initVis()
                 patch.cohortMeshes.add(cohort.treeMeshes);

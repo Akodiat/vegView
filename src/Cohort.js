@@ -43,6 +43,7 @@ class Cohort {
 
     initVis() {
         this.treeMeshes = new THREE.Group();
+        this.treeMeshes.name = idFromData(this)+"_treeMeshes"
         const elems = [];
         for (let iTree=0; iTree<this.maxTreeCount; iTree++) {
             elems.push(emptyElem);
