@@ -81,21 +81,10 @@ function init() {
 function onDataLoaded(patchManager) {
 
     // Setup timeline range slider
-    const timeline = document.getElementById("timeline");
     const timelineYearLabel = document.getElementById("timelineYearLabel");
-    timeline.min = patchManager.minYear;
-    timeline.max = patchManager.maxYear;
 
     // Start at the first year in the range
-    timeline.value = patchManager.minYear;
-    timelineYearLabel.innerHTML = timeline.value;
-
-    // Update year when the timeline is manipulated
-    timeline.oninput = () => {
-        timelineYearLabel.innerHTML = timeline.value;
-        patchManager.setYear(timeline.valueAsNumber);
-        render()
-    }
+    timelineYearLabel.innerHTML = patchManager.minYear;
 
     const fancyTreeSwitch = document.getElementById("fancyTrees");
     patchManager.fancyTrees = fancyTreeSwitch.checked;
@@ -143,12 +132,10 @@ function onDataLoaded(patchManager) {
             case "ArrowLeft":
                 patchManager.prevYear();
                 render();
-                timeline.value = patchManager.currentYear;
                 timelineYearLabel.innerHTML = patchManager.currentYear;
                 break;
             case "ArrowRight":
                 patchManager.nextYear(); render();
-                timeline.value = patchManager.currentYear;
                 timelineYearLabel.innerHTML = patchManager.currentYear;
                 break;
             case "KeyE":
@@ -162,7 +149,11 @@ function onDataLoaded(patchManager) {
     }
 
     // Setup plotting
-    const plotter = new VegaPlotter(patchManager);
+    const plotter = new VegaPlotter(patchManager, year=>{
+        timelineYearLabel.innerHTML = year;
+        patchManager.setYear(year);
+        render();
+    });
     plotter.timePlot();
     const yFieldSelect = document.getElementById("yFieldSelect");
     const aggregateSelect = document.getElementById("aggregateSelect");
