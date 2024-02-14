@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {MapControls} from './libs/OrbitControls.js';
 import {VegaPlotter} from './src/plot.js';
 import {getClosestOpaque, exportGLTF} from './src/utils.js';
-import {loadVegetationStructure} from './src/loadData.js';
+import {loadData} from './src/loadData.js';
 
 let camera, scene, renderer, controls;
 
@@ -54,7 +54,7 @@ function init() {
     // Load data when file is uploaded
     const fileInput = document.getElementById("fileInput");
     fileInput.onchange = () => {
-        loadVegetationStructure(fileInput.files[0]).then(
+        loadData(fileInput.files).then(
             patchManager=>onDataLoaded(patchManager)
         );
     }
@@ -66,7 +66,7 @@ function init() {
         switch (keyEvent.code) {
             case "Enter":
                 if (fileInput.files.length > 0) {
-                    loadVegetationStructure(fileInput.files[0]).then(
+                    loadData(fileInput.files).then(
                         patchManager=>onDataLoaded(patchManager)
                     );
                     keyEvent.preventDefault();
@@ -162,7 +162,7 @@ function onDataLoaded(patchManager) {
     }
 
     // Setup plotting
-    const plotter = new VegaPlotter(patchManager.patches);
+    const plotter = new VegaPlotter(patchManager);
     plotter.timePlot();
     const yFieldSelect = document.getElementById("yFieldSelect");
     const aggregateSelect = document.getElementById("aggregateSelect");

@@ -1,10 +1,17 @@
 class VegaPlotter {
-    constructor(patches) {
+    constructor(patchManager) {
         // Flatten data to a list of datapoints
         this.data = [];
-        for (const patch of patches.values()) {
+        for (const patch of patchManager.patches.values()) {
             for (const cohort of patch.cohorts.values()) {
-                this.data.push(...cohort.timeSteps.values());
+                for (const [year, data] of cohort.timeSteps.entries()) {
+                    const d = {
+                        ...data,
+                        ...patchManager.yearData.get(year),
+                        positions: undefined
+                    }
+                    this.data.push(d);
+                }
             }
         }
     }

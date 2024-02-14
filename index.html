@@ -38,7 +38,7 @@
 			data-placement="bottom">
 				<h1>Vegetation model viewer</h1>
 				<label for="fileInput">Upload data here:
-					<input type="file" id="fileInput" accept=".out"/>
+					<input type="file" id="fileInput" accept=".out" multiple/>
 				</label>
 			</article>
 		</div>
@@ -69,7 +69,22 @@
 				<div class="grid" style="display: flex;">
 					<label for="yFieldSelect">Property
 						<select id="yFieldSelect">
-							<option value="Height" selected>Height of tree</option>
+							<option value="BNE" selected>BNE</option>
+							<option value="BINE">BINE</option>
+							<option value="BNS">BNS</option>
+							<option value="TeNE">TeNE</option>
+							<option value="TeBS">TeBS</option>
+							<option value="IBS">IBS</option>
+							<option value="TeBE">TeBE</option>
+							<option value="TrBE">TrBE</option>
+							<option value="TrIBE">TrIBE</option>
+							<option value="TrBR">TrBR</option>
+							<option value="C3G">C3G</option>
+							<option value="C4G">C4G</option>
+							<option value="VegC">VegC</option>
+							<option value="LitterC">LitterC</option>
+							<option value="SoilC">SoilC</option>
+							<option value="Height">Height of tree</option>
 							<option value="Diam">Diameter of stem</option>
 							<option value="Cmass">Total C mass of cohort</option>
 							<option value="Age">Age of cohort</option>
@@ -81,12 +96,12 @@
 					</label>
 					<label for="aggregateSelect">Aggregation
 						<select id="aggregateSelect">
-							<option value="average" selected>Average</option>
-							<option value="median" selected>Median</option>
+							<option value="average">Average</option>
+							<option value="median">Median</option>
 							<option value="max">Max</option>
 							<option value="min">Min</option>
 							<option value="sum">Sum</option>
-							<option>None</option>
+							<option selected>None</option>
 						</select>
 					</label>
 					<label for="colorFieldSelect">Group by

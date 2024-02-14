@@ -37,7 +37,8 @@ class PatchManager {
             [240, 102, 255], // TrBR
         ].map(c=> new THREE.Color(`rgb(${c.join(',')})`));
         this.minYear = Infinity;
-        this.maxYear = -Infinity
+        this.maxYear = -Infinity;
+        this.yearData = new Map();
     }
 
     addData(data) {
@@ -57,6 +58,16 @@ class PatchManager {
         this.years.add(data.Year);
         this.minYear = Math.min(this.minYear, data.Year);
         this.maxYear = Math.max(this.maxYear, data.Year);
+    }
+
+    addYearData(data) {
+        if (!this.yearData.has(data.Year)) {
+            this.yearData.set(data.Year, {});
+        }
+        const yearData = this.yearData.get(data.Year);
+        for(let property in data) {
+            yearData[property] = data[property];
+        }
     }
 
 
