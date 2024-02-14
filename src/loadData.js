@@ -36,7 +36,8 @@ async function itemsFromFile(file) {
  * @returns The populated patch manager
  */
 async function loadData(files, patchManager = new PatchManager()) {
-    let vegStructFile, yearDataFiles;
+    let vegStructFile
+    let yearDataFiles = [];
 
     const isVegStructFile = f => f.name.includes("veg_struct");
 

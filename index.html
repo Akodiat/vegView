@@ -40,6 +40,7 @@
 				<label for="fileInput">Upload data here:
 					<input type="file" id="fileInput" accept=".out" multiple/>
 				</label>
+				A vegetation structure file, e.g. "veg_struct.out" is expected, but you can also add additional data, such as "cpool.out" and "lai.out", by uploading multiple files.
 			</article>
 		</div>
 		<div class="container-fluid" id="settingsContainer" style="position: absolute; display: none; z-index: 999;">
@@ -69,7 +70,7 @@
 				<div class="grid" style="display: flex;">
 					<label for="yFieldSelect">Property
 						<select id="yFieldSelect">
-							<option value="BNE" selected>BNE</option>
+							<option value="BNE">BNE</option>
 							<option value="BINE">BINE</option>
 							<option value="BNS">BNS</option>
 							<option value="TeNE">TeNE</option>
@@ -84,7 +85,7 @@
 							<option value="VegC">VegC</option>
 							<option value="LitterC">LitterC</option>
 							<option value="SoilC">SoilC</option>
-							<option value="Height">Height of tree</option>
+							<option selected value="Height">Height of tree</option>
 							<option value="Diam">Diameter of stem</option>
 							<option value="Cmass">Total C mass of cohort</option>
 							<option value="Age">Age of cohort</option>
@@ -96,12 +97,12 @@
 					</label>
 					<label for="aggregateSelect">Aggregation
 						<select id="aggregateSelect">
-							<option value="average">Average</option>
+							<option selected value="average">Average</option>
 							<option value="median">Median</option>
 							<option value="max">Max</option>
 							<option value="min">Min</option>
 							<option value="sum">Sum</option>
-							<option selected>None</option>
+							<option >None</option>
 						</select>
 					</label>
 					<label for="colorFieldSelect">Group by

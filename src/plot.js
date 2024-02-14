@@ -43,13 +43,6 @@ class VegaPlotter {
                         field: yField,
                         type: 'quantitative'
                     },
-                    x: {
-                        field: 'Year',
-                        type: 'nominal',
-                        axis: {
-                            title: ""
-                        }
-                    },
                     color: {field: colorField, type: 'nominal'},
                     tooltip: [
                         {aggregate: aggregate,
