@@ -254,8 +254,9 @@ class PatchManager {
             const cohort = this.getCohortById(cohortId);
             cohort.instancedBoles.material.emissive = emissiveColorSelected;
             cohort.instancedCrowns.material.emissive = emissiveColorSelected;
-            this.selectedCohortId = cohortId;
         }
+
+        this.selectedCohortId = cohortId;
     }
 
     nextYear() {
