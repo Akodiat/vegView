@@ -4,6 +4,8 @@ import {Patch} from './Patch.js';
 import {Cohort, CohortTimestep, idFromData} from './Cohort.js';
 import {emptyElem} from './utils.js';
 import {TreeMesh} from './TreeMesh.js';
+import {NURBSSurface} from '../libs/curves/NURBSSurface.js';
+import {ParametricGeometry} from '../libs/geometries/ParametricGeometry.js';
 
 const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
@@ -93,6 +95,8 @@ class PatchManager {
             )
             this.patchMeshes.add(p.meshes);
         }
+
+        this.patchMeshes.add(this.drawDetailedTerrain());
     }
 
     calcPatchesCentre() {
@@ -282,6 +286,39 @@ class PatchManager {
             }
         }
         this.setYear(this.currentYear);
+    }
+
+    drawDetailedTerrain() {
+        //const positions = [...this.patches.values()].map(p=>p.meshes.position);
+        const positions = [...this.patches.values()].flatMap(p=>[
+            p.meshes.position,
+            new THREE.Vector3(p.sideLength, 0, 0).add(p.meshes.position),
+            new THREE.Vector3(0, 0, p.sideLength).add(p.meshes.position),
+            new THREE.Vector3(p.sideLength, 0, p.sideLength).add(p.meshes.position),
+        ]);
+        const xs = new Set(positions.map(p=>p.x));
+
+        const nsControlPoints = [...xs].map(x =>
+            positions.filter(p => p.x === x).map(
+                p => new THREE.Vector4(p.x, p.y, p.z, 1))
+        )
+
+        const degree1 = 3;
+        const degree2 = 3;
+        const knots1 = [0, 0, 0, 0, 1, 1, 1, 1];
+        const knots2 = [0, 0, 0, 0, 1, 1, 1, 1];
+        const nurbsSurface = new NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
+
+        function getSurfacePoint(u, v, target) {
+            return nurbsSurface.getPoint(u, v, target);
+        }
+
+        const geometry = new ParametricGeometry(getSurfacePoint, 20, 20);
+        const material = new THREE.MeshLambertMaterial({
+            side: THREE.DoubleSide
+        });
+        const object = new THREE.Mesh(geometry, material);
+        return object
     }
 }
 
