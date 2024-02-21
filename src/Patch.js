@@ -19,7 +19,7 @@ class PatchCell extends THREE.Vector2 {
 }
 
 class Patch {
-    constructor(PID, Px, Py, Pheight, margin = 1) {
+    constructor(PID, Px, Py, Pheight) {
         this.PID = PID;
         this.Px = Px;
         this.Py = Py;
@@ -48,9 +48,9 @@ class Patch {
         const grassMaterial = new THREE.MeshStandardMaterial({color: this.grassColor});
         this.grassMesh = new THREE.Mesh(grassGeometry, grassMaterial);
         this.grassMesh.position.set(
-            this.Px * this.sideLength * margin - this.sideLength/2,
-            this.Pheight / 2 - minGrassThickness/2,
-            this.Py * this.sideLength * margin - this.sideLength/2
+            this.sideLength / 2,
+            -this.Pheight/2 - minGrassThickness/2,
+            this.sideLength / 2
         );
         this.grassMesh.receiveShadow = true;
         this.grassMesh.name = `patch_${PID}_grassMesh`;

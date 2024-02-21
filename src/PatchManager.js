@@ -74,32 +74,33 @@ class PatchManager {
     initVis(year) {
         this.patchMeshes = new THREE.Group();
         // Setup instancing meshes for each cohort
-        for (const patch of this.patches.values()) {
-            patch.initTreePositions(year);
-            patch.meshes = new THREE.Group();
-            patch.meshes.name = `patch_${patch.PID}`
-            patch.cohortMeshes = new THREE.Group();
-            patch.cohortMeshes.name = patch.meshes.name + "_cohortMeshes"
-            for (const cohort of patch.cohorts.values()) {
+        for (const p of this.patches.values()) {
+            p.initTreePositions(year);
+            p.meshes = new THREE.Group();
+            p.meshes.name = `patch_${p.PID}`
+            p.cohortMeshes = new THREE.Group();
+            p.cohortMeshes.name = p.meshes.name + "_cohortMeshes"
+            for (const cohort of p.cohorts.values()) {
                 cohort.initVis()
-                patch.cohortMeshes.add(cohort.treeMeshes);
+                p.cohortMeshes.add(cohort.treeMeshes);
             }
-            patch.meshes.add(patch.cohortMeshes);
-            patch.meshes.add(patch.grassMesh);
-            this.patchMeshes.add(patch.meshes);
+            p.meshes.add(p.cohortMeshes);
+            p.meshes.add(p.grassMesh);
+            p.meshes.position.set(
+                p.Px * p.sideLength * this.patchMargins - p.sideLength,
+                p.Pheight,
+                p.Py * p.sideLength * this.patchMargins - p.sideLength
+            )
+            this.patchMeshes.add(p.meshes);
         }
     }
 
     calcPatchesCentre() {
         const com = new THREE.Vector3();
         for (const patch of this.patches.values()) {
-            com.add(new THREE.Vector3(
-                patch.Px * patch.sideLength * this.patchMargins - patch.sideLength/2,
-                0,
-                patch.Py * patch.sideLength * this.patchMargins - patch.sideLength/2
-                ));
-            }
-            return com.divideScalar(this.patches.size);
+           com.add(patch.meshes.position)
+        }
+        return com.divideScalar(this.patches.size);
     }
 
     setYear(year) {
@@ -149,15 +150,13 @@ class PatchManager {
                         continue;
                     }
                     const p = cohortData.positions.get(iTree);
-                    const xpos = patch.Px * patch.sideLength * this.patchMargins - patch.sideLength + p.x;
-                    const ypos = patch.Py * patch.sideLength * this.patchMargins - patch.sideLength + p.y;
 
                     const boleElem = {
                         position: new THREE.Vector3(
-                            xpos,
-                            patch.Pheight + (this.fancyTrees? 0 : cohortData.Height/2),
-                            ypos
-                            ),
+                            p.x,
+                            this.fancyTrees? 0 : cohortData.Height/2,
+                            p.y
+                        ),
                         // Give trees different rotations (relevant if fancy)
                         quaternion: new THREE.Quaternion().setFromAxisAngle(cohort.instancedBoles.up, iTree),
                         scale: new THREE.Vector3(
@@ -171,9 +170,9 @@ class PatchManager {
 
                     const crownElem = {
                         position: new THREE.Vector3(
-                            xpos,
-                            patch.Pheight + (this.fancyTrees? 0 : cohortData.Height-(cohortData.Boleht/2)),
-                            ypos
+                            p.x,
+                            this.fancyTrees? 0 : cohortData.Height-(cohortData.Boleht/2),
+                            p.y
                         ),
                         quaternion: new THREE.Quaternion(),
                         scale: new THREE.Vector3(
