@@ -25,7 +25,7 @@ class PatchManager {
         this.years = new Set();
         this.boleColor = new THREE.Color(0x8c654a);
         this.crownColor = new THREE.Color(0x426628);
-        this.patchMargins = 1.2;
+        this.patchMargins = 1.05;
         this.pftColors = [
             [102, 102, 240], // BNE
             [254, 254, 101], // BINE
