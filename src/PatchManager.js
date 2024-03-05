@@ -312,13 +312,23 @@ class PatchManager {
 
             min.x = Math.min(p.x, min.x);
             min.y = Math.min(p.z, min.y);
-        })
+        });
 
         const xs = new Set(positions.map(p=>p.x));
-        const nsControlPoints = [...xs].map(x =>
-            positions.filter(p => p.x === x).map(
-                p => new THREE.Vector4(p.x, p.y, p.z, 1))
-        );
+        const zs = new Set(positions.map(p=>p.z));
+        const nsControlPoints = [...xs].map(x => {
+            const ps = positions.filter(p => p.x === x).map(
+                p => new THREE.Vector4(p.x, p.y, p.z, 1)
+            );
+            const meanY = ps.map(p=>p.y).reduce((a, b) => a + b, 0) / ps.length;
+            const pzs = new Set(ps.map(p=>p.z));
+            [...zs].forEach(z=>{
+                if (!pzs.has(z)) {
+                    ps.push(new THREE.Vector4(x, meanY, z, 0.01));
+                }
+            })
+            return ps;
+        });
 
         const knotmaker = s => {
             let a = [];
@@ -349,7 +359,7 @@ class PatchManager {
         );
         const material = new THREE.MeshLambertMaterial({
             side: THREE.DoubleSide,
-            color: new THREE.Color(0x95c639)
+            color: new THREE.Color(0x664228)
         });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.receiveShadow = true;
