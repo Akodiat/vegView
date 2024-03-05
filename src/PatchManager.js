@@ -4,6 +4,8 @@ import {Patch} from './Patch.js';
 import {Cohort, CohortTimestep, idFromData} from './Cohort.js';
 import {emptyElem} from './utils.js';
 import {TreeMesh} from './TreeMesh.js';
+import {NURBSSurface} from '../libs/curves/NURBSSurface.js';
+import {ParametricGeometry} from '../libs/geometries/ParametricGeometry.js';
 
 const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
@@ -93,6 +95,11 @@ class PatchManager {
             )
             this.patchMeshes.add(p.meshes);
         }
+
+        const terrainObj = this.drawDetailedTerrain();
+        this.detailedTerrainMesh = terrainObj.mesh;
+        this.detailedTerrainMap = terrainObj.surfaceMap;
+        this.patchMeshes.add(this.detailedTerrainMesh);
     }
 
     calcPatchesCentre() {
@@ -154,7 +161,7 @@ class PatchManager {
                     const boleElem = {
                         position: new THREE.Vector3(
                             p.x,
-                            this.fancyTrees? 0 : cohortData.Height/2,
+                            this.fancyTrees? this.detailedTerrainMap(p, patch) : cohortData.Height/2,
                             p.y
                         ),
                         // Give trees different rotations (relevant if fancy)
@@ -171,7 +178,7 @@ class PatchManager {
                     const crownElem = {
                         position: new THREE.Vector3(
                             p.x,
-                            this.fancyTrees? 0 : cohortData.Height-(cohortData.Boleht/2),
+                            this.fancyTrees? this.detailedTerrainMap(p, patch) : cohortData.Height-(cohortData.Boleht/2),
                             p.y
                         ),
                         quaternion: new THREE.Quaternion(),
@@ -189,7 +196,10 @@ class PatchManager {
 
             // Paint grass or not
             patch.grassMesh.material.color = grassyPatch ? patch.grassColor : patch.noGrassColor
+
+            patch.grassMesh.visible = !this.fancyTrees;
         }
+        this.detailedTerrainMesh.visible = this.fancyTrees;
 
         this.currentYear = year;
         this.drawCohortInfo();
@@ -283,6 +293,79 @@ class PatchManager {
         }
         this.setYear(this.currentYear);
     }
+
+    drawDetailedTerrain(slices=20, stacks=20) {
+        // Extract corner positions from patches
+        const positions = [...this.patches.values()].flatMap(p=>[
+            p.meshes.position,
+            new THREE.Vector3(p.sideLength, 0, 0).add(p.meshes.position),
+            new THREE.Vector3(0, 0, p.sideLength).add(p.meshes.position),
+            new THREE.Vector3(p.sideLength, 0, p.sideLength).add(p.meshes.position),
+        ]);
+
+        // Calculate min and max value (for later use in surface map)
+        const max = new THREE.Vector2(-Infinity, -Infinity);
+        const min = new THREE.Vector2(Infinity, Infinity);
+        positions.forEach(p=>{
+            max.x = Math.max(p.x, max.x);
+            max.y = Math.max(p.z, max.y);
+
+            min.x = Math.min(p.x, min.x);
+            min.y = Math.min(p.z, min.y);
+        })
+
+        const xs = new Set(positions.map(p=>p.x));
+        const nsControlPoints = [...xs].map(x =>
+            positions.filter(p => p.x === x).map(
+                p => new THREE.Vector4(p.x, p.y, p.z, 1))
+        );
+
+        const knotmaker = s => {
+            let a = [];
+            for (let i=0; i<s; i++) {
+                a.push(0);
+            }
+            for (let i=0; i<s; i++) {
+                a.push(1);
+            }
+            return a;
+        }
+
+        // Setup parameters for NURBS surface
+        // The rules for knots are still a bit of a mystery to me,
+        // but this seems to work
+        const len1 = nsControlPoints.length;
+        const len2 = Math.min(...nsControlPoints.map(p=>p.length));
+        const knots1 = knotmaker(len1); //[0, 0, 0, 0, 1, 1, 1, 1] for 4 patches
+        const knots2 = knotmaker(len2); //[0, 0, 0, 0, 1, 1, 1, 1] for 4 patches;
+        const degree1 = knots1.length - 1 - len2; // 3
+        const degree2 = knots2.length - 1 - len2; // 3
+        const nurbsSurface = new NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
+
+
+        const geometry = new ParametricGeometry(
+            (u,v,target)=>nurbsSurface.getPoint(u,v,target),
+            slices, stacks
+        );
+        const material = new THREE.MeshLambertMaterial({
+            side: THREE.DoubleSide,
+            color: new THREE.Color(0x95c639)
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.receiveShadow = true;
+
+        return {
+            mesh,
+            surfaceMap: (p, patch) => {
+                const u = (p.x - min.x + patch.meshes.position.x) / (max.x - min.x);
+                const v = (p.y - min.y + patch.meshes.position.z) / (max.y - min.y);
+                const vec = new THREE.Vector3();
+                nurbsSurface.getPoint(u, v, vec);
+                return vec.y - patch.Pheight;
+            }}
+    }
 }
+
+
 
 export {PatchManager}

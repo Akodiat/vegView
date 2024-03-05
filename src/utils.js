@@ -155,26 +155,4 @@ function saveArrayBuffer(buffer, filename) {
     save(new Blob([buffer], {type: 'application/octet-stream'}), filename);
 }
 
-/*
-function saveString(text, filename) {
-    let element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-    element.setAttribute('download', filename);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-}
-
-function saveArrayBuffer(buffer, filename) {
-    var link = document.createElement( 'a' );
-    link.style.display = 'none';
-    document.body.appendChild(link); // Firefox workaround, see #6594 threejs
-    let blob = new Blob([buffer], {type: 'application/octet-stream'});
-    link.href = URL.createObjectURL( blob );
-    link.download = filename;
-    link.click();
-}
-*/
-
 export {randItem, emptyElem, getClosestOpaque, exportGLTF}
