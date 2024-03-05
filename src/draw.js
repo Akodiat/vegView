@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 /**
  * Draw a particle point cloud
@@ -9,13 +9,13 @@ import * as THREE from 'three';
  * @param {string} texturePath Path to image used as texture
  * @returns {THREE.Points} Three.js Object containing the points
  */
-function drawParticles(positions, colors, size=10, sizeAttenuation = true, texturePath = 'resources/circle.png') {
+function drawParticles(positions, colors, size=10, sizeAttenuation = true, texturePath = "resources/circle.png") {
     const loader = new THREE.TextureLoader();
     const texture = loader.load(texturePath);
 
     const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
     geometry.computeBoundingSphere();
 
     const material = new THREE.PointsMaterial({

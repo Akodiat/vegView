@@ -1,6 +1,6 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 import {drawInstances} from "./draw.js";
-import {emptyElem} from './utils.js';
+import {emptyElem} from "./utils.js";
 
 class Cohort {
     constructor(data) {
@@ -16,10 +16,10 @@ class Cohort {
             data.Diam === 0 &&
             data.CrownA === 1 &&
             data.DensI === 1
-        )
+        );
 
         if (this.isGrass) {
-            console.log("grass")
+            console.log("grass");
         }
 
         // Store all timesteps in a map from year to CohortTimestep
@@ -43,7 +43,7 @@ class Cohort {
 
     initVis() {
         this.treeMeshes = new THREE.Group();
-        this.treeMeshes.name = idFromData(this)+"_treeMeshes"
+        this.treeMeshes.name = idFromData(this)+"_treeMeshes";
         const elems = [];
         for (let iTree=0; iTree<this.maxTreeCount; iTree++) {
             elems.push(emptyElem);
@@ -78,25 +78,25 @@ class Cohort {
 }
 
 class CohortTimestep {
-    Lon; // Longitude
-    Lat; // Latitude
-    Year; // Year
-    SID; // Stand ID
-    PID; // Patch ID
-    IID; // Cohort ID
-    PFT; // Plant Functional Type ID
-    Age; // Age of cohort
-    Pos; // Center position of cohort [0//1]
-    Height; // Height of tree
-    Boleht; // Bole height of tree
-    Diam; // Diameter of stem (m)
-    CrownA; // Crown area (m2)
-    DensI; // Density of trees in cohort (trees m//2)
-    LAI; // Leaf Area Index (m2 m//2)
-    GPP; // Gross Primary Production (kg C m//2 yr//1)
-    GPPns; // Gross Primary Production with N stress (kg C m//2 yr//1)
-    GPPno; // Gross Primary Production with no stress (kg C m//2 yr//1)
-    Cmass; // Total C mass of cohort (kg C m//2)
+    // Lon: Longitude
+    // Lat: Latitude
+    // Year: Year
+    // SID: Stand ID
+    // PID: Patch ID
+    // IID: Cohort ID
+    // PFT: Plant Functional Type ID
+    // Age: Age of cohort
+    // Pos: Center position of cohort [0//1]
+    // Height: Height of tree
+    // Boleht: Bole height of tree
+    // Diam: Diameter of stem (m)
+    // CrownA: Crown area (m2)
+    // DensI: Density of trees in cohort (trees m//2)
+    // LAI: Leaf Area Index (m2 m//2)
+    // GPP: Gross Primary Production (kg C m//2 yr//1)
+    // GPPns: Gross Primary Production with N stress (kg C m//2 yr//1)
+    // GPPno: Gross Primary Production with no stress (kg C m//2 yr//1)
+    // Cmass: Total C mass of cohort (kg C m//2)
 
     /**
      *
@@ -121,7 +121,7 @@ class CohortTimestep {
  * @returns {string} Unique string identifying the cohort, patch, and stand
  */
 function idFromData(data) {
-    return `${data.SID}:${data.PID}:${data.IID}`
+    return `${data.SID}:${data.PID}:${data.IID}`;
 }
 
-export {Cohort, CohortTimestep, idFromData}
+export {Cohort, CohortTimestep, idFromData};

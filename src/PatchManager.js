@@ -1,24 +1,20 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 import {updateInstance} from "./draw.js";
-import {Patch} from './Patch.js';
-import {Cohort, CohortTimestep, idFromData} from './Cohort.js';
-import {emptyElem} from './utils.js';
-import {TreeMesh} from './TreeMesh.js';
-import {NURBSSurface} from '../libs/curves/NURBSSurface.js';
-import {ParametricGeometry} from '../libs/geometries/ParametricGeometry.js';
+import {Patch} from "./Patch.js";
+import {Cohort, CohortTimestep, idFromData} from "./Cohort.js";
+import {emptyElem} from "./utils.js";
+import {TreeMesh} from "./TreeMesh.js";
+import {NURBSSurface} from "../libs/curves/NURBSSurface.js";
+import {ParametricGeometry} from "../libs/geometries/ParametricGeometry.js";
 
 const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
-const twigTexture = new THREE.TextureLoader().load('./assets/twig-1.png');
+const twigTexture = new THREE.TextureLoader().load("./assets/twig-1.png");
 
 const emissiveColorSelected = new THREE.Color(0x42d5ff);
 const emissiveColorUnselected = new THREE.Color(0x000000);
 
 class PatchManager {
-    currentYear;
-    years;
-    boleColor;
-    patchMeshes;
     constructor() {
         this.patches = new Map();
         this.currentYear = undefined;
@@ -37,7 +33,7 @@ class PatchManager {
             [101, 193, 254], // TrBE
             [254, 208, 162], // TrIBE
             [240, 102, 255], // TrBR
-        ].map(c=> new THREE.Color(`rgb(${c.join(',')})`));
+        ].map(c=> new THREE.Color(`rgb(${c.join(",")})`));
         this.minYear = Infinity;
         this.maxYear = -Infinity;
         this.yearData = new Map();
@@ -79,11 +75,11 @@ class PatchManager {
         for (const p of this.patches.values()) {
             p.initTreePositions(year);
             p.meshes = new THREE.Group();
-            p.meshes.name = `patch_${p.PID}`
+            p.meshes.name = `patch_${p.PID}`;
             p.cohortMeshes = new THREE.Group();
-            p.cohortMeshes.name = p.meshes.name + "_cohortMeshes"
+            p.cohortMeshes.name = p.meshes.name + "_cohortMeshes";
             for (const cohort of p.cohorts.values()) {
-                cohort.initVis()
+                cohort.initVis();
                 p.cohortMeshes.add(cohort.treeMeshes);
             }
             p.meshes.add(p.cohortMeshes);
@@ -92,7 +88,7 @@ class PatchManager {
                 p.Px * p.sideLength * this.patchMargins - p.sideLength,
                 p.Pheight,
                 p.Py * p.sideLength * this.patchMargins - p.sideLength
-            )
+            );
             this.patchMeshes.add(p.meshes);
         }
 
@@ -105,7 +101,7 @@ class PatchManager {
     calcPatchesCentre() {
         const com = new THREE.Vector3();
         for (const patch of this.patches.values()) {
-           com.add(patch.meshes.position)
+            com.add(patch.meshes.position);
         }
         return com.divideScalar(this.patches.size);
     }
@@ -147,7 +143,7 @@ class PatchManager {
                     cohort.instancedCrowns.geometry = crownGeometry;
                     cohort.instancedCrowns.material.map = undefined;
                 }
-                cohort.instancedCrowns.material.needsUpdate = true
+                cohort.instancedCrowns.material.needsUpdate = true;
 
                 const nTrees = cohortData.DensI * cohort.maxTreeCount;
                 for (let iTree=0; iTree<cohort.maxTreeCount; iTree++) {
@@ -172,7 +168,7 @@ class PatchManager {
                             this.fancyTrees? 1 : cohortData.Diam
                         ),
                         color: this.boleColor
-                    }
+                    };
                     updateInstance(cohort.instancedBoles, boleElem, iTree, mTemp);
 
                     const crownElem = {
@@ -188,14 +184,14 @@ class PatchManager {
                             this.fancyTrees? 1 :crownRadius
                         ),
                         color: this.pftColors[cohortData.PFT].clone()
-                    }
-                    console.assert(crownElem.color.isColor, "Not color")
+                    };
+                    console.assert(crownElem.color.isColor, "Not color");
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
                 }
             }
 
             // Paint grass or not
-            patch.grassMesh.material.color = grassyPatch ? patch.grassColor : patch.noGrassColor
+            patch.grassMesh.material.color = grassyPatch ? patch.grassColor : patch.noGrassColor;
 
             patch.grassMesh.visible = !this.fancyTrees;
         }
@@ -211,7 +207,7 @@ class PatchManager {
             document.getElementById("cohortInfoContainer").style.display = "none";
         } else {
             // Create new cohort info table
-            const cohortData = this.getSelectedCohortData()
+            const cohortData = this.getSelectedCohortData();
             const cohortInfoTable = document.getElementById("cohortInfoTable");
             cohortInfoTable.innerHTML = "";
             for(let property in cohortData) {
@@ -223,7 +219,7 @@ class PatchManager {
 
     getCohortByInstanceId(instanceId) {
         const cohortIDs = [...this.cohorts.keys()];
-        return this.cohorts.get(cohortIDs[instanceId])
+        return this.cohorts.get(cohortIDs[instanceId]);
     }
 
     getSelectedCohortData() {
@@ -232,22 +228,22 @@ class PatchManager {
             ...cohort.timeSteps.get(this.currentYear),
             yearOfBirth: cohort.yearOfBirth,
             yearOfDeath: cohort.yearOfDeath,
-        }
+        };
     }
 
     getCohortById(cohortId) {
         for (const patch of this.patches.values()) {
             if (patch.cohorts.has(cohortId)) {
-                return patch.cohorts.get(cohortId)
+                return patch.cohorts.get(cohortId);
             }
         }
     }
 
     selectCohort(cohortId) {
-        console.log("Selected cohort "+cohortId)
+        console.log("Selected cohort "+cohortId);
         if (cohortId === this.selectedCohortId) {
             // Already selected
-            return
+            return;
         }
 
 
@@ -275,7 +271,7 @@ class PatchManager {
             // Make sure we dont overshoot the last year
             if (this.currentYear > max) {
                 this.currentYear = max;
-                break
+                break;
             }
         }
         this.setYear(this.currentYear);
@@ -288,7 +284,7 @@ class PatchManager {
             // Make sure we dont overshoot the first year
             if (this.currentYear < min) {
                 this.currentYear = min;
-                break
+                break;
             }
         }
         this.setYear(this.currentYear);
@@ -326,7 +322,7 @@ class PatchManager {
                 if (!pzs.has(z)) {
                     ps.push(new THREE.Vector4(x, meanY, z, 0.01));
                 }
-            })
+            });
             return ps;
         });
 
@@ -339,7 +335,7 @@ class PatchManager {
                 a.push(1);
             }
             return a;
-        }
+        };
 
         // Setup parameters for NURBS surface
         // The rules for knots are still a bit of a mystery to me,
@@ -372,10 +368,10 @@ class PatchManager {
                 const vec = new THREE.Vector3();
                 nurbsSurface.getPoint(u, v, vec);
                 return vec.y - patch.Pheight;
-            }}
+            }};
     }
 }
 
 
 
-export {PatchManager}
+export {PatchManager};

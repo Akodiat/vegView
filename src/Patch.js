@@ -1,13 +1,11 @@
-import * as THREE from 'three';
-import {randItem} from './utils.js';
-import {idFromData} from './Cohort.js';
+import * as THREE from "three";
+import {randItem} from "./utils.js";
+import {idFromData} from "./Cohort.js";
 
 class PatchCell extends THREE.Vector2 {
-    occupyingCohort;
-    occupyingInstance;
 
     constructor(x, y) {
-        super(x, y)
+        super(x, y);
     }
     // Make sure things are copied correctly
     clone() {
@@ -43,7 +41,7 @@ class Patch {
             this.sideLength
         );
 
-        this.noGrassColor = new THREE.Color(0x664228)
+        this.noGrassColor = new THREE.Color(0x664228);
         this.grassColor = new THREE.Color(0x95c639);
         const grassMaterial = new THREE.MeshStandardMaterial({color: this.grassColor});
         this.grassMesh = new THREE.Mesh(grassGeometry, grassMaterial);
@@ -101,14 +99,14 @@ class Patch {
                 year, this.allCells.get(year).filter(c=>(
                     c.occupyingCohort === undefined &&
                     c.occupyingInstance === undefined
-                )
-            ));
+                ))
+            );
             for (const c of this.cohorts.values()) {
                 // Also copy positions (instead of starting from scratch)
                 if (c.timeSteps.has(year) && c.timeSteps.has(lastYear)) {
                     c.timeSteps.get(lastYear).positions.forEach((cell, instanceId)=> {
-                        c.timeSteps.get(year).positions.set(instanceId, cell)
-                    })
+                        c.timeSteps.get(year).positions.set(instanceId, cell);
+                    });
                 }
             }
         }
@@ -145,9 +143,9 @@ class Patch {
                     this.allCells.get(year).filter(c => (
                         c.occupyingCohort === undefined &&
                         c.occupyingInstance === undefined
-                    )
-                ));
-                console.log(`Available cells: ${this.availableCells.get(year).length}`)
+                    ))
+                );
+                console.log(`Available cells: ${this.availableCells.get(year).length}`);
             }
         }
 
@@ -166,7 +164,7 @@ class Patch {
                     data: d,
                     crownRadius: crownRadius,
                     instanceId: d.positions.size
-                }
+                };
                 // Choose an available cell at random
                 let cell = randItem(this.availableCells.get(year));
 
@@ -189,10 +187,10 @@ class Patch {
                 }
                 d.positions.set(tree.instanceId, cell);
             }
-            console.log(`Available cells: ${this.availableCells.get(year).length}`)
+            console.log(`Available cells: ${this.availableCells.get(year).length}`);
         }
         this.positionedYears.add(year);
     }
 }
 
-export {Patch}
+export {Patch};

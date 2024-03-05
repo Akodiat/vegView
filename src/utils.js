@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import {GLTFExporter} from '../libs/exporters/GLTFExporter.js';
+import * as THREE from "three";
+import {GLTFExporter} from "../libs/exporters/GLTFExporter.js";
 
 function randItem(array){
     return array[Math.floor(Math.random() * array.length)];
@@ -10,7 +10,7 @@ const emptyElem = {
     quaternion: new THREE.Quaternion(),
     scale: new THREE.Vector3(),
     color: new THREE.Color()
-}
+};
 
 // https://discourse.threejs.org/t/how-to-ignore-the-transparent-part-of-sprite-by-ray-pickup/7773/3
 function getClosestOpaque(intersectObjects) {
@@ -24,7 +24,7 @@ function getClosestOpaque(intersectObjects) {
             // 2D ratio of where the mouse is on the image
             const {uv: {x: UX, y: UY}} = intersect;
             // The actual w, h of the image
-            const {width: OW, height: OH, src} = image;
+            const {width: OW, height: OH} = image;
             // Get the image data
             const imageData = getImageData(image);
             // the X & Y of the image
@@ -44,8 +44,8 @@ function getClosestOpaque(intersectObjects) {
 }
 
 function getImageData(image) {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
     let {naturalWidth: w, naturalHeight: h} = image;
     canvas.width = w;
     canvas.height = h;
@@ -55,7 +55,7 @@ function getImageData(image) {
 }
 
 
-function exportGLTF(scene, binary=false, name='scene') {
+function exportGLTF(scene, binary=false, name="scene") {
     // Instantiate an exporter
     let exporter = new GLTFExporter();
     let options = {
@@ -77,7 +77,7 @@ function exportGLTF(scene, binary=false, name='scene') {
             }
         },
         error => {
-            console.log('An error happened during parsing', error);
+            console.log("An error happened during parsing", error);
         },
         options
     );
@@ -112,9 +112,9 @@ function deinstantiate(object, materialMap) {
             const hexColor = color.getHex();
 
             if (!materialMap.has(hexColor)) {
-                const m = object.material.clone()
+                const m = object.material.clone();
                 m.color.copy(color);
-                materialMap.set(hexColor, m)
+                materialMap.set(hexColor, m);
             }
             const mesh = new THREE.Mesh(
                 object.geometry,
@@ -138,8 +138,8 @@ function deinstantiate(object, materialMap) {
     }
 }
 
-const link = document.createElement('a');
-link.style.display = 'none';
+const link = document.createElement("a");
+link.style.display = "none";
 document.body.appendChild(link); // Firefox workaround, see #6594 threejs
 function save( blob, filename ) {
     link.href = URL.createObjectURL(blob);
@@ -148,11 +148,11 @@ function save( blob, filename ) {
 }
 
 function saveString( text, filename ) {
-    save(new Blob([text], {type: 'text/plain'}), filename);
+    save(new Blob([text], {type: "text/plain"}), filename);
 }
 
 function saveArrayBuffer(buffer, filename) {
-    save(new Blob([buffer], {type: 'application/octet-stream'}), filename);
+    save(new Blob([buffer], {type: "application/octet-stream"}), filename);
 }
 
-export {randItem, emptyElem, getClosestOpaque, exportGLTF}
+export {randItem, emptyElem, getClosestOpaque, exportGLTF};

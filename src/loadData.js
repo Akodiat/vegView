@@ -1,4 +1,4 @@
-import {PatchManager} from './PatchManager.js';
+import {PatchManager} from "./PatchManager.js";
 
 /**
  * Parse csv-like files with a header line and float values
@@ -20,7 +20,7 @@ async function itemsFromFile(file) {
         if (line !== "") {
             const lineVals = getVals(line);
             let item = {};
-            header.forEach((h, i) => item[h] = parseFloat(lineVals[i]))
+            header.forEach((h, i) => item[h] = parseFloat(lineVals[i]));
             items.push(item);
         }
     }
@@ -36,7 +36,7 @@ async function itemsFromFile(file) {
  * @returns The populated patch manager
  */
 async function loadData(files, patchManager = new PatchManager()) {
-    let vegStructFile
+    let vegStructFile;
     let yearDataFiles = [];
 
     const isVegStructFile = f => f.name.includes("veg_struct");
@@ -63,4 +63,4 @@ async function loadData(files, patchManager = new PatchManager()) {
     return patchManager;
 }
 
-export {loadData}
+export {loadData};

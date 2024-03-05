@@ -1,8 +1,8 @@
-import * as THREE from 'three';
-import {MapControls} from './libs/OrbitControls.js';
-import {VegaPlotter} from './src/plot.js';
-import {getClosestOpaque, exportGLTF} from './src/utils.js';
-import {loadData} from './src/loadData.js';
+import * as THREE from "three";
+import {MapControls} from "./libs/OrbitControls.js";
+import {VegaPlotter} from "./src/plot.js";
+import {getClosestOpaque, exportGLTF} from "./src/utils.js";
+import {loadData} from "./src/loadData.js";
 
 let camera, scene, renderer, controls;
 
@@ -21,7 +21,7 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.shadowMap.enabled = true;
-    const container = document.getElementById('container');
+    const container = document.getElementById("container");
     container.appendChild(renderer.domElement);
 
 
@@ -44,10 +44,10 @@ function init() {
 
     // And camera controls
     controls = new MapControls(camera, renderer.domElement);
-    controls.addEventListener('change', render);
+    controls.addEventListener("change", render);
 
     // Update camera aspect ratio on window resize
-    window.addEventListener('resize', onWindowResize);
+    window.addEventListener("resize", onWindowResize);
 
     render();
 
@@ -57,25 +57,25 @@ function init() {
         loadData(fileInput.files).then(
             patchManager=>onDataLoaded(patchManager)
         );
-    }
+    };
 
     // The browser remembers the last input, so this is a shortcut to just
     // load whatever is in the fileInput without going through the Open
     // file dialog. (Just press Enter)
     document.onkeydown = (keyEvent)=>{
         switch (keyEvent.code) {
-            case "Enter":
-                if (fileInput.files.length > 0) {
-                    loadData(fileInput.files).then(
-                        patchManager=>onDataLoaded(patchManager)
-                    );
-                    keyEvent.preventDefault();
-                }
-                break;
-            default:
-                break;
+        case "Enter":
+            if (fileInput.files.length > 0) {
+                loadData(fileInput.files).then(
+                    patchManager=>onDataLoaded(patchManager)
+                );
+                keyEvent.preventDefault();
+            }
+            break;
+        default:
+            break;
         }
-    }
+    };
 }
 
 function onDataLoaded(patchManager) {
@@ -129,24 +129,25 @@ function onDataLoaded(patchManager) {
     // New keybindings, for when the data is loaded
     document.onkeydown = (keyEvent)=>{
         switch (keyEvent.code) {
-            case "ArrowLeft":
-                patchManager.prevYear();
-                render();
-                timelineYearLabel.innerHTML = patchManager.currentYear;
-                break;
-            case "ArrowRight":
-                patchManager.nextYear(); render();
-                timelineYearLabel.innerHTML = patchManager.currentYear;
-                break;
-            case "KeyE":
-                if (keyEvent.ctrlKey) {
-                    exportGLTF(scene)
-                    keyEvent.preventDefault();
-                }
-            default:
-                break;
+        case "ArrowLeft":
+            patchManager.prevYear();
+            render();
+            timelineYearLabel.innerHTML = patchManager.currentYear;
+            break;
+        case "ArrowRight":
+            patchManager.nextYear(); render();
+            timelineYearLabel.innerHTML = patchManager.currentYear;
+            break;
+        case "KeyE":
+            if (keyEvent.ctrlKey) {
+                exportGLTF(scene);
+                keyEvent.preventDefault();
+            }
+            break;
+        default:
+            break;
         }
-    }
+    };
 
     // Setup plotting
     const plotter = new VegaPlotter(patchManager, year=>{
@@ -164,11 +165,11 @@ function onDataLoaded(patchManager) {
             aggregateSelect.value,
             colorFieldSelect.value
         );
-    }
+    };
     yFieldSelect.onchange = aggregateSelect.onchange = colorFieldSelect.onchange = updatePlot;
 
     // Select cohorts when clicked
-    window.addEventListener('dblclick', event => {
+    window.addEventListener("dblclick", event => {
         // calculate pointer position in normalized device coordinates
         // (-1 to +1) for both components
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -185,7 +186,7 @@ function onDataLoaded(patchManager) {
             );
         } else {
             // Clear selection
-            patchManager.selectCohort(undefined)
+            patchManager.selectCohort(undefined);
         }
         patchManager.drawCohortInfo();
         render();
