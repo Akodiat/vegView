@@ -8,7 +8,8 @@ import {NURBSSurface} from "../libs/curves/NURBSSurface.js";
 import {ParametricGeometry} from "../libs/geometries/ParametricGeometry.js";
 
 const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
-const crownGeometry = new THREE.CylinderGeometry(.2, .5, 1, 16);
+const crownGeometreCone = new THREE.CylinderGeometry(.1, 1, 1, 16);
+const crownGeometrySphere = new THREE.SphereGeometry(1, 8, 16);
 const twigTexture = new THREE.TextureLoader().load("./assets/twig-1.png");
 
 const emissiveColorSelected = new THREE.Color(0x42d5ff);
@@ -22,18 +23,18 @@ class PatchManager {
         this.boleColor = new THREE.Color(0x8c654a);
         this.crownColor = new THREE.Color(0x426628);
         this.patchMargins = 1.05;
-        this.pftColors = [
-            [102, 102, 240], // BNE
-            [254, 254, 101], // BINE
-            [254, 178, 101], // BNS
-            [179, 179, 179], // TeNE
-            [117, 254, 101], // TeBS
-            [254, 237, 167], // IBS
-            [ 99,  99,  99], // TeBE
-            [101, 193, 254], // TrBE
-            [254, 208, 162], // TrIBE
-            [240, 102, 255], // TrBR
-        ].map(c=> new THREE.Color(`rgb(${c.join(",")})`));
+        this.pftConstants = [
+            {color: new THREE.Color(0x2222f4), geometry: crownGeometreCone}, // BNE
+            {color: new THREE.Color(0x8b8c8c), geometry: crownGeometreCone}, // BINE
+            {color: new THREE.Color(0xfed126), geometry: crownGeometreCone}, // BNS
+            {color: new THREE.Color(0xc8bfe7), geometry: crownGeometrySphere}, // TeNE
+            {color: new THREE.Color(0xf82625), geometry: crownGeometrySphere}, // TeBS
+            {color: new THREE.Color(0x25f925), geometry: crownGeometrySphere}, // IBS
+            {color: new THREE.Color(0xe821e8), geometry: crownGeometrySphere}, // TeBE
+            {color: new THREE.Color(0x26e3e3), geometry: crownGeometrySphere}, // TrBE
+            {color: new THREE.Color(0xf56c6c), geometry: crownGeometrySphere}, // TrIBE
+            {color: new THREE.Color(0xf6ef2a), geometry: crownGeometrySphere}, // TrBR
+        ];
         this.minYear = Infinity;
         this.maxYear = -Infinity;
         this.yearData = new Map();
@@ -140,7 +141,7 @@ class PatchManager {
                     cohort.instancedCrowns.material.map = twigTexture;
                 } else {
                     cohort.instancedBoles.geometry = boleGeometry;
-                    cohort.instancedCrowns.geometry = crownGeometry;
+                    cohort.instancedCrowns.geometry = this.pftConstants[cohortData.PFT].geometry;
                     cohort.instancedCrowns.material.map = undefined;
                 }
                 cohort.instancedCrowns.material.needsUpdate = true;
@@ -181,9 +182,9 @@ class PatchManager {
                         scale: new THREE.Vector3(
                             this.fancyTrees? 1 : crownRadius,
                             this.fancyTrees? 1 : cohortData.Boleht,
-                            this.fancyTrees? 1 :crownRadius
+                            this.fancyTrees? 1 : crownRadius
                         ),
-                        color: this.pftColors[cohortData.PFT].clone()
+                        color: this.pftConstants[cohortData.PFT].color.clone()
                     };
                     console.assert(crownElem.color.isColor, "Not color");
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
