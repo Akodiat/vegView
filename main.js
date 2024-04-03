@@ -144,6 +144,34 @@ function onDataLoaded(patchManager) {
                 keyEvent.preventDefault();
             }
             break;
+        case "KeyV":
+            if (keyEvent.ctrlKey) {
+                keyEvent.preventDefault();
+                // eslint-disable-next-line no-undef
+                const capturer = new CCapture({
+                    format: "webm",
+                    display: "true",
+                    framerate: 4
+                });
+                capturer.start();
+
+                scene.background = new THREE.Color(0xFFFFFF);
+
+                const step = () => {
+                    if (patchManager.isLastYear()) {
+                        capturer.stop();
+                        capturer.save();
+                        scene.background = null;
+                    } else {
+                        patchManager.nextYear();
+                        render();
+                        capturer.capture(renderer.domElement);
+                        requestAnimationFrame(step);
+                    }
+                };
+                step();
+            }
+            break;
         default:
             break;
         }

@@ -265,6 +265,11 @@ class PatchManager {
         this.selectedCohortId = cohortId;
     }
 
+    isLastYear() {
+        const max = Math.max(...this.years);
+        return this.currentYear >= max;
+    }
+
     nextYear() {
         // Skip years we don't have data for
         const max = Math.max(...this.years);
