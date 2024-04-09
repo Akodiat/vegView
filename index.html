@@ -3,7 +3,7 @@
 	<head>
 		<title>vegView</title>
 
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+		<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
 
 		<script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
 		<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3"></script>
@@ -23,6 +23,27 @@
 
 			#timelineContainer {
 				background-color: rgba(255, 255, 255, 0.808);
+				position: fixed; bottom: 0; display: none;
+				padding: 8px;
+				width: 100%;
+				z-index: 1;
+			}
+
+			.ribbon-menu {
+				position: absolute;
+				width: 100%;
+				z-index: 1;
+			}
+			.ribbon-menu .tabs-holder {
+				background-color: #f5f6f7cf;
+			}
+
+			.row {
+				margin: unset;
+			}
+
+			.plotSelect {
+				width: 200px;
 			}
 		</style>
 
@@ -32,86 +53,119 @@
 		<html data-theme="light"></html>
 	</head>
 	<body style="margin: 0">
-		<div id="fileUploadContainer" class="container-fluid" style="position: absolute;">
-			<article
-			data-tooltip="Browse and select a vegetation structure output file to load"
-			data-placement="bottom">
-				<h1>Vegetation model viewer</h1>
+		<div class="dialog" data-role="dialog" id="dataLoadDialog">
+			<div class="dialog-title">Load data</div>
+			<div class="dialog-content">
 				<label for="fileInput">Upload data here:
-					<input type="file" id="fileInput" accept=".out" multiple/>
+					<input type="file" id="fileInput" data-role="file" data-mode="drop" accept=".out" multiple/>
 				</label>
-				A vegetation structure file, e.g. "veg_struct.out" is expected, but you can also add additional data, such as "cpool.out" and "lai.out", by uploading multiple files.
-			</article>
+				<p>
+					A vegetation structure file, e.g. "veg_struct.out" is expected, but you can also add additional data, such as "cpool.out" and "lai.out", by uploading multiple files.
+				</p>
+			</div>
+			<div class="dialog-actions">
+				<button class="button js-dialog-close">Cancel</button>
+				<button class="button primary js-dialog-close" id="dataLoadButton">Load</button>
+			</div>
 		</div>
-		<div class="container-fluid" id="settingsContainer" style="position: absolute; display: none; z-index: 999;">
-			<fieldset>
-				<label>
-				  <input id="fancyTrees" type="checkbox" role="switch" />
-				  Tree detail
-				</label>
-			  </fieldset>
-		</div>
-		<div id="cohortInfoContainer" style="position: fixed; display: none;">
-			<article>
-				<h2>Cohort info</h2>
-				<figure style="margin-bottom: 0;">
-					<table role="grid" style="margin-bottom: 0;">
-						<tbody id="cohortInfoTable">
-						</tbody>
-					</table>
-				</figure>
-			</article>
-		</div>
-		<div id="timelineContainer" class="container-fluid"
-			style="position: fixed; bottom: 0; display: none;"
-		>
+		<aside class="sidebar pos-absolute z-2" data-role="sidebar" data-toggle="#sidebar-toggle-2" data-shift=".shifted-content">
+			<div class="sidebar-header bg-grayMouse">
+				<span class="title fg-white">VegView</span>
+				<span class="subtitle fg-white">A vegetation model viewer for LPJ-GUESS<br>Developed by Joakim Bohlin, InfraVis</span>
+			</div>
+			<ul class="sidebar-menu">
+				<li><a href="https://web.nateko.lu.se/lpj-guess/"><span class="mif-home icon"></span>LPJ-GUESS</a></li>
+				<li><a href="https://github.com/Akodiat/vegView"><span class="mif-github icon"></span>Source code</a></li>
+			</ul>
+		</aside>
+		<nav data-role="ribbonmenu" class="shifted-content">
+			<ul class="tabs-holder">
+				<li class="static" id="sidebar-toggle-2"><a href="#">About</a></li>
+				<li><a href="#section-file">File</a></li>
+				<li><a href="#section-view">View</a></li>
+			</ul>
+
+			<div class="content-holder">
+				<div class="section" id="section-file">
+					<button class="ribbon-button" onclick="Metro.dialog.open('#dataLoadDialog')">
+						<span class="mif-folder-open mif-4x"></span>
+						<span class="caption">Load data</span>
+					</button>
+				</div>
+				<div class="section" id="section-view">
+					<div class="group">
+
+						<div id="fancyTrees" data-role="button-group" data-cls-active="active">
+							<button name="simpleTreeButton" class="ribbon-button active">
+								<span class="icon">
+									<span class="mif-cloud6"></span>
+								</span>
+								<span class="caption">Simple</span>
+							</button>
+							<button name="detailedTreeButton" class="ribbon-button">
+								<span class="icon">
+									<span class="mif-star-full"></span>
+								</span>
+								<span class="caption">Detailed</span>
+							</button>
+						</div>
+
+						<span class="title">Tree detail</span>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<div id="timelineContainer">
 			<details open style="display: contents;">
 				<summary title="Plot"></summary>
-				<div class="grid" style="display: flex;">
-					<label for="yFieldSelect">Property
-						<select id="yFieldSelect">
-							<option value="BNE">BNE</option>
-							<option value="BINE">BINE</option>
-							<option value="BNS">BNS</option>
-							<option value="TeNE">TeNE</option>
-							<option value="TeBS">TeBS</option>
-							<option value="IBS">IBS</option>
-							<option value="TeBE">TeBE</option>
-							<option value="TrBE">TrBE</option>
-							<option value="TrIBE">TrIBE</option>
-							<option value="TrBR">TrBR</option>
-							<option value="C3G">C3G</option>
-							<option value="C4G">C4G</option>
-							<option value="VegC">VegC</option>
-							<option value="LitterC">LitterC</option>
-							<option value="SoilC">SoilC</option>
-							<option selected value="Height">Height of tree</option>
-							<option value="Diam">Diameter of stem</option>
-							<option value="Cmass">Total C mass of cohort</option>
-							<option value="Age">Age of cohort</option>
-							<option value="CrownA">Crown area</option>
-							<option value="GPPns">Gross Primary Production with N stress</option>
-							<option value="GPPno">Gross Primary Production with no stress</option>
-							<option value="GPP">Gross Primary Production</option>
-						</select>
-					</label>
-					<label for="aggregateSelect">Aggregation
-						<select id="aggregateSelect">
-							<option selected value="average">Average</option>
-							<option value="median">Median</option>
-							<option value="max">Max</option>
-							<option value="min">Min</option>
-							<option value="sum">Sum</option>
-							<option >None</option>
-						</select>
-					</label>
-					<label for="colorFieldSelect">Group by
-						<select id="colorFieldSelect">
-							<option value="PID" selected>Patch ID</option>
-							<option value="IID">Cohort ID</option>
-							<option value="PFT">Plant Functional Type ID</option>
-						</select>
-					</label>
+				<div class="grid">
+					<div class="row">
+						<label for="yFieldSelect">Property
+							<select id="yFieldSelect" data-role="select" class="plotSelect">
+								<option value="BNE">BNE</option>
+								<option value="BINE">BINE</option>
+								<option value="BNS">BNS</option>
+								<option value="TeNE">TeNE</option>
+								<option value="TeBS">TeBS</option>
+								<option value="IBS">IBS</option>
+								<option value="TeBE">TeBE</option>
+								<option value="TrBE">TrBE</option>
+								<option value="TrIBE">TrIBE</option>
+								<option value="TrBR">TrBR</option>
+								<option value="C3G">C3G</option>
+								<option value="C4G">C4G</option>
+								<option value="VegC">VegC</option>
+								<option value="LitterC">LitterC</option>
+								<option value="SoilC">SoilC</option>
+								<option selected value="Height">Height of tree</option>
+								<option value="Diam">Diameter of stem</option>
+								<option value="Cmass">Total C mass of cohort</option>
+								<option value="Age">Age of cohort</option>
+								<option value="CrownA">Crown area</option>
+								<option value="GPPns">Gross Primary Production with N stress</option>
+								<option value="GPPno">Gross Primary Production with no stress</option>
+								<option value="GPP">Gross Primary Production</option>
+							</select>
+						</label>
+						<label for="aggregateSelect">Aggregation
+							<select id="aggregateSelect" data-role="select" class="plotSelect">
+								<option selected value="average">Average</option>
+								<option value="median">Median</option>
+								<option value="max">Max</option>
+								<option value="min">Min</option>
+								<option value="sum">Sum</option>
+								<option >None</option>
+							</select>
+						</label>
+						<label for="colorFieldSelect">Group by
+							<select id="colorFieldSelect" data-role="select"  class="plotSelect">
+								<option value="PID" selected>Patch ID</option>
+								<option value="IID">Cohort ID</option>
+								<option value="PFT">Plant Functional Type ID</option>
+							</select>
+						</label>
+					</div>
 				</div>
 				<div id="plot" style="width: 100%; display: flex;"></div>
 			</details>
@@ -135,6 +189,7 @@
 
 		<script src="libs/CCapture.all.min.js"></script>
 		<script src="libs/proctree.js"></script>
+		<script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
 		<script type="module" src="main.js"></script>
 	</body>
 </html>

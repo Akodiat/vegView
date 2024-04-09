@@ -11,6 +11,8 @@ class VegaPlotter {
                         ...patchManager.yearData.get(year),
                         positions: undefined
                     };
+                    // Convert to date
+                    d.Date = new Date(d.Year, 0, 1);
                     this.data.push(d);
                 }
             }
@@ -27,9 +29,10 @@ class VegaPlotter {
             width: "container", height: 150,
             encoding: {
                 x: {
-                    field: "Year",
-                    type: "nominal",
+                    field: "Date",
+                    type: "temporal",
                     axis: {
+                        format: "%Y",
                         title: ""
                     }
                 }
@@ -49,7 +52,7 @@ class VegaPlotter {
                                 field: yField,
                                 type: "quantitative",
                             },
-                            {field: "Year", type: "quantitative"},
+                            {field: "Date",  type: "temporal", axis: {format: "%Y"}},
                             {field: colorField, type: "nominal"}
                         ],
                     }
@@ -71,15 +74,15 @@ class VegaPlotter {
                     }
                 },
                 {
-                    transform: [{filter: {and: ["index.Year", {param: "index"}]}}],
+                    transform: [{filter: {and: ["index.Date", {param: "index"}]}}],
                     mark: "rule",
                 },
                 {
-                    transform: [{filter: {and: ["index.Year", {param: "index"}]}}],
+                    transform: [{filter: {and: ["index.Date", {param: "index"}]}}],
                     mark: "text",
                     encoding: {
                         y: {"value": 10},
-                        text: {field: "Year", type: "nominal", fontSize: 30}
+                        text: {field: "Date", type: "temporal", axis: {format: "%Y"}, fontSize: 30}
                     }
                 }
             ],

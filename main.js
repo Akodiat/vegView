@@ -53,7 +53,8 @@ function init() {
 
     // Load data when file is uploaded
     const fileInput = document.getElementById("fileInput");
-    fileInput.onchange = () => {
+    const dataLoadButton = document.getElementById("dataLoadButton");
+    dataLoadButton.onclick = () => {
         loadData(fileInput.files).then(
             patchManager=>onDataLoaded(patchManager)
         );
@@ -87,12 +88,15 @@ function onDataLoaded(patchManager) {
     timelineYearLabel.innerHTML = patchManager.minYear;
 
     const fancyTreeSwitch = document.getElementById("fancyTrees");
-    patchManager.fancyTrees = fancyTreeSwitch.checked;
-    fancyTreeSwitch.onchange = () => {
-        patchManager.fancyTrees = fancyTreeSwitch.checked;
-        patchManager.setYear(patchManager.currentYear);
-        render();
-    };
+    let isDetailed = () => fancyTreeSwitch.querySelector(".active").name === "detailedTreeButton";
+    patchManager.fancyTrees = isDetailed();
+    for (const c of fancyTreeSwitch.children) {
+        c.onclick = () => {
+            patchManager.fancyTrees = c.name === "detailedTreeButton";
+            patchManager.setYear(patchManager.currentYear);
+            render();
+        };
+    }
 
     // Setup visualisation
     patchManager.initVis(patchManager.minYear);
@@ -220,10 +224,7 @@ function onDataLoaded(patchManager) {
         render();
     });
     render();
-
-    document.getElementById("fileUploadContainer").style.display = "none";
     document.getElementById("timelineContainer").style.display = "block";
-    document.getElementById("settingsContainer").style.display = "block";
 }
 
 function onWindowResize() {

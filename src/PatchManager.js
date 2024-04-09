@@ -204,17 +204,32 @@ class PatchManager {
 
     drawCohortInfo() {
         if (this.selectedCohortId === undefined) {
-            // Hide cohort info table
-            document.getElementById("cohortInfoContainer").style.display = "none";
+            // Close cohort info table if it is open
+            if (this.cohortInfoWindow !== undefined) {
+                // eslint-disable-next-line no-undef
+                Metro.window.close(this.cohortInfoWindow);
+            }
+            this.cohortInfoWindow = undefined;
         } else {
             // Create new cohort info table
             const cohortData = this.getSelectedCohortData();
-            const cohortInfoTable = document.getElementById("cohortInfoTable");
-            cohortInfoTable.innerHTML = "";
+            let content = "";
             for(let property in cohortData) {
-                cohortInfoTable.innerHTML+=`<tr><th scope="row">${property}</th><td>${cohortData[property]}</td></tr>`;
+                content +=`<tr><th scope="row">${property}</th><td>${cohortData[property]}</td></tr>`;
             }
-            document.getElementById("cohortInfoContainer").style.display = "block";
+            // Create new cohort info window, or replace the content
+            // of an opened one.
+            if (this.cohortInfoWindow === undefined) {
+                // eslint-disable-next-line no-undef
+                this.cohortInfoWindow = Metro.window.create({
+                    title: "Cohort info",
+                    place: "center",
+                    icon: "<span class='mif-rocket'></span>",
+                    content: `<table class="table striped row-hover"><tbody id="cohortInfoBody">${content}</tbody></table>`
+                });
+            } else {
+                document.getElementById("cohortInfoBody").innerHTML = content;
+            }
         }
     }
 
