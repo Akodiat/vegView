@@ -3,6 +3,7 @@ import {MapControls} from "./libs/OrbitControls.js";
 import {VegaPlotter} from "./src/plot.js";
 import {getClosestOpaque, exportGLTF} from "./src/utils.js";
 import {loadData} from "./src/loadData.js";
+import {Api} from "./src/api.js";
 
 let camera, scene, renderer, controls;
 
@@ -56,7 +57,10 @@ function init() {
     const dataLoadButton = document.getElementById("dataLoadButton");
     dataLoadButton.onclick = () => {
         loadData(fileInput.files).then(
-            patchManager=>onDataLoaded(patchManager)
+            patchManager=>{
+                window.api = new Api(camera, scene, renderer, controls, patchManager);
+                onDataLoaded(patchManager);
+            }
         );
     };
 
@@ -68,7 +72,10 @@ function init() {
         case "Enter":
             if (fileInput.files.length > 0) {
                 loadData(fileInput.files).then(
-                    patchManager=>onDataLoaded(patchManager)
+                    patchManager=>{
+                        window.api = new Api(camera, scene, renderer, controls, patchManager);
+                        onDataLoaded(patchManager);
+                    }
                 );
                 keyEvent.preventDefault();
             }
@@ -146,34 +153,6 @@ function onDataLoaded(patchManager) {
             if (keyEvent.ctrlKey) {
                 exportGLTF(scene);
                 keyEvent.preventDefault();
-            }
-            break;
-        case "KeyV":
-            if (keyEvent.ctrlKey) {
-                keyEvent.preventDefault();
-                // eslint-disable-next-line no-undef
-                const capturer = new CCapture({
-                    format: "webm",
-                    display: "true",
-                    framerate: 4
-                });
-                capturer.start();
-
-                scene.background = new THREE.Color(0xFFFFFF);
-
-                const step = () => {
-                    if (patchManager.isLastYear()) {
-                        capturer.stop();
-                        capturer.save();
-                        scene.background = null;
-                    } else {
-                        patchManager.nextYear();
-                        render();
-                        capturer.capture(renderer.domElement);
-                        requestAnimationFrame(step);
-                    }
-                };
-                step();
             }
             break;
         default:

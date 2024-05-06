@@ -36,15 +36,15 @@ class TreeMesh extends THREE.Object3D {
 
         // https://github.com/donmccurdy/glTF-Procedural-Trees/
         const treeGeometry = new THREE.BufferGeometry();
-        treeGeometry.setAttribute('position', createFloatAttribute(tree.verts, 3));
-        treeGeometry.setAttribute('normal', normalizeAttribute(createFloatAttribute(tree.normals, 3)));
-        treeGeometry.setAttribute('uv', createFloatAttribute(tree.UV, 2));
+        treeGeometry.setAttribute("position", createFloatAttribute(tree.verts, 3));
+        treeGeometry.setAttribute("normal", normalizeAttribute(createFloatAttribute(tree.normals, 3)));
+        treeGeometry.setAttribute("uv", createFloatAttribute(tree.UV, 2));
         treeGeometry.setIndex(createIntAttribute(tree.faces, 1));
 
         const twigGeometry = new THREE.BufferGeometry();
-        twigGeometry.setAttribute('position', createFloatAttribute(tree.vertsTwig, 3));
-        twigGeometry.setAttribute('normal', normalizeAttribute(createFloatAttribute(tree.normalsTwig, 3)));
-        twigGeometry.setAttribute('uv', createFloatAttribute(tree.uvsTwig, 2));
+        twigGeometry.setAttribute("position", createFloatAttribute(tree.vertsTwig, 3));
+        twigGeometry.setAttribute("normal", normalizeAttribute(createFloatAttribute(tree.normalsTwig, 3)));
+        twigGeometry.setAttribute("uv", createFloatAttribute(tree.uvsTwig, 2));
         twigGeometry.setIndex(createIntAttribute(tree.facesTwig, 1));
 
         const treeMaterial = new THREE.MeshStandardMaterial({

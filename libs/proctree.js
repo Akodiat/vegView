@@ -1,3 +1,5 @@
+/* eslint-disable no-redeclare */
+/* eslint-disable indent */
 /*
 proctree.js
 Copyright (c) 2012, Paul Brunt

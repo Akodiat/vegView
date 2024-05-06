@@ -1,6 +1,13 @@
 import * as THREE from "three";
 import {GLTFExporter} from "../libs/exporters/GLTFExporter.js";
 
+function notify(message, type) {
+    // eslint-disable-next-line no-undef
+    Metro.notify.create(message, type, {
+        keepOpen: true
+    });
+}
+
 function randItem(array){
     return array[Math.floor(Math.random() * array.length)];
 }
@@ -155,4 +162,4 @@ function saveArrayBuffer(buffer, filename) {
     save(new Blob([buffer], {type: "application/octet-stream"}), filename);
 }
 
-export {randItem, emptyElem, getClosestOpaque, exportGLTF};
+export {notify, randItem, emptyElem, getClosestOpaque, exportGLTF};

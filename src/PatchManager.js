@@ -225,6 +225,7 @@ class PatchManager {
                     title: "Cohort info",
                     place: "center",
                     icon: "<span class='mif-rocket'></span>",
+                    height: 500,
                     content: `<table class="table striped row-hover"><tbody id="cohortInfoBody">${content}</tbody></table>`
                 });
             } else {

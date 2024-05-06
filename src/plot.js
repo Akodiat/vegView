@@ -1,6 +1,7 @@
 class VegaPlotter {
     constructor(patchManager, onclick) {
         this.onclick = onclick;
+        this.patchManager = patchManager;
         // Flatten data to a list of datapoints
         this.data = [];
         for (const patch of patchManager.patches.values()) {
@@ -60,10 +61,11 @@ class VegaPlotter {
                 {
                     params: [{
                         name: "index",
+                        value: [{x: {year: Math.min(...this.patchManager.years)}}],
                         select: {
                             type: "point",
                             encodings: ["x"],
-                            on: "pointermove",
+                            on: "click",
                             nearest: true
                         }
                     }],

@@ -48,6 +48,9 @@ async function loadData(files, patchManager = new PatchManager()) {
         yearDataFiles = [...files].filter(f => f != vegStructFile);
     }
 
+    // Save name (without suffix)
+    patchManager.datasetName = vegStructFile.name.split(".").slice(0,-1).join();
+
     const items = await itemsFromFile(vegStructFile);
     for (const item of items) {
         patchManager.addData(item);
