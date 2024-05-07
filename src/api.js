@@ -98,7 +98,7 @@ class Api {
         );
     }
 
-    exportGLTF(scene=this.scene, binary=false, name="scene") {
+    exportGLTF(scene=this.scene, binary=false, name=this.patchManager.datasetName) {
         exportGLTF(scene, binary, name);
     }
 
