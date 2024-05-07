@@ -9,7 +9,7 @@ import {ParametricGeometry} from "../libs/geometries/ParametricGeometry.js";
 
 const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const crownGeometreCone = new THREE.CylinderGeometry(.1, 1, 1, 16);
-const crownGeometrySphere = new THREE.SphereGeometry(1, 8, 16);
+const crownGeometrySphere = new THREE.SphereGeometry(0.5, 8, 16);
 const twigTexture = new THREE.TextureLoader().load("./assets/twig-1.png");
 
 const emissiveColorSelected = new THREE.Color(0x42d5ff);
@@ -175,13 +175,13 @@ class PatchManager {
                     const crownElem = {
                         position: new THREE.Vector3(
                             p.x,
-                            this.fancyTrees? this.detailedTerrainMap(p, patch) : cohortData.Height-(cohortData.Boleht/2),
+                            this.fancyTrees? this.detailedTerrainMap(p, patch) : (cohortData.Height+cohortData.Boleht)/2,
                             p.y
                         ),
                         quaternion: new THREE.Quaternion(),
                         scale: new THREE.Vector3(
                             this.fancyTrees? 1 : crownRadius,
-                            this.fancyTrees? 1 : cohortData.Boleht,
+                            this.fancyTrees? 1 : cohortData.Height - cohortData.Boleht,
                             this.fancyTrees? 1 : crownRadius
                         ),
                         color: this.pftConstants[cohortData.PFT].color.clone()
