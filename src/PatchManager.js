@@ -203,13 +203,14 @@ class PatchManager {
     }
 
     drawCohortInfo() {
+        const cohortInfoBody = document.getElementById("cohortInfoBody");
         if (this.selectedCohortId === undefined) {
             // Close cohort info table if it is open
-            if (this.cohortInfoWindow !== undefined) {
+            if (cohortInfoBody !== null) {
                 // eslint-disable-next-line no-undef
                 Metro.window.close(this.cohortInfoWindow);
             }
-            this.cohortInfoWindow = undefined;
+            //this.cohortInfoWindow = undefined;
         } else {
             // Create new cohort info table
             const cohortData = this.getSelectedCohortData();
@@ -217,19 +218,26 @@ class PatchManager {
             for(let property in cohortData) {
                 content +=`<tr><th scope="row">${property}</th><td>${cohortData[property]}</td></tr>`;
             }
+
             // Create new cohort info window, or replace the content
             // of an opened one.
-            if (this.cohortInfoWindow === undefined) {
+            // eslint-disable-next-line no-undef
+            if (cohortInfoBody === null) {
                 // eslint-disable-next-line no-undef
                 this.cohortInfoWindow = Metro.window.create({
                     title: "Cohort info",
                     place: "center",
-                    icon: "<span class='mif-rocket'></span>",
+                    icon: "<span class='mif-info'></span>",
                     height: 500,
+                    btnMin: false,
+                    btnMax: false,
+                    onClose: () => {
+                        this.selectCohort(undefined);
+                    },
                     content: `<table class="table striped row-hover"><tbody id="cohortInfoBody">${content}</tbody></table>`
                 });
             } else {
-                document.getElementById("cohortInfoBody").innerHTML = content;
+                cohortInfoBody.innerHTML = content;
             }
         }
     }
