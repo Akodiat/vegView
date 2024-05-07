@@ -11,6 +11,11 @@ class Api {
         this.timelineYearLabel = document.getElementById("timelineYearLabel");
     }
 
+    redraw() {
+        this.patchManager.setYear(this.patchManager.currentYear);
+        this.renderer.render(this.scene, this.camera);
+    }
+
     prevYear() {
         this.patchManager.prevYear();
         this.timelineYearLabel.innerHTML = this.patchManager.currentYear;
@@ -116,6 +121,49 @@ class Api {
                 notify("Canvas is too large to save, please try a smaller scaling factor", "alert");
             }
             this.scaleCanvas(1/scaleFactor);
+        });
+    }
+
+    showPFTEditor() {
+        const rows = this.patchManager.pftConstants.map(
+            (c,i)=>`<tr>
+                <td>${i}</td>
+                <td>
+                    <input onchange="api.patchManager.pftConstants[${i}].name = this.value; api.redraw()" type="text" value="${c.name}">
+                </td>
+                <td>
+                    <select onchange="api.patchManager.pftConstants[${i}].geometry = this.value; api.redraw()">
+                        <option value="cone" ${c.geometry === "cone" ? "selected" : ""}>cone</option>
+                        <option value="sphere" ${c.geometry === "sphere" ? "selected" : ""}>sphere</option>
+                    </select>
+                </td>
+                <td>
+                    <input onchange="api.patchManager.pftConstants[${i}].color.set(this.value); api.redraw()" type="color" value="#${c.color.getHexString()}"/>
+                </td>
+            </tr>
+            `
+
+        );
+        // eslint-disable-next-line no-undef
+        Metro.window.create({
+            title: "PFT settings",
+            place: "center",
+            icon: "<span class='mif-cog'></span>",
+            content: `
+<table class="table striped">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Geometry</th>
+            <th>Color</th>
+        </tr>
+    </thead>
+    <tbody>
+    ${rows}
+    </tbody>
+</table>
+`
         });
     }
 
