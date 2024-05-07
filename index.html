@@ -203,6 +203,15 @@
 			<label for="timeline" style="text-align: right;">Current year:
 				<span id="timelineYearLabel">1992</span>
 			</label>
+			<button class="button secondary cycle" onclick="api.prevYear()">
+				<span class="mif-previous icon"></span>
+			</button>
+			<button class="button primary cycle" id="trajectoryStartButton" onclick="api.playTrajectory()">
+				<span class="mif-play icon"></span>
+			</button>
+			<button class="button secondary cycle" onclick="api.nextYear()">
+				<span class="mif-next icon"></span>
+			</button>
 		</div>
 		<div id="container"></div>
 

@@ -23,6 +23,27 @@ class Api {
         this.renderer.render(this.scene, this.camera);
     }
 
+    playTrajectory() {
+        let stop = false;
+        const button = document.getElementById("trajectoryStartButton");
+        button.innerHTML = "<span class='mif-stop icon'></span>";
+        button.onclick = ()=>{
+            stop = true;
+        };
+
+        const step = () => {
+            if (stop) {
+                button.onclick = ()=>{this.playTrajectory();};
+                // eslint-disable-next-line quotes
+                button.innerHTML = "<span class='mif-play icon'></span>";
+            } else {
+                this.nextYear();
+                requestAnimationFrame(step);
+            }
+        };
+        step();
+    }
+
     scaleCanvas(scalingFactor=2) {
         const canvas = this.renderer.domElement;
         const width = canvas.width;
