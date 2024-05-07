@@ -42,8 +42,9 @@ class Api {
             stop = true;
         };
 
+        const lastYear = Math.max(...this.patchManager.years);
         const step = () => {
-            if (stop) {
+            if (this.patchManager.currentYear >= lastYear || stop) {
                 button.onclick = ()=>{this.playTrajectory();};
                 // eslint-disable-next-line quotes
                 button.innerHTML = "<span class='mif-play icon'></span>";
