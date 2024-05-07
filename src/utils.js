@@ -162,4 +162,4 @@ function saveArrayBuffer(buffer, filename) {
     save(new Blob([buffer], {type: "application/octet-stream"}), filename);
 }
 
-export {notify, randItem, emptyElem, getClosestOpaque, exportGLTF};
+export {notify, randItem, emptyElem, getClosestOpaque, exportGLTF, saveString};

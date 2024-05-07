@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import {notify, exportGLTF} from "./utils.js";
+import {notify, exportGLTF, saveString} from "./utils.js";
 
 class Api {
     constructor(camera, scene, renderer, controls, patchManager) {
@@ -32,6 +32,34 @@ class Api {
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(canvas.width, canvas.height);
         this.renderer.render(this.scene, this.camera);
+    }
+
+    exportCSV(delimiter = ",") {
+        const data = [];
+        for (const patch of this.patchManager.patches.values()) {
+            for (const cohort of patch.cohorts.values()) {
+                for (const [year, timestep] of cohort.timeSteps.entries()) {
+                    for (const p of timestep.positions.values()) {
+                        const d = {
+                            x: p.x.toFixed(3),
+                            y: p.y.toFixed(3),
+                            ...timestep,
+                            ...this.patchManager.yearData.get(year)
+                        };
+                        delete d.positions;
+                        data.push(d);
+                    }
+                }
+            }
+        }
+
+        const keys = Object.keys(data[0]);
+        const header = keys.join(delimiter);
+        const lines = [header, ...data.map(
+            d=>keys.map(k=>d[k]).join(delimiter)
+        )];
+
+        saveString(lines.join("\n"), this.patchManager.datasetName+".csv")
     }
 
     exportGLTF(scene=this.scene, binary=false, name="scene") {
