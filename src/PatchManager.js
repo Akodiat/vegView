@@ -180,9 +180,9 @@ class PatchManager {
                         ),
                         quaternion: new THREE.Quaternion(),
                         scale: new THREE.Vector3(
-                            this.fancyTrees? 1 : crownRadius,
+                            this.fancyTrees? 1 : crownRadius*2,
                             this.fancyTrees? 1 : cohortData.Height - cohortData.Boleht,
-                            this.fancyTrees? 1 : crownRadius
+                            this.fancyTrees? 1 : crownRadius*2
                         ),
                         color: this.pftConstants[cohortData.PFT].color.clone()
                     };
