@@ -127,15 +127,25 @@ class Api {
             icon: "<span class='mif-video-camera'></span>",
             content: `
 <form>
-<legend>File format:</legend>
-<select id="videoExportFormat" data-role="select">
-    <option value="webm" selected="selected">webm</option>
-    <option value="gif">gif</option>
-    <option value="png">png</option>
-    <option value="jpg">jpg</option>
-</select>
-<input type="number" value="10" id="videoFramerate" data-role="input" data-prepend="Frame rate" data-append="fps">
-<input type="number" value="1" id="videoScaleFactor" data-role="input" data-prepend="Scale factor" data-append="times">
+<div class="form-group">
+    <label>File format:</label>
+    <select id="videoExportFormat" data-role="select">
+        <option value="webm" selected="selected">webm</option>
+        <option value="gif">gif</option>
+        <option value="png">png</option>
+        <option value="jpg">jpg</option>
+    </select>
+    <small class="text-muted">Webm is a modern video format that is low in file size, while gif takes significantly more space.<br>If you select png or jpg, the output will be a compressed tar of images.</small>
+
+</div>
+<div class="form-group">
+    <input type="number" value="10" id="videoFramerate" data-role="input" data-prepend="Frame rate" data-append="fps">
+    <small class="text-muted">Number of frames per second (used for webm and gif)</small>
+</div>
+<div class="form-group">
+    <input type="number" value="1" id="videoScaleFactor" data-role="input" data-prepend="Scale factor" data-append="times">
+    <small class="text-muted">Increase this to get a higher-resolution video</small>
+</div>
 </form>
 <button id="videoExportStartButton" class="primary button" onclick="api.exportVideo()">Start</button>
 <div id="videoExportProgress" data-role="progress" data-type="load" data-value="35" style="display: none"></div>
@@ -169,6 +179,7 @@ class Api {
             workersPath: "libs/"
         });
         capturer.start();
+        capturer.capture(this.renderer.domElement);
 
         this.scaleCanvas(scaleFactor);
 
