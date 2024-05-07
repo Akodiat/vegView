@@ -9,7 +9,7 @@ import {ParametricGeometry} from "../libs/geometries/ParametricGeometry.js";
 
 const boleGeometry = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const crownGeometries = {
-    cone: new THREE.CylinderGeometry(.1, 1, 1, 16),
+    cone: new THREE.CylinderGeometry(.1, 0.5, 1, 16),
     sphere: new THREE.SphereGeometry(0.5, 8, 16)
 };
 const twigTexture = new THREE.TextureLoader().load("./assets/twig-1.png");
