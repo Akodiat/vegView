@@ -16,6 +16,12 @@ class Api {
         this.renderer.render(this.scene, this.camera);
     }
 
+
+    updateMargins(patchMargins) {
+        this.patchManager.updateMargins(patchMargins);
+        this.renderer.render(this.scene, this.camera);
+    }
+
     prevYear() {
         this.patchManager.prevYear();
         this.timelineYearLabel.innerHTML = this.patchManager.currentYear;

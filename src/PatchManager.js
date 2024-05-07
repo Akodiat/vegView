@@ -45,7 +45,7 @@ class PatchManager {
     addData(data) {
         // Add patch data
         if (!this.patches.has(data.PID)) {
-            this.patches.set(data.PID, new Patch(data.PID, data.Px, data.Py, data.Pheight, this.patchMargins));
+            this.patches.set(data.PID, new Patch(data.PID, data.Px, data.Py, data.Pheight));
         }
         const patch = this.patches.get(data.PID);
 
@@ -69,6 +69,22 @@ class PatchManager {
         for(let property in data) {
             yearData[property] = data[property];
         }
+    }
+
+    updateMargins(patchMargins) {
+        this.patchMargins = patchMargins;
+        for (const p of this.patches.values()) {
+            p.meshes.position.set(
+                p.Px * p.sideLength * this.patchMargins - p.sideLength,
+                p.Pheight,
+                p.Py * p.sideLength * this.patchMargins - p.sideLength
+            );
+        }
+
+        // Redraw the detailed terrain
+        const terrainObj = this.drawDetailedTerrain();
+        this.detailedTerrainMesh.geometry = terrainObj.mesh.geometry;
+        this.detailedTerrainMap = terrainObj.surfaceMap;
     }
 
 
