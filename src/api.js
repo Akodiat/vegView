@@ -59,7 +59,10 @@ class Api {
             d=>keys.map(k=>d[k]).join(delimiter)
         )];
 
-        saveString(lines.join("\n"), this.patchManager.datasetName+".csv")
+        saveString(
+            lines.join("\n"),
+            this.patchManager.datasetName+".csv"
+        );
     }
 
     exportGLTF(scene=this.scene, binary=false, name="scene") {
@@ -72,7 +75,7 @@ class Api {
         }
 
         let saveImage = () => {
-            this.renderer.domElement.toBlob(function(blob) {
+            this.renderer.domElement.toBlob(blob => {
                 var a = document.createElement("a");
                 var url = URL.createObjectURL(blob);
                 a.href = url;
