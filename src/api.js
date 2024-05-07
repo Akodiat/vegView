@@ -202,13 +202,33 @@ class Api {
     <small class="text-muted">Increase this to get a higher-resolution video</small>
 </div>
 </form>
+<hr>
+<div class="form-group">
+    <button class="secondary button" onclick="api.exportOrbitingVideo()">Create orbiting video</button>
+    <small class="text-muted">Orbit around the patches while recording the video</small>
+</div>
+<hr>
 <button id="videoExportStartButton" class="primary button" onclick="api.exportVideo()">Start</button>
 <div id="videoExportProgress" data-role="progress" data-type="load" data-value="35" style="display: none"></div>
 `
         });
     }
 
-    exportVideo(format, framerate, scaleFactor) {
+    exportOrbitingVideo(format, framerate, scaleFactor, distance=100, height=50) {
+        const target = this.patchManager.calcPatchesCentre();
+        const cameraPathFunction = progress => {
+            // Make a circle
+            const position = new THREE.Vector3(
+                distance * Math.cos(progress * 2*Math.PI),
+                height,
+                distance * Math.sin(progress * 2*Math.PI)
+            );
+            return {position, target};
+        };
+        this.exportVideo(format, framerate, scaleFactor, cameraPathFunction);
+    }
+
+    exportVideo(format, framerate, scaleFactor, cameraPathFunction) {
         if (format === undefined) {
             format = document.getElementById("videoExportFormat").value;
         }
@@ -242,8 +262,8 @@ class Api {
 
         const lastYear = Math.max(...this.patchManager.years);
         const firstYear = this.patchManager.currentYear;
-        const progress = document.getElementById("videoExportProgress");
-        progress.style.display = "block";
+        const progressBar = document.getElementById("videoExportProgress");
+        progressBar.style.display = "block";
 
         const step = () => {
             if (this.patchManager.currentYear >= lastYear || stop) {
@@ -253,14 +273,19 @@ class Api {
                 this.scaleCanvas(1/scaleFactor);
                 button.onclick = ()=>{this.exportVideo();};
                 button.innerText = "Start";
+                progressBar.style.display = "none";
             } else {
-                this.patchManager.nextYear();
+                this.nextYear();
+                const progress = (this.patchManager.currentYear - firstYear) / (lastYear - firstYear);
+                if (cameraPathFunction !== undefined) {
+                    const s = cameraPathFunction(progress);
+                    this.camera.position.copy(s.position);
+                    this.controls.target.copy(s.target);
+                    this.controls.update();
+                }
                 this.renderer.render(this.scene, this.camera);
                 capturer.capture(this.renderer.domElement);
-                progress.dataset.value = (100 *
-                    (this.patchManager.currentYear - firstYear) /
-                    (lastYear - firstYear)
-                );
+                progressBar.dataset.value = (100 * progress);
                 requestAnimationFrame(step);
             }
         };

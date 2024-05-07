@@ -119,8 +119,13 @@ class PatchManager {
 
     calcPatchesCentre() {
         const com = new THREE.Vector3();
-        for (const patch of this.patches.values()) {
-            com.add(patch.meshes.position);
+        for (const p of this.patches.values()) {
+            const pos = new THREE.Vector3(
+                p.Px * p.sideLength * this.patchMargins - p.sideLength/2,
+                p.Pheight,
+                p.Py * p.sideLength * this.patchMargins - p.sideLength/2
+            );
+            com.add(pos);
         }
         return com.divideScalar(this.patches.size);
     }
