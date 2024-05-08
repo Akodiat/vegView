@@ -31,6 +31,10 @@ function init() {
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(2, 2, 10);
 
+    // Needed to make objects attached to
+    // the camera (legend) visible.
+    scene.add(camera);
+
     // Setup hemisphere and ambient lights
     // Directional light is setup later, when we know where to point it
     const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.75);

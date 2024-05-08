@@ -22,6 +22,7 @@ class PatchManager {
         this.patches = new Map();
         this.currentYear = undefined;
         this.years = new Set();
+        this.usedPFTs = new Set();
         this.boleColor = new THREE.Color(0x8c654a);
         this.crownColor = new THREE.Color(0x426628);
         this.patchMargins = 1.05;
@@ -59,6 +60,9 @@ class PatchManager {
         this.years.add(data.Year);
         this.minYear = Math.min(this.minYear, data.Year);
         this.maxYear = Math.max(this.maxYear, data.Year);
+
+        // Keep track of PFTs used
+        this.usedPFTs.add(data.PFT);
     }
 
     addYearData(data) {

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import {notify, exportGLTF, saveString} from "./utils.js";
+import {HTMLMesh} from "../libs/interactive/HTMLMesh.js";
 
 class Api {
     constructor(camera, scene, renderer, controls, patchManager) {
@@ -131,6 +132,91 @@ class Api {
         });
     }
 
+    setPFTLegendVisibility(visible) {
+        if (visible) {
+            this.showPFTLegend();
+        } else {
+            this.hidePFTLegend();
+        }
+    }
+
+    hidePFTLegend() {
+        this.camera.remove(this.legend);
+        this.legend = undefined;
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    /**
+     * Show a legend in the scene. An HTML mesh is used instead of a normal
+     * HTML element so that the legend can be visible in exported images
+     * @param {number} scale Scale down (and use a large font size) to gain resolution
+     * @param {number} fontSize Increase (and use a smaller scale) to gain resolution
+     * @param {number} distance Distance from camera
+     * @param {number} margin Margin from edge
+     */
+    showPFTLegend(scale = 0.25, fontSize="4em", distance = 1, margin = 1.05) {
+        const rows = this.patchManager.pftConstants.map(
+            (c,i)=>`<tr>
+                <td>${i}</td>
+                <td>${c.name}</td>
+                <td style="background:#${c.color.getHexString()}"></td>
+            </tr>`
+        ).filter((c,i)=>this.patchManager.usedPFTs.has(i));
+        const legendDiv = document.createElement("table");
+        legendDiv.style.fontSize = fontSize;
+        legendDiv.style.borderRadius = "15px";
+        legendDiv.classList.add("table", "cell-border");
+        legendDiv.innerHTML = `
+            <thead>
+                <tr>
+                    <th>PFT</th>
+                    <th>Name</th>
+                    <th>Color</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows}
+            </tbody>`;
+
+        // I have no idea why this is needed
+        // but some commas are appended at the end
+        while (legendDiv.innerHTML.endsWith(",")) {
+            legendDiv.innerHTML = legendDiv.innerHTML.slice(0, -1);
+        }
+
+        legendDiv.style.backgroundColor = "white";//"transparent";
+        legendDiv.style.position = "fixed";
+        legendDiv.style.bottom = 0;
+        legendDiv.style.width = "auto";
+        document.body.appendChild(legendDiv);
+
+        // Remove any old legend mesh and create a new
+        this.camera.remove(this.legend);
+        this.legend = new HTMLMesh(legendDiv);
+
+        // Remove the div from the body
+        // It was only needed for creating the mesh
+        legendDiv.remove();
+
+        // Scale down mesh to gain resolution
+        this.legend.scale.multiplyScalar(scale);
+        this.camera.add(this.legend);
+        this.legend.position.z = -distance;
+
+        // Position to the left of the view
+        const positionToLeft = ()=>{
+            const verticalFOV = THREE.MathUtils.degToRad(this.camera.fov);
+            const visibleHeight = 2 * Math.tan(verticalFOV / 2) * distance;
+            const visibleWidth = visibleHeight * this.camera.aspect;
+            this.legend.position.x = -visibleWidth/2 + (margin*scale*this.legend.geometry.parameters.width/2);
+            this.renderer.render(this.scene, this.camera);
+        };
+        positionToLeft();
+
+        // Update position on window resize
+        window.addEventListener("resize", positionToLeft);
+    }
+
     showPFTEditor() {
         const rows = this.patchManager.pftConstants.map(
             (c,i)=>`<tr>
@@ -160,7 +246,7 @@ class Api {
 <table class="table striped">
     <thead>
         <tr>
-            <th></th>
+            <th>PFT</th>
             <th>Name</th>
             <th>Geometry</th>
             <th>Color</th>
@@ -254,7 +340,6 @@ class Api {
             workersPath: "libs/"
         });
         capturer.start();
-        capturer.capture(this.renderer.domElement);
 
         this.scaleCanvas(scaleFactor);
 
@@ -289,6 +374,7 @@ class Api {
                 requestAnimationFrame(step);
             }
         };
+        capturer.capture(this.renderer.domElement);
         step();
     }
 }
