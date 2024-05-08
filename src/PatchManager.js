@@ -370,6 +370,16 @@ class PatchManager {
             new THREE.Vector3(p.sideLength, 0, p.sideLength).add(p.meshes.position),
         ]);
 
+
+        // Sort by x primarily, then by z if x values are equal
+        // This avoids misformed terrain in some cases
+        positions.sort((a,b)=>{
+            if (a.x<b.x) return -1;
+            if (a.x>b.x) return 1;
+            if (a.z<b.z) return -1;
+            if (a.z>b.z) return 1;
+        })
+
         // Calculate min and max value (for later use in surface map)
         const max = new THREE.Vector2(-Infinity, -Infinity);
         const min = new THREE.Vector2(Infinity, Infinity);
