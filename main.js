@@ -107,17 +107,6 @@ function onDataLoaded(patchManager) {
     // Start at the first year in the range
     timelineYearLabel.innerHTML = patchManager.minYear;
 
-    const fancyTreeSwitch = document.getElementById("fancyTrees");
-    let isDetailed = () => fancyTreeSwitch.querySelector(".active").name === "detailedTreeButton";
-    patchManager.fancyTrees = isDetailed();
-    for (const c of fancyTreeSwitch.children) {
-        c.onclick = () => {
-            patchManager.fancyTrees = c.name === "detailedTreeButton";
-            patchManager.setYear(patchManager.currentYear);
-            render();
-        };
-    }
-
     // Setup visualisation
     patchManager.initVis(patchManager.minYear);
     patchManager.setYear(patchManager.minYear);

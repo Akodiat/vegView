@@ -137,29 +137,10 @@
 						<span class="title">Patch margin</span>
 					</div>
 
-
-					<div class="group">
-						<div id="fancyTrees" data-role="button-group" data-cls-active="active">
-							<button name="simpleTreeButton" class="ribbon-button active">
-								<span class="icon">
-									<span class="mif-cloud6"></span>
-								</span>
-								<span class="caption">Simple</span>
-							</button>
-							<button name="detailedTreeButton" class="ribbon-button">
-								<span class="icon">
-									<span class="mif-star-full"></span>
-								</span>
-								<span class="caption">Detailed</span>
-							</button>
-						</div>
-
-						<span class="title">Tree detail</span>
-					</div>
-
-					<div class="group">
-						<input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch">
-						<span class="title">PFT legend</span>
+					<div class="group flex-column" style="padding-bottom: 10px !important">
+						<div style="height: 18px;"><input onchange="api.setTreeDetail(this.checked)" type="checkbox" data-role="switch" data-caption="Detailed trees"></div>
+						<div style="height: 18px;"><input onchange="api.setTerrainSmoothness(this.checked)" type="checkbox" data-role="switch" data-caption="Smooth terrain"></div>
+						<div style="height: 18px;"><input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch" data-caption="PFT legend"></div>
 					</div>
 				</div>
 			</div>

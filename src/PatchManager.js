@@ -19,6 +19,8 @@ const emissiveColorUnselected = new THREE.Color(0x000000);
 
 class PatchManager {
     constructor() {
+        this.detailedTrees = false;
+        this.smoothTerrain = false;
         this.patches = new Map();
         this.currentYear = undefined;
         this.years = new Set();
@@ -86,7 +88,7 @@ class PatchManager {
         }
 
         // Redraw the detailed terrain
-        const terrainObj = this.drawDetailedTerrain();
+        const terrainObj = this.drawSmoothTerrain();
         this.detailedTerrainMesh.geometry = terrainObj.mesh.geometry;
         this.detailedTerrainMap = terrainObj.surfaceMap;
     }
@@ -115,7 +117,7 @@ class PatchManager {
             this.patchMeshes.add(p.meshes);
         }
 
-        const terrainObj = this.drawDetailedTerrain();
+        const terrainObj = this.drawSmoothTerrain();
         this.detailedTerrainMesh = terrainObj.mesh;
         this.detailedTerrainMap = terrainObj.surfaceMap;
         this.patchMeshes.add(this.detailedTerrainMesh);
@@ -155,7 +157,7 @@ class PatchManager {
                 const cohortData = cohort.timeSteps.get(year);
 
                 const crownRadius = Math.sqrt(cohortData.CrownA/Math.PI);
-                if (this.fancyTrees) {
+                if (this.detailedTrees) {
                     const treeMesh = new TreeMesh({
                         segments: 6, levels: 2, treeSteps: 2,
                         trunkLength: cohortData.Boleht,
@@ -182,34 +184,48 @@ class PatchManager {
                     }
                     const p = cohortData.positions.get(iTree);
 
+                    let boleHeight = 0;
+                    if (this.smoothTerrain) {
+                        boleHeight += this.detailedTerrainMap(p, patch);
+                    }
+                    if (!this.detailedTrees) {
+                        boleHeight += cohortData.Boleht/2;
+                    }
                     const boleElem = {
                         position: new THREE.Vector3(
                             p.x,
-                            this.fancyTrees? this.detailedTerrainMap(p, patch) : cohortData.Height/2,
+                            boleHeight,
                             p.y
                         ),
-                        // Give trees different rotations (relevant if fancy)
+                        // Give trees different rotations (relevant if trees are detailed)
                         quaternion: new THREE.Quaternion().setFromAxisAngle(cohort.instancedBoles.up, iTree),
                         scale: new THREE.Vector3(
-                            this.fancyTrees? 1 : cohortData.Diam,
-                            this.fancyTrees? 1 : cohortData.Height,
-                            this.fancyTrees? 1 : cohortData.Diam
+                            this.detailedTrees? 1 : cohortData.Diam,
+                            this.detailedTrees? 1 : cohortData.Boleht,
+                            this.detailedTrees? 1 : cohortData.Diam
                         ),
                         color: this.boleColor
                     };
                     updateInstance(cohort.instancedBoles, boleElem, iTree, mTemp);
 
+                    let crownHeight = 0;
+                    if (this.smoothTerrain) {
+                        crownHeight += this.detailedTerrainMap(p, patch);
+                    }
+                    if (!this.detailedTrees) {
+                        crownHeight += (cohortData.Height+cohortData.Boleht)/2;
+                    }
                     const crownElem = {
                         position: new THREE.Vector3(
                             p.x,
-                            this.fancyTrees? this.detailedTerrainMap(p, patch) : (cohortData.Height+cohortData.Boleht)/2,
+                            crownHeight,
                             p.y
                         ),
                         quaternion: new THREE.Quaternion(),
                         scale: new THREE.Vector3(
-                            this.fancyTrees? 1 : crownRadius*2,
-                            this.fancyTrees? 1 : cohortData.Height - cohortData.Boleht,
-                            this.fancyTrees? 1 : crownRadius*2
+                            this.detailedTrees? 1 : crownRadius*2,
+                            this.detailedTrees? 1 : cohortData.Height - cohortData.Boleht,
+                            this.detailedTrees? 1 : crownRadius*2
                         ),
                         color: this.pftConstants[cohortData.PFT].color.clone()
                     };
@@ -221,9 +237,9 @@ class PatchManager {
             // Paint grass or not
             patch.grassMesh.material.color = grassyPatch ? patch.grassColor : patch.noGrassColor;
 
-            patch.grassMesh.visible = !this.fancyTrees;
+            patch.grassMesh.visible = !this.smoothTerrain;
         }
-        this.detailedTerrainMesh.visible = this.fancyTrees;
+        this.detailedTerrainMesh.visible = this.smoothTerrain;
 
         this.currentYear = year;
         this.drawCohortInfo();
@@ -347,7 +363,7 @@ class PatchManager {
         this.setYear(this.currentYear);
     }
 
-    drawDetailedTerrain(slices=20, stacks=20) {
+    drawSmoothTerrain(slices=20, stacks=20) {
         // Extract corner positions from patches
         const positions = [...this.patches.values()].flatMap(p=>[
             p.meshes.position,
@@ -412,7 +428,7 @@ class PatchManager {
         );
         const material = new THREE.MeshLambertMaterial({
             side: THREE.DoubleSide,
-            color: new THREE.Color(0x664228)
+            color: new THREE.Color(0x95c639)
         });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.receiveShadow = true;

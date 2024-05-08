@@ -12,6 +12,16 @@ class Api {
         this.timelineYearLabel = document.getElementById("timelineYearLabel");
     }
 
+    setTreeDetail(detailed) {
+        this.patchManager.detailedTrees = detailed;
+        this.redraw();
+    }
+
+    setTerrainSmoothness(smooth) {
+        this.patchManager.smoothTerrain = smooth;
+        this.redraw();
+    }
+
     redraw() {
         this.patchManager.setYear(this.patchManager.currentYear);
         this.renderer.render(this.scene, this.camera);
