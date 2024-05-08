@@ -300,14 +300,14 @@ class Api {
         });
     }
 
-    exportOrbitingVideo(format, framerate, scaleFactor, distance=100, height=50) {
+    exportOrbitingVideo(format, framerate, scaleFactor, distance=100, height=50, nOrbits=1) {
         const target = this.patchManager.calcPatchesCentre();
         const cameraPathFunction = progress => {
             // Make a circle
             const position = new THREE.Vector3(
-                target.x + distance * Math.cos(progress * 2*Math.PI),
+                target.x + distance * Math.cos(progress * nOrbits*2*Math.PI),
                 height,
-                target.z + distance * Math.sin(progress * 2*Math.PI)
+                target.z + distance * Math.sin(progress * nOrbits*2*Math.PI)
             );
             return {position, target};
         };
