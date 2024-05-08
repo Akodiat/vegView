@@ -19,8 +19,6 @@ const emissiveColorUnselected = new THREE.Color(0x000000);
 
 class PatchManager {
     constructor() {
-        this.detailedTrees = false;
-        this.smoothTerrain = false;
         this.patches = new Map();
         this.currentYear = undefined;
         this.years = new Set();

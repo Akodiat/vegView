@@ -100,6 +100,10 @@ function init() {
 }
 
 function onDataLoaded(patchManager) {
+    // Firefox can keep a previous checkbox state through reload
+    // so let's set the values accordingly
+    patchManager.detailedTrees = document.getElementById("detailedTrees").checked;
+    patchManager.smoothTerrain = document.getElementById("smoothTerrain").checked;
 
     // Setup timeline range slider
     const timelineYearLabel = document.getElementById("timelineYearLabel");
