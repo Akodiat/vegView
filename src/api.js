@@ -305,9 +305,9 @@ class Api {
         const cameraPathFunction = progress => {
             // Make a circle
             const position = new THREE.Vector3(
-                distance * Math.cos(progress * 2*Math.PI),
+                target.x + distance * Math.cos(progress * 2*Math.PI),
                 height,
-                distance * Math.sin(progress * 2*Math.PI)
+                target.z + distance * Math.sin(progress * 2*Math.PI)
             );
             return {position, target};
         };
