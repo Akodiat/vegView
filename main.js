@@ -44,8 +44,8 @@ function init() {
     scene.add(ambientLight);
 
     // Add x-y-z axis indicator
-    const axesHelper = new THREE.AxesHelper(5);
-    scene.add(axesHelper);
+    //const axesHelper = new THREE.AxesHelper(5);
+    //scene.add(axesHelper);
 
     // And camera controls
     controls = new MapControls(camera, renderer.domElement);
@@ -53,6 +53,11 @@ function init() {
 
     // Update camera aspect ratio on window resize
     window.addEventListener("resize", onWindowResize);
+
+    // Open the dialog to load data if the user clicks the empty scene
+    // eslint-disable-next-line no-undef
+    const openDataLoadDialog = ()=>Metro.dialog.open("#dataLoadDialog");
+    container.addEventListener("click", openDataLoadDialog);
 
     render();
 
@@ -62,6 +67,9 @@ function init() {
     dataLoadButton.onclick = () => {
         loadData(fileInput.files).then(
             patchManager=>{
+                // We can now remove this listener, since data is loaded
+                container.removeEventListener("click", openDataLoadDialog);
+
                 window.api = new Api(camera, scene, renderer, controls, patchManager);
                 window.THREE = THREE;
                 onDataLoaded(patchManager);
