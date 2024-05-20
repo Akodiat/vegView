@@ -12,6 +12,11 @@ class Api {
         this.timelineYearLabel = document.getElementById("timelineYearLabel");
     }
 
+    setDetailedTreeLevel(levels) {
+        this.patchManager.detailedTreeLevels = levels;
+        this.redraw();
+    }
+
     setTreeDetail(detailed) {
         this.patchManager.detailedTrees = detailed;
         this.redraw();

@@ -12,7 +12,6 @@ const crownGeometries = {
     cone: new THREE.CylinderGeometry(.1, 0.5, 1, 16),
     sphere: new THREE.SphereGeometry(0.5, 8, 16)
 };
-const twigTexture = new THREE.TextureLoader().load("./assets/twig-1.png");
 
 const emissiveColorSelected = new THREE.Color(0x42d5ff);
 const emissiveColorUnselected = new THREE.Color(0x000000);
@@ -26,6 +25,7 @@ class PatchManager {
         this.boleColor = new THREE.Color(0x8c654a);
         this.crownColor = new THREE.Color(0x426628);
         this.patchMargins = 1.05;
+        this.detailedTreeLevels = 2;
         this.pftConstants = [
             {color: new THREE.Color(0x2222f4), geometry: "cone", name: "BNE"},
             {color: new THREE.Color(0x8b8c8c), geometry: "cone", name: "BINE"},
@@ -156,16 +156,18 @@ class PatchManager {
 
                 const crownRadius = Math.sqrt(cohortData.CrownA/Math.PI);
                 if (this.detailedTrees) {
-                    const treeMesh = new TreeMesh({
-                        segments: 6, levels: 2, treeSteps: 2,
-                        trunkLength: cohortData.Boleht,
-                        initalBranchLength: crownRadius,
-                        maxRadius: cohortData.Diam,
-                        twigScale: cohortData.Boleht / 5
-                    });
+                    const treeMesh = new TreeMesh(
+                        this.pftConstants[cohortData.PFT].name,
+                        cohortData.Height,
+                        cohortData.Boleht,
+                        crownRadius,
+                        cohortData.Diam,
+                        this.detailedTreeLevels,
+                        cohortData.IID
+                    );
                     cohort.instancedBoles.geometry = treeMesh.trunkMesh.geometry;
                     cohort.instancedCrowns.geometry = treeMesh.twigsMesh.geometry;
-                    cohort.instancedCrowns.material.map = twigTexture;
+                    cohort.instancedCrowns.material.map = treeMesh.twigsMesh.material.map;
                 } else {
                     cohort.instancedBoles.geometry = boleGeometry;
                     cohort.instancedCrowns.geometry = crownGeometries[this.pftConstants[cohortData.PFT].geometry];
@@ -225,9 +227,8 @@ class PatchManager {
                             this.detailedTrees? 1 : cohortData.Height - cohortData.Boleht,
                             this.detailedTrees? 1 : crownRadius*2
                         ),
-                        color: this.pftConstants[cohortData.PFT].color.clone()
+                        color: this.detailedTrees? this.crownColor : this.pftConstants[cohortData.PFT].color.clone()
                     };
-                    console.assert(crownElem.color.isColor, "Not color");
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
                 }
             }
