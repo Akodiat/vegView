@@ -389,7 +389,18 @@ class Api {
                 requestAnimationFrame(step);
             }
         };
+
+        // Get first frame
+        if (cameraPathFunction !== undefined) {
+            const s = cameraPathFunction(0);
+            this.camera.position.copy(s.position);
+            this.controls.target.copy(s.target);
+            this.controls.update();
+        }
+        this.renderer.render(this.scene, this.camera);
         capturer.capture(this.renderer.domElement);
+
+        // Step through the rest of the trajectory
         step();
     }
 }
