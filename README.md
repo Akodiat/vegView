@@ -12,6 +12,20 @@ The application is already live at [akodiat.github.io/vegView/](https://akodiat.
 
 To upload, select "File", "Load data" and browse for the data file on your computer. A vegetation structure file, e.g. "veg_struct.out" is expected, but you can also add additional data, such as "cpool.out" and "lai.out", by uploading multiple files at the same time (Ctrl-click to select multiple files). Finally, click the "Load" button to load the data.
 
+### File output
+ * **Image:** Saves the current view as a PNG image. Use the dropdown arrow next to the camera button to increase the multiplier for higher-resolution images.
+ * **Video:** Create a video of the trajectory. Use the dropdown arrow next to the camera button to increase the multiplier for higher-resolution images. See also [Advanced video export] below.(#advanced-video-export).
+ * **glTF** Export the scene as a glTF 3D shape file.
+ * **CSV** Export a CSV file containing all the data (including individual tree coordinates).
+
+### View options
+ * **PFT editor:** Change which PFT id corresponds to what colour and shape
+ * **Patch margin:** Update the distance between patches. A value of 1 means no margin. A value of 1.2 means 20% margin.
+ * **Detailed trees** Toggle to show detailed trees, with branches and foilage.
+ * **Smooth terrain** Toggle to show a smooth interpolated surface connecting the patches.
+ * **PFT Legend** Toggle the PFT legend on or off. The legend will also be visible in videos.
+ * **Tree detail level** Set the number of times tree branches should split. Be aware that high values will make the visualisation really slow and might cause the WebGL context to crash.
+
 ### Running locally
 If you want to run the code locally, you need to start a static webserver.
 If you have python 3 on your system, navigate the root of the repository and type:
