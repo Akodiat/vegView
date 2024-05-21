@@ -5,7 +5,9 @@ A vegetation model viewer for [LPJ-GUESS](https://web.nateko.lu.se/lpj-guess).
 Developed by Joakim Bohlin, InfraVis
 
 ## Getting started
-The application is already live at [akodiat.github.io/vegView/](https://akodiat.github.io/vegView/), so you should only need to click the link and upload your data.
+The application is already live at [akodiat.github.io/vegView/](https://akodiat.github.io/vegView/), so you should only need to click the link.
+
+To upload, select "File", "Load data" and browse for the data file on your computer. A vegetation structure file, e.g. "veg_struct.out" is expected, but you can also add additional data, such as "cpool.out" and "lai.out", by uploading multiple files at the same time (Ctrl-click to select multiple files). Finally, click the "Load" button to load the data.
 
 ### Running locally
 If you want to run the code locally, you need to start a static webserver.

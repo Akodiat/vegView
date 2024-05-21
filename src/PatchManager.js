@@ -18,7 +18,7 @@ const emissiveColorUnselected = new THREE.Color(0x000000);
 
 class PatchManager {
     /**
-     * Class to manage patches
+     * Class to manage patches and all their cohorts
      */
     constructor() {
         this.patches = new Map();
@@ -46,6 +46,15 @@ class PatchManager {
         this.yearData = new Map();
     }
 
+    /**
+     * Add patch data
+     * @param {{
+    * Lon: number, Lat: number, Year: number, SID: number, PID: number,
+    * IID: number, PFT: number, Age: number, Pos: number, Height: number,
+    * Boleht: number, Diam: number, CrownA: number, DensI: number,
+    * LAI: number, GPP: number, GPPns: number, GPPno: number, Cmass: number
+    * }} data Cohort data
+     */
     addData(data) {
         // Add patch data
         if (!this.patches.has(data.PID)) {
@@ -68,6 +77,10 @@ class PatchManager {
         this.usedPFTs.add(data.PFT);
     }
 
+    /**
+     * Add data common for all patches and cohorts during given year
+     * @param {*} data
+     */
     addYearData(data) {
         if (!this.yearData.has(data.Year)) {
             this.yearData.set(data.Year, {});
@@ -78,6 +91,11 @@ class PatchManager {
         }
     }
 
+    /**
+     * Updates the distance between patches
+     * @param {number} patchMargins A factor to distance patches from each
+     * other. A value of 1 means no margin. A value of 1.2 means 20% margin.
+     */
     updateMargins(patchMargins) {
         this.patchMargins = patchMargins;
         for (const p of this.patches.values()) {
@@ -95,6 +113,13 @@ class PatchManager {
     }
 
 
+    /**
+     * Initialise the visualisation.
+     * Only needs to be run once, but needs to know
+     * the year to initialise the tree positions
+     * @param {*} year Year to initialise on
+     * (usually the first year in the simulation)
+     */
     initVis(year) {
         this.patchMeshes = new THREE.Group();
         // Setup instancing meshes for each cohort
@@ -124,6 +149,10 @@ class PatchManager {
         this.patchMeshes.add(this.detailedTerrainMesh);
     }
 
+    /**
+     * Calculate the centre of mass for the patches
+     * @returns {THREE.Vector3} Centre of mass position
+     */
     calcPatchesCentre() {
         const com = new THREE.Vector3();
         for (const p of this.patches.values()) {
@@ -137,6 +166,10 @@ class PatchManager {
         return com.divideScalar(this.patches.size);
     }
 
+    /**
+     * Sets the current year and redraws all cohorts
+     * @param {number} year Year to set
+     */
     setYear(year) {
         console.log(`Showing year ${year}`);
 
@@ -247,6 +280,10 @@ class PatchManager {
         this.drawCohortInfo();
     }
 
+    /**
+     * Updates the cohort info window depending on what cohort (if any)
+     * is currently selected
+     */
     drawCohortInfo() {
         const cohortInfoBody = document.getElementById("cohortInfoBody");
         if (this.selectedCohortId === undefined) {
@@ -287,11 +324,10 @@ class PatchManager {
         }
     }
 
-    getCohortByInstanceId(instanceId) {
-        const cohortIDs = [...this.cohorts.keys()];
-        return this.cohorts.get(cohortIDs[instanceId]);
-    }
-
+    /**
+     * Convenience function to get the data for the currently selected cohort
+     * @returns data
+     */
     getSelectedCohortData() {
         const cohort = this.getCohortById(this.selectedCohortId);
         return {
@@ -301,6 +337,11 @@ class PatchManager {
         };
     }
 
+    /**
+     * Find the cohort that matches the given cohort ID
+     * @param {number} cohortId
+     * @returns {Cohort} cohort
+     */
     getCohortById(cohortId) {
         for (const patch of this.patches.values()) {
             if (patch.cohorts.has(cohortId)) {
@@ -309,13 +350,16 @@ class PatchManager {
         }
     }
 
+    /**
+     * Select cohort by cohortID
+     * @param {number} cohortId
+     */
     selectCohort(cohortId) {
         console.log("Selected cohort "+cohortId);
         if (cohortId === this.selectedCohortId) {
             // Already selected
             return;
         }
-
 
         // Clear current selection
         if (this.selectedCohortId !== undefined) {
@@ -334,11 +378,10 @@ class PatchManager {
         this.selectedCohortId = cohortId;
     }
 
-    isLastYear() {
-        const max = Math.max(...this.years);
-        return this.currentYear >= max;
-    }
-
+    /**
+     * Go to the next year of the trajectory, skipping years that we do not
+     * have data for.
+     */
     nextYear() {
         // Skip years we don't have data for
         const max = Math.max(...this.years);
@@ -352,6 +395,10 @@ class PatchManager {
         this.setYear(this.currentYear);
     }
 
+    /**
+     * Go to the previous year of the trajectory, skipping years that we do not
+     * have data for.
+     */
     prevYear() {
         // Skip years we don't have data for
         const min = Math.min(...this.years);
@@ -365,6 +412,12 @@ class PatchManager {
         this.setYear(this.currentYear);
     }
 
+    /**
+     * Function for creating the interpolated, smooth terrain mesh
+     * @param {number} slices Number of length-wise divisions for the parametric geometry
+     * @param {number} stacks Number of width-wise divisions for the parametric geometry
+     * @returns {{mesh: THREE.Mesh, surfaceMap: function(THREE.Vector3, Patch): number}}
+     */
     drawSmoothTerrain(slices=20, stacks=20) {
         // Extract corner positions from patches
         const positions = [...this.patches.values()].flatMap(p=>[
@@ -456,7 +509,5 @@ class PatchManager {
             }};
     }
 }
-
-
 
 export {PatchManager};
