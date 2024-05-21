@@ -1,4 +1,32 @@
-import * as THREE from "three";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: PatchManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: PatchManager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as THREE from "three";
 import {updateInstance} from "./draw.js";
 import {Patch} from "./Patch.js";
 import {Cohort, CohortTimestep, idFromData} from "./Cohort.js";
@@ -179,7 +207,7 @@ class PatchManager {
                 cohort.instancedCrowns.material.needsUpdate = true;
 
                 const nTrees = cohortData.DensI * cohort.maxTreeCount;
-                for (let iTree=0; iTree<cohort.maxTreeCount; iTree++) {
+                for (let iTree=0; iTree&lt;cohort.maxTreeCount; iTree++) {
                     if (iTree >= nTrees) {
                         updateInstance(cohort.instancedBoles, emptyElem, iTree, mTemp);
                         updateInstance(cohort.instancedCrowns, emptyElem, iTree, mTemp);
@@ -261,7 +289,7 @@ class PatchManager {
             const cohortData = this.getSelectedCohortData();
             let content = "";
             for(let property in cohortData) {
-                content +=`<tr><th scope="row">${property}</th><td>${cohortData[property]}</td></tr>`;
+                content +=`&lt;tr>&lt;th scope="row">${property}&lt;/th>&lt;td>${cohortData[property]}&lt;/td>&lt;/tr>`;
             }
 
             // Create new cohort info window, or replace the content
@@ -272,14 +300,14 @@ class PatchManager {
                 this.cohortInfoWindow = Metro.window.create({
                     title: "Cohort info",
                     place: "center",
-                    icon: "<span class='mif-info'></span>",
+                    icon: "&lt;span class='mif-info'>&lt;/span>",
                     height: 500,
                     btnMin: false,
                     btnMax: false,
                     onClose: () => {
                         this.selectCohort(undefined);
                     },
-                    content: `<table class="table striped row-hover"><tbody id="cohortInfoBody">${content}</tbody></table>`
+                    content: `&lt;table class="table striped row-hover">&lt;tbody id="cohortInfoBody">${content}&lt;/tbody>&lt;/table>`
                 });
             } else {
                 cohortInfoBody.innerHTML = content;
@@ -357,7 +385,7 @@ class PatchManager {
         const min = Math.min(...this.years);
         while(!this.years.has(--this.currentYear)) {
             // Make sure we dont overshoot the first year
-            if (this.currentYear < min) {
+            if (this.currentYear &lt; min) {
                 this.currentYear = min;
                 break;
             }
@@ -378,9 +406,9 @@ class PatchManager {
         // Sort by x primarily, then by z if x values are equal
         // This avoids misformed terrain in some cases
         positions.sort((a,b)=>{
-            if (a.x<b.x) return -1;
+            if (a.x&lt;b.x) return -1;
             if (a.x>b.x) return 1;
-            if (a.z<b.z) return -1;
+            if (a.z&lt;b.z) return -1;
             if (a.z>b.z) return 1;
         });
 
@@ -413,10 +441,10 @@ class PatchManager {
 
         const knotmaker = s => {
             let a = [];
-            for (let i=0; i<s; i++) {
+            for (let i=0; i&lt;s; i++) {
                 a.push(0);
             }
-            for (let i=0; i<s; i++) {
+            for (let i=0; i&lt;s; i++) {
                 a.push(1);
             }
             return a;
@@ -459,4 +487,26 @@ class PatchManager {
 
 
 
-export {PatchManager};
+export {PatchManager};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Api.html">Api</a></li><li><a href="Cohort.html">Cohort</a></li><li><a href="CohortTimestep.html">CohortTimestep</a></li><li><a href="PatchManager.html">PatchManager</a></li><li><a href="VegaPlotter.html">VegaPlotter</a></li></ul><h3>Global</h3><ul><li><a href="global.html#deinstantiate">deinstantiate</a></li><li><a href="global.html#drawInstances">drawInstances</a></li><li><a href="global.html#drawParticles">drawParticles</a></li><li><a href="global.html#idFromData">idFromData</a></li><li><a href="global.html#itemsFromFile">itemsFromFile</a></li><li><a href="global.html#loadData">loadData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Tue May 21 2024 19:11:43 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

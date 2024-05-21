@@ -79,10 +79,9 @@ class TreeMesh extends THREE.Object3D {
             trunkLength: defaultBoleHeight,
             initalBranchLength: 0.5 * crownRadius / scale,
             maxRadius: 0.5 * boleDiam / scale,
-            seed: THREE.MathUtils.randInt(0, 1000),
             levels: levels,
             seed: seed
-        }
+        };
 
         const tree = new Tree(spec);
 

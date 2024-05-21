@@ -5,7 +5,7 @@ A vegetation model viewer for [LPJ-GUESS](https://web.nateko.lu.se/lpj-guess).
 Developed by Joakim Bohlin, InfraVis
 
 ## Getting started
-The application is already live at https://akodiat.github.io/vegView/, so you should only need to click the link and upload your data.
+The application is already live at [akodiat.github.io/vegView/](https://akodiat.github.io/vegView/), so you should only need to click the link and upload your data.
 
 ### Running locally
 If you want to run the code locally, you need to start a static webserver.
@@ -15,20 +15,29 @@ python -m http.server 8000
 ```
 
 If you don't want to install python, a full list of alternative oneliners is available here:
-https://gist.github.com/willurd/5720255
+[gist.github.com/willurd/5720255](https://gist.github.com/willurd/5720255)
 
-Once the static server is running, go to http://localhost:8000
+Once the static server is running, go to [localhost:8000](http://localhost:8000)
 
-## API
+## Documentation
+
+Code documentation is found at [akodiat.github.io/vegView/docs](https://akodiat.github.io/vegView/docs).
+
+To compile the documentation (and generate the `docs/` directory), call `jsdoc` with the included config in the repository root:
+```sh
+jsdoc -c jsdocConf.json
+```
+
+### API
 The VegView API can be accessed through the [web developer console](https://webmasters.stackexchange.com/questions/8525/how-do-i-open-the-javascript-console-in-different-browsers#77337).
 
-All relevant functions and objects are found as members of the `api` object, e.g. `api.camera`, `api.patchManager`, `api.nextYear()`, `api.exportCSV(delimiter)`.
+All relevant functions and objects are found as members of the `api` object, e.g. `api.camera`, `api.patchManager`, `api.nextYear()`, `api.exportCSV(delimiter)`. More information can be found [in the documentation](https://akodiat.github.io/vegView/docs/Api.html).
 
 See also the Three.js docs: https://threejs.org/docs/, for information on updating the scene.
 
 The code for the API is found in [src/api.js](../main/src/api.js).
 
-## Advanced video export
+### Advanced video export
 While having the video export open, you can customise more options through the API:
 
 ```js

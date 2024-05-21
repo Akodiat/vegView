@@ -1,4 +1,32 @@
-import * as THREE from "three";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: api.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: api.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as THREE from "three";
 import {notify, exportGLTF, saveString} from "./utils.js";
 import {HTMLMesh} from "../libs/interactive/HTMLMesh.js";
 
@@ -93,7 +121,7 @@ class Api {
     playTrajectory() {
         let stop = false;
         const button = document.getElementById("trajectoryStartButton");
-        button.innerHTML = "<span class='mif-stop icon'></span>";
+        button.innerHTML = "&lt;span class='mif-stop icon'>&lt;/span>";
         const stopFunction = ()=>{
             stop = true;
         };
@@ -105,7 +133,7 @@ class Api {
             if (this.patchManager.currentYear >= lastYear || stop) {
                 button.onclick = ()=>{this.playTrajectory();};
                 // eslint-disable-next-line quotes
-                button.innerHTML = "<span class='mif-play icon'></span>";
+                button.innerHTML = "&lt;span class='mif-play icon'>&lt;/span>";
             } else {
                 this.nextYear();
                 requestAnimationFrame(step);
@@ -243,27 +271,27 @@ class Api {
      */
     showPFTLegend(scale = 0.25, fontSize="4em", distance = 1, margin = 1.05) {
         const rows = this.patchManager.pftConstants.map(
-            (c,i)=>`<tr>
-                <td>${i}</td>
-                <td>${c.name}</td>
-                <td style="background:#${c.color.getHexString()}"></td>
-            </tr>`
+            (c,i)=>`&lt;tr>
+                &lt;td>${i}&lt;/td>
+                &lt;td>${c.name}&lt;/td>
+                &lt;td style="background:#${c.color.getHexString()}">&lt;/td>
+            &lt;/tr>`
         ).filter((c,i)=>this.patchManager.usedPFTs.has(i));
         const legendDiv = document.createElement("table");
         legendDiv.style.fontSize = fontSize;
         legendDiv.style.borderRadius = "15px";
         legendDiv.classList.add("table", "cell-border");
         legendDiv.innerHTML = `
-            <thead>
-                <tr>
-                    <th>PFT</th>
-                    <th>Name</th>
-                    <th>Color</th>
-                </tr>
-            </thead>
-            <tbody>
+            &lt;thead>
+                &lt;tr>
+                    &lt;th>PFT&lt;/th>
+                    &lt;th>Name&lt;/th>
+                    &lt;th>Color&lt;/th>
+                &lt;/tr>
+            &lt;/thead>
+            &lt;tbody>
                 ${rows}
-            </tbody>`;
+            &lt;/tbody>`;
 
         // I have no idea why this is needed
         // but some commas are appended at the end
@@ -309,21 +337,21 @@ class Api {
      */
     showPFTEditor() {
         const rows = this.patchManager.pftConstants.map(
-            (c,i)=>`<tr>
-                <td>${i}</td>
-                <td>
-                    <input onchange="api.patchManager.pftConstants[${i}].name = this.value; api.redraw()" type="text" value="${c.name}">
-                </td>
-                <td>
-                    <select onchange="api.patchManager.pftConstants[${i}].geometry = this.value; api.redraw()">
-                        <option value="cone" ${c.geometry === "cone" ? "selected" : ""}>cone</option>
-                        <option value="sphere" ${c.geometry === "sphere" ? "selected" : ""}>sphere</option>
-                    </select>
-                </td>
-                <td>
-                    <input onchange="api.patchManager.pftConstants[${i}].color.set(this.value); api.redraw()" type="color" value="#${c.color.getHexString()}"/>
-                </td>
-            </tr>
+            (c,i)=>`&lt;tr>
+                &lt;td>${i}&lt;/td>
+                &lt;td>
+                    &lt;input onchange="api.patchManager.pftConstants[${i}].name = this.value; api.redraw()" type="text" value="${c.name}">
+                &lt;/td>
+                &lt;td>
+                    &lt;select onchange="api.patchManager.pftConstants[${i}].geometry = this.value; api.redraw()">
+                        &lt;option value="cone" ${c.geometry === "cone" ? "selected" : ""}>cone&lt;/option>
+                        &lt;option value="sphere" ${c.geometry === "sphere" ? "selected" : ""}>sphere&lt;/option>
+                    &lt;/select>
+                &lt;/td>
+                &lt;td>
+                    &lt;input onchange="api.patchManager.pftConstants[${i}].color.set(this.value); api.redraw()" type="color" value="#${c.color.getHexString()}"/>
+                &lt;/td>
+            &lt;/tr>
             `
 
         );
@@ -331,21 +359,21 @@ class Api {
         Metro.window.create({
             title: "PFT settings",
             place: "center",
-            icon: "<span class='mif-cog'></span>",
+            icon: "&lt;span class='mif-cog'>&lt;/span>",
             content: `
-<table class="table striped">
-    <thead>
-        <tr>
-            <th>PFT</th>
-            <th>Name</th>
-            <th>Geometry</th>
-            <th>Color</th>
-        </tr>
-    </thead>
-    <tbody>
+&lt;table class="table striped">
+    &lt;thead>
+        &lt;tr>
+            &lt;th>PFT&lt;/th>
+            &lt;th>Name&lt;/th>
+            &lt;th>Geometry&lt;/th>
+            &lt;th>Color&lt;/th>
+        &lt;/tr>
+    &lt;/thead>
+    &lt;tbody>
     ${rows}
-    </tbody>
-</table>
+    &lt;/tbody>
+&lt;/table>
 `
         });
     }
@@ -355,37 +383,37 @@ class Api {
         Metro.window.create({
             title: "Export video",
             place: "center",
-            icon: "<span class='mif-video-camera'></span>",
+            icon: "&lt;span class='mif-video-camera'>&lt;/span>",
             content: `
-<form>
-<div class="form-group">
-    <label>File format:</label>
-    <select id="videoExportFormat" data-role="select">
-        <option value="webm" selected="selected">webm</option>
-        <option value="gif">gif</option>
-        <option value="png">png</option>
-        <option value="jpg">jpg</option>
-    </select>
-    <small class="text-muted">Webm is a modern video format that is low in file size, while gif takes significantly more space.<br>If you select png or jpg, the output will be a compressed tar of images.</small>
+&lt;form>
+&lt;div class="form-group">
+    &lt;label>File format:&lt;/label>
+    &lt;select id="videoExportFormat" data-role="select">
+        &lt;option value="webm" selected="selected">webm&lt;/option>
+        &lt;option value="gif">gif&lt;/option>
+        &lt;option value="png">png&lt;/option>
+        &lt;option value="jpg">jpg&lt;/option>
+    &lt;/select>
+    &lt;small class="text-muted">Webm is a modern video format that is low in file size, while gif takes significantly more space.&lt;br>If you select png or jpg, the output will be a compressed tar of images.&lt;/small>
 
-</div>
-<div class="form-group">
-    <input type="number" value="10" id="videoFramerate" data-role="input" data-prepend="Frame rate" data-append="fps">
-    <small class="text-muted">Number of frames per second (used for webm and gif)</small>
-</div>
-<div class="form-group">
-    <input type="number" value="1" id="videoScaleFactor" data-role="input" data-prepend="Scale factor" data-append="times">
-    <small class="text-muted">Increase this to get a higher-resolution video</small>
-</div>
-</form>
-<hr>
-<div class="form-group">
-    <button class="secondary button" onclick="api.exportOrbitingVideo()">Create orbiting video</button>
-    <small class="text-muted">Orbit around the patches while recording the video</small>
-</div>
-<hr>
-<button id="videoExportStartButton" class="primary button" onclick="api.exportVideo()">Start</button>
-<div id="videoExportProgress" data-role="progress" data-type="load" data-value="35" style="display: none"></div>
+&lt;/div>
+&lt;div class="form-group">
+    &lt;input type="number" value="10" id="videoFramerate" data-role="input" data-prepend="Frame rate" data-append="fps">
+    &lt;small class="text-muted">Number of frames per second (used for webm and gif)&lt;/small>
+&lt;/div>
+&lt;div class="form-group">
+    &lt;input type="number" value="1" id="videoScaleFactor" data-role="input" data-prepend="Scale factor" data-append="times">
+    &lt;small class="text-muted">Increase this to get a higher-resolution video&lt;/small>
+&lt;/div>
+&lt;/form>
+&lt;hr>
+&lt;div class="form-group">
+    &lt;button class="secondary button" onclick="api.exportOrbitingVideo()">Create orbiting video&lt;/button>
+    &lt;small class="text-muted">Orbit around the patches while recording the video&lt;/small>
+&lt;/div>
+&lt;hr>
+&lt;button id="videoExportStartButton" class="primary button" onclick="api.exportVideo()">Start&lt;/button>
+&lt;div id="videoExportProgress" data-role="progress" data-type="load" data-value="35" style="display: none">&lt;/div>
 `
         });
     }
@@ -502,4 +530,26 @@ class Api {
     }
 }
 
-export {Api};
+export {Api};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Api.html">Api</a></li><li><a href="Cohort.html">Cohort</a></li><li><a href="CohortTimestep.html">CohortTimestep</a></li><li><a href="PatchManager.html">PatchManager</a></li><li><a href="VegaPlotter.html">VegaPlotter</a></li></ul><h3>Global</h3><ul><li><a href="global.html#deinstantiate">deinstantiate</a></li><li><a href="global.html#drawInstances">drawInstances</a></li><li><a href="global.html#drawParticles">drawParticles</a></li><li><a href="global.html#idFromData">idFromData</a></li><li><a href="global.html#itemsFromFile">itemsFromFile</a></li><li><a href="global.html#loadData">loadData</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Tue May 21 2024 19:11:43 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
