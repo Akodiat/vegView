@@ -2,6 +2,9 @@
 
 A vegetation model viewer for [LPJ-GUESS](https://web.nateko.lu.se/lpj-guess).
 
+![](./assets/cover.png)
+![](../assets/cover.png)
+
 Developed by Joakim Bohlin, InfraVis
 
 ## Getting started
