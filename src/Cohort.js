@@ -10,7 +10,6 @@ class Cohort {
         this.PFT = data.PFT;
 
         this.isGrass = (
-            data.Pos === 0 &&
             data.Height === 0 &&
             data.Boleht === 0 &&
             data.Diam === 0 &&
