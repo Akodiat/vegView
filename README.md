@@ -29,15 +29,16 @@ To compile the documentation (and generate the `docs/` directory), call `jsdoc` 
 ```sh
 jsdoc -c jsdocConf.json
 ```
+The 3D visualisation is all accomplished using the library Three.js, so you might also want to have a look at [their documentation](https://threejs.org/docs/#manual/en/introduction/Creating-a-scene).
 
 ### API
 The VegView API can be accessed through the [web developer console](https://webmasters.stackexchange.com/questions/8525/how-do-i-open-the-javascript-console-in-different-browsers#77337).
 
-All relevant functions and objects are found as members of the `api` object, e.g. `api.camera`, `api.patchManager`, `api.nextYear()`, `api.exportCSV(delimiter)`. More information can be found [in the documentation](https://akodiat.github.io/vegView/docs/Api.html).
+All relevant functions and objects are found as members of the `api` object, e.g. `api.camera`, `api.patchManager`, `api.nextYear()`, `api.exportCSV(delimiter)`.
 
-See also the Three.js docs: https://threejs.org/docs/, for information on updating the scene.
+More information can be found [in the documentation](https://akodiat.github.io/vegView/docs/Api.html).
+As noted above, it is also good to have the [Three.js documentation](https://threejs.org/docs/#manual/en/introduction/Creating-a-scene) at hand.
 
-The code for the API is found in [src/api.js](../main/src/api.js).
 
 ### Advanced video export
 While having the video export open, you can customise more options through the API:
