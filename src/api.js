@@ -147,6 +147,8 @@ class Api {
                         const d = {
                             x: p.x.toFixed(3),
                             y: p.y.toFixed(3),
+                            z: this.patchManager.detailedTerrainMap(p, patch),
+                            TID: p.occupyingInstance,
                             ...timestep,
                             ...this.patchManager.yearData.get(year)
                         };
@@ -156,6 +158,9 @@ class Api {
                 }
             }
         }
+
+        // Sort chronologically
+        data.sort((a, b) => a.Year - b.Year);
 
         const keys = Object.keys(data[0]);
         const header = keys.join(delimiter);
