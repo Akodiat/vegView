@@ -22,6 +22,11 @@ class Api {
         this.timelineYearLabel = document.getElementById("timelineYearLabel");
     }
 
+    /**
+     * Color boles by a data attribute. Call without arguments to clear.
+     * @param {string} attribute Data column from the input file, e.g. "Diam"
+     * @param {string} colorMap A matplotlib color map name
+     */
     setBoleColorScheme(attribute, colorMap="rainbow") {
         if (attribute === undefined) {
             this.patchManager.boleColorScheme = undefined;
@@ -36,6 +41,12 @@ class Api {
         this.redraw();
     }
 
+
+    /**
+     * Color crowns by a data attribute. Call without arguments to clear.
+     * @param {string} attribute Data column from the input file, e.g. "Height"
+     * @param {string} colorMap A matplotlib color map name
+     */
     setCrownColorScheme(attribute, colorMap="rainbow") {
         if (attribute === undefined) {
             this.patchManager.crownColorScheme = undefined;
