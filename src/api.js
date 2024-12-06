@@ -305,9 +305,7 @@ class Api {
      * Show window with PFT editor
      */
     showPFTEditor() {
-        const rows = this.patchManager.pftConstants.filter(
-            (c,i)=>this.patchManager.usedPFTs.has(i)
-        ).map(
+        const rows = this.patchManager.pftConstants.map(
             (c,i)=>`<tr>
                 <td>${i}</td>
                 <td>
@@ -327,7 +325,9 @@ class Api {
                 </td>
             </tr>
             `
-
+        ).filter(
+            // Only list PFTs used
+            (c,i)=>this.patchManager.usedPFTs.has(i)
         );
         // eslint-disable-next-line no-undef
         Metro.window.create({

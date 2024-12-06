@@ -252,6 +252,8 @@ class PatchManager {
                 cohort.instancedCrowns.material.needsUpdate = true;
                 cohort.instancedBoles.material.needsUpdate = true;
 
+                const crownColor = this.detailedTrees? this.crownColor : this.pftConstants[cohortData.PFT].color.clone();
+
                 const nTrees = cohortData.DensI * cohort.maxTreeCount;
                 for (let iTree=0; iTree<cohort.maxTreeCount; iTree++) {
                     if (iTree >= nTrees) {
@@ -305,7 +307,7 @@ class PatchManager {
                             this.detailedTrees? 1 : cohortData.Height - cohortData.Boleht,
                             this.detailedTrees? 1 : crownRadius*2
                         ),
-                        color: this.detailedTrees? this.crownColor : this.pftConstants[cohortData.PFT].color.clone()
+                        color: crownColor
                     };
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
                 }
