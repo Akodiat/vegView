@@ -87,6 +87,7 @@ function init() {
                 loadData(fileInput.files).then(
                     patchManager=>{
                         window.api = new Api(camera, scene, renderer, controls, patchManager);
+                        window.THREE = THREE;
                         onDataLoaded(patchManager);
                     }
                 );

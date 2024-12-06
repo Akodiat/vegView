@@ -144,9 +144,13 @@
 						<div style="height: 18px;"><input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch" data-caption="PFT legend"></div>
 					</div>
 
-					<div class="group">
-						<input onchange="api.setDetailedTreeLevel(this.value)" style="width: 3em;" type="text" data-role="spinner" data-min-value="1" data-step="0.1" value="2" data-fixed="3">
-						<span class="title">Tree detail level</span>
+					<div class="group" title="Higher value means less detail (and better performance)">
+						<input onchange="api.setDetailedTreeFactor(this.value)"
+						style="width: 3em;" type="text" data-role="spinner"
+						data-min-value="1" data-step="0.1" value="3"
+						data-fixed="3"
+						>
+						<span class="title">Tree detail factor</span>
 					</div>
 				</div>
 			</div>

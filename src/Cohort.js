@@ -83,9 +83,9 @@ class Cohort {
         this.treeMeshes.add(this.instancedCrowns);
 
         this.instancedBoles.castShadow = true;
-        this.instancedBoles.receiveShadow = true;
+        this.instancedBoles.receiveShadow = false;
         this.instancedCrowns.castShadow = true;
-        this.instancedCrowns.receiveShadow = true;
+        this.instancedCrowns.receiveShadow = false;
     }
 }
 

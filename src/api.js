@@ -27,8 +27,8 @@ class Api {
      * really slow and might cause the WebGL context to crash.
      * @param {number} levels Number of divisions per tree branch
      */
-    setDetailedTreeLevel(levels) {
-        this.patchManager.detailedTreeLevels = levels;
+    setDetailedTreeFactor(levels) {
+        this.patchManager.detailedTreeFactor = levels;
         this.redraw();
     }
 

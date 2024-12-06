@@ -3,7 +3,7 @@ import {updateInstance} from "./draw.js";
 import {Patch} from "./Patch.js";
 import {Cohort, CohortTimestep, idFromData} from "./Cohort.js";
 import {emptyElem} from "./utils.js";
-import {TreeMesh} from "./TreeMesh.js";
+import {Tree} from "../libs/ez-tree.es.js";
 import {NURBSSurface} from "../libs/curves/NURBSSurface.js";
 import {ParametricGeometry} from "../libs/geometries/ParametricGeometry.js";
 
@@ -28,18 +28,18 @@ class PatchManager {
         this.boleColor = new THREE.Color(0x8c654a);
         this.crownColor = new THREE.Color(0x426628);
         this.patchMargins = 1.05;
-        this.detailedTreeLevels = 2;
+        this.detailedTreeFactor = 3;
         this.pftConstants = [
-            {color: new THREE.Color(0x2222f4), geometry: "cone", name: "BNE"},
-            {color: new THREE.Color(0x8b8c8c), geometry: "cone", name: "BINE"},
-            {color: new THREE.Color(0xfed126), geometry: "cone", name: "BNS"},
-            {color: new THREE.Color(0xc8bfe7), geometry: "sphere", name: "TeNE"},
-            {color: new THREE.Color(0xf82625), geometry: "sphere", name: "TeBS"},
-            {color: new THREE.Color(0x25f925), geometry: "sphere", name: "IBS"},
-            {color: new THREE.Color(0xe821e8), geometry: "sphere", name: "TeBE"},
-            {color: new THREE.Color(0x26e3e3), geometry: "sphere", name: "TrBE"},
-            {color: new THREE.Color(0xf56c6c), geometry: "sphere", name: "TrIBE"},
-            {color: new THREE.Color(0xf6ef2a), geometry: "sphere", name: "TrBR"},
+            {color: new THREE.Color(0x2222f4), geometry: "cone", name: "BNE", detailMesh: "Pine Medium"},
+            {color: new THREE.Color(0x8b8c8c), geometry: "cone", name: "BINE", detailMesh: "Pine Medium"},
+            {color: new THREE.Color(0xfed126), geometry: "cone", name: "BNS", detailMesh: "Pine Medium"},
+            {color: new THREE.Color(0xc8bfe7), geometry: "cone", name: "TeNE", detailMesh: "Pine Medium"},
+            {color: new THREE.Color(0xf82625), geometry: "sphere", name: "TeBS", detailMesh: "Oak Medium"},
+            {color: new THREE.Color(0x25f925), geometry: "sphere", name: "IBS", detailMesh: "Aspen Medium"},
+            {color: new THREE.Color(0xe821e8), geometry: "sphere", name: "TeBE", detailMesh: "Ash Medium"},
+            {color: new THREE.Color(0x26e3e3), geometry: "sphere", name: "TrBE", detailMesh: "Oak Medium"},
+            {color: new THREE.Color(0xf56c6c), geometry: "sphere", name: "TrIBE", detailMesh: "Aspen Medium"},
+            {color: new THREE.Color(0xf6ef2a), geometry: "sphere", name: "TrBR", detailMesh: "Ash Medium"},
         ];
         this.minYear = Infinity;
         this.maxYear = -Infinity;
@@ -191,25 +191,64 @@ class PatchManager {
                 const cohortData = cohort.timeSteps.get(year);
 
                 const crownRadius = Math.sqrt(cohortData.CrownA/Math.PI);
+
                 if (this.detailedTrees) {
-                    const treeMesh = new TreeMesh(
-                        this.pftConstants[cohortData.PFT].name,
-                        cohortData.Height,
-                        cohortData.Boleht,
-                        crownRadius,
-                        cohortData.Diam,
-                        this.detailedTreeLevels,
-                        cohortData.IID
+
+                    const treeMesh = new Tree();
+
+                    // Use the correct preset
+                    treeMesh.loadPreset(this.pftConstants[cohortData.PFT].detailMesh);
+
+                    // Adapt preset options to cohort data
+                    // Also try to simplify to get a lower amount of vertices
+
+                    treeMesh.options.branch.levels = Math.min(treeMesh.options.branch.levels, 2);
+                    const approxScale = cohortData.Height/treeMesh.options.branch.length[0];
+                    if (treeMesh.options.type == "evergreen") {
+                        treeMesh.options.branch.length[0] = cohortData.Height;
+                        treeMesh.options.branch.length[1] = crownRadius * 2;
+                    } else {
+                        treeMesh.options.branch.length[0] = cohortData.Height - crownRadius;
+                        treeMesh.options.branch.length[1] = crownRadius;
+                    }
+
+                    treeMesh.options.branch.length[2] = 1;
+                    treeMesh.options.branch.length[3] = 1;
+
+                    treeMesh.options.branch.sections[0] = 4;
+                    treeMesh.options.branch.sections[1] = 4;
+                    treeMesh.options.branch.segments[0] = 3;
+                    treeMesh.options.branch.segments[1] = 3;
+
+                    treeMesh.options.branch.radius[0] = cohortData.Diam/2;
+                    treeMesh.options.leaves.size *= approxScale;
+
+                    treeMesh.options.branch.start[1] = 0.5;
+
+                    treeMesh.options.branch.children[0] = Math.round(
+                        treeMesh.options.branch.children[0] /
+                        this.detailedTreeFactor
                     );
-                    cohort.instancedBoles.geometry = treeMesh.trunkMesh.geometry;
-                    cohort.instancedCrowns.geometry = treeMesh.twigsMesh.geometry;
-                    cohort.instancedCrowns.material.map = treeMesh.twigsMesh.material.map;
+                    treeMesh.options.branch.children[1] = Math.round(
+                        treeMesh.options.branch.children[1] /
+                        this.detailedTreeFactor
+                    );
+
+                    // Generate the tree mesh
+                    treeMesh.generate();
+
+                    // Update geometries and materials
+                    cohort.instancedBoles.geometry = treeMesh.branchesMesh.geometry;
+                    cohort.instancedBoles.material = treeMesh.branchesMesh.material.clone();
+                    cohort.instancedCrowns.geometry = treeMesh.leavesMesh.geometry;
+                    cohort.instancedCrowns.material = treeMesh.leavesMesh.material.clone();
                 } else {
                     cohort.instancedBoles.geometry = boleGeometry;
                     cohort.instancedCrowns.geometry = crownGeometries[this.pftConstants[cohortData.PFT].geometry];
                     cohort.instancedCrowns.material.map = undefined;
                 }
                 cohort.instancedCrowns.material.needsUpdate = true;
+                cohort.instancedBoles.material.needsUpdate = true;
 
                 const nTrees = cohortData.DensI * cohort.maxTreeCount;
                 for (let iTree=0; iTree<cohort.maxTreeCount; iTree++) {
@@ -257,7 +296,8 @@ class PatchManager {
                             crownHeight,
                             p.y
                         ),
-                        quaternion: new THREE.Quaternion(),
+                        // Give trees different rotations (relevant if trees are detailed)
+                        quaternion: new THREE.Quaternion().setFromAxisAngle(cohort.instancedBoles.up, iTree),
                         scale: new THREE.Vector3(
                             this.detailedTrees? 1 : crownRadius*2,
                             this.detailedTrees? 1 : cohortData.Height - cohortData.Boleht,
