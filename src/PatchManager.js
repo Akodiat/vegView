@@ -258,8 +258,20 @@ class PatchManager {
                     crownColor = cohort.instancedCrowns.material.color;
                     boleColor = cohort.instancedBoles.material.color;
                 } else {
-                    crownColor = this.pftConstants[cohortData.PFT].color.clone();
-                    boleColor = this.boleColor;
+                    if (this.crownColorScheme) {
+                        crownColor = this.crownColorScheme.lut.getColor(
+                            cohortData[this.crownColorScheme.attribute]
+                        );
+                    } else {
+                        crownColor = this.pftConstants[cohortData.PFT].color.clone();
+                    }
+                    if (this.boleColorScheme) {
+                        boleColor = this.boleColorScheme.lut.getColor(
+                            cohortData[this.boleColorScheme.attribute]
+                        );
+                    } else {
+                        boleColor = this.boleColor;
+                    }
                 }
 
                 const nTrees = cohortData.DensI * cohort.maxTreeCount;

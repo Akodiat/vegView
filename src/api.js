@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import {notify, exportGLTF, saveString} from "./utils.js";
 import {HTMLMesh} from "../libs/interactive/HTMLMesh.js";
+import {Lut} from "../libs/math/Lut.js";
 
 class Api {
     /**
@@ -19,6 +20,51 @@ class Api {
         this.controls = controls;
         this.patchManager = patchManager;
         this.timelineYearLabel = document.getElementById("timelineYearLabel");
+    }
+
+    setBoleColorScheme(attribute, colorMap="rainbow") {
+        if (attribute === undefined) {
+            this.patchManager.boleColorScheme = undefined;
+            return;
+        } else {
+            const lut = this.calcLut(attribute, colorMap);
+            this.patchManager.boleColorScheme = {
+                lut: lut,
+                attribute: attribute
+            };
+        }
+        this.redraw();
+    }
+
+    setCrownColorScheme(attribute, colorMap="rainbow") {
+        if (attribute === undefined) {
+            this.patchManager.crownColorScheme = undefined;
+        } else {
+            const lut = this.calcLut(attribute, colorMap);
+            this.patchManager.crownColorScheme = {
+                lut: lut,
+                attribute: attribute
+            };
+        }
+        this.redraw();
+    }
+
+    calcLut(attribute, colorMap="rainbow") {
+        let max = -Infinity;
+        let min = Infinity;
+        for (const patch of this.patchManager.patches.values()) {
+            for (const cohort of patch.cohorts.values()) {
+                for (const t of cohort.timeSteps.values())  {
+                    max = Math.max(t[attribute], max);
+                    min = Math.min(t[attribute], min);
+                }
+            }
+        }
+        const lut = new Lut(colorMap);
+        lut.setMin(min);
+        lut.setMax(max);
+
+        return lut;
     }
 
     /**
