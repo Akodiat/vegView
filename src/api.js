@@ -248,10 +248,9 @@ class Api {
      */
     showPFTLegend(scale = 0.25, fontSize="4em", distance = 1, margin = 1.05) {
         const rows = this.patchManager.pftConstants.map(
-            (c,i)=>`<tr>
-                <td>${i}</td>
+            c=>`<tr>
                 <td>${c.name}</td>
-                <td style="background:#${c.color.getHexString()}"></td>
+                <td style="width: 150px; background:#${c.color.getHexString()}"></td>
             </tr>`
         ).filter((c,i)=>this.patchManager.usedPFTs.has(i));
         const legendDiv = document.createElement("table");
@@ -259,13 +258,6 @@ class Api {
         legendDiv.style.borderRadius = "15px";
         legendDiv.classList.add("table", "cell-border");
         legendDiv.innerHTML = `
-            <thead>
-                <tr>
-                    <th>PFT</th>
-                    <th>Name</th>
-                    <th>Color</th>
-                </tr>
-            </thead>
             <tbody>
                 ${rows}
             </tbody>`;
@@ -313,7 +305,9 @@ class Api {
      * Show window with PFT editor
      */
     showPFTEditor() {
-        const rows = this.patchManager.pftConstants.map(
+        const rows = this.patchManager.pftConstants.filter(
+            (c,i)=>this.patchManager.usedPFTs.has(i)
+        ).map(
             (c,i)=>`<tr>
                 <td>${i}</td>
                 <td>
@@ -324,6 +318,9 @@ class Api {
                         <option value="cone" ${c.geometry === "cone" ? "selected" : ""}>cone</option>
                         <option value="sphere" ${c.geometry === "sphere" ? "selected" : ""}>sphere</option>
                     </select>
+                </td>
+                <td>
+                    <input onchange="api.patchManager.pftConstants[${i}].detailMesh = this.value; api.redraw()" type="text" value="${c.detailMesh}"/>
                 </td>
                 <td>
                     <input onchange="api.patchManager.pftConstants[${i}].color.set(this.value); api.redraw()" type="color" value="#${c.color.getHexString()}"/>
@@ -343,7 +340,8 @@ class Api {
         <tr>
             <th>PFT</th>
             <th>Name</th>
-            <th>Geometry</th>
+            <th>Simple shape</th>
+            <th>Detailed shape</th>
             <th>Color</th>
         </tr>
     </thead>
