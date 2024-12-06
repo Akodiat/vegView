@@ -1,0 +1,11 @@
+{
+    "source": {
+        "include": ["README.md", "main.js", "src"]
+    },
+    "sourceType": "module",
+    "opts": {
+        "encoding": "utf8",
+        "destination": "./docs/",
+        "recurse": true
+    }
+}
