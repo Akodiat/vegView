@@ -63,20 +63,13 @@ class Cohort {
 
         this.instancedBoles = drawInstances(
             undefined, elems,
-            new THREE.MeshStandardMaterial({
-                roughness: 1.0,
-                metalness: 0.0
-            })
+            new THREE.MeshPhongMaterial()
         );
         this.instancedBoles.cohortId = idFromData(this);
 
         this.instancedCrowns = drawInstances(
             undefined, elems,
-            new THREE.MeshStandardMaterial({
-                roughness: 1.0,
-                metalness: 0.0,
-                alphaTest: 0.9
-            })
+            new THREE.MeshPhongMaterial()
         );
         this.instancedCrowns.cohortId = idFromData(this);
         this.treeMeshes.add(this.instancedBoles);

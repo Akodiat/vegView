@@ -246,6 +246,8 @@ class PatchManager {
                     cohort.instancedBoles.geometry = boleGeometry;
                     cohort.instancedCrowns.geometry = crownGeometries[this.pftConstants[cohortData.PFT].geometry];
                     cohort.instancedCrowns.material.map = undefined;
+                    cohort.instancedCrowns.material.transparent = true;
+                    cohort.instancedCrowns.material.opacity = 1 - Math.exp(-0.5*cohortData.LAI);
                 }
                 cohort.instancedCrowns.material.needsUpdate = true;
                 cohort.instancedBoles.material.needsUpdate = true;
