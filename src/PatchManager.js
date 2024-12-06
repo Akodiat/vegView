@@ -244,6 +244,7 @@ class PatchManager {
                     cohort.instancedCrowns.material = treeMesh.leavesMesh.material.clone();
                 } else {
                     cohort.instancedBoles.geometry = boleGeometry;
+                    cohort.instancedBoles.material.map = undefined;
                     cohort.instancedCrowns.geometry = crownGeometries[this.pftConstants[cohortData.PFT].geometry];
                     cohort.instancedCrowns.material.map = undefined;
                     cohort.instancedCrowns.material.transparent = true;
@@ -252,7 +253,14 @@ class PatchManager {
                 cohort.instancedCrowns.material.needsUpdate = true;
                 cohort.instancedBoles.material.needsUpdate = true;
 
-                const crownColor = this.detailedTrees? this.crownColor : this.pftConstants[cohortData.PFT].color.clone();
+                let crownColor, boleColor;
+                if (this.detailedTrees) {
+                    crownColor = cohort.instancedCrowns.material.color;
+                    boleColor = cohort.instancedBoles.material.color;
+                } else {
+                    crownColor = this.pftConstants[cohortData.PFT].color.clone();
+                    boleColor = this.boleColor;
+                }
 
                 const nTrees = cohortData.DensI * cohort.maxTreeCount;
                 for (let iTree=0; iTree<cohort.maxTreeCount; iTree++) {
@@ -283,7 +291,7 @@ class PatchManager {
                             this.detailedTrees? 1 : cohortData.Boleht,
                             this.detailedTrees? 1 : cohortData.Diam
                         ),
-                        color: this.boleColor
+                        color: boleColor
                     };
                     updateInstance(cohort.instancedBoles, boleElem, iTree, mTemp);
 
