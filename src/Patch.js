@@ -89,10 +89,7 @@ class Patch {
             // Get most recent year and copy cells
             const lastYear = Math.max(...prevYears);
             for (const c of this.allCells.get(lastYear)) {
-                // Don't use positions for cohorts that will be removed
-                if (c.occupyingCohort === undefined || c.occupyingCohort.timeSteps.has(year)) {
-                    this.allCells.get(year).push(c.clone());
-                }
+                this.allCells.get(year).push(c.clone());
             }
             //this.allCells.set(year, this.allCells.get(lastYear).map(c=>c.clone()));
             this.availableCells.set(
