@@ -13,9 +13,11 @@ class Api {
      * @param {MapControls} controls
      * @param {PatchManager} patchManager
      */
-    constructor(camera, scene, renderer, controls, patchManager) {
+    constructor(camera, scene, orthoCamera, uiScene, renderer, controls, patchManager) {
         this.camera = camera;
         this.scene = scene;
+        this.orthoCamera = orthoCamera;
+        this.uiScene = uiScene;
         this.renderer = renderer;
         this.controls = controls;
         this.patchManager = patchManager;
@@ -39,6 +41,17 @@ class Api {
         ["crownColorSelect", "crownColorMapSelect"].forEach(select=>
             document.getElementById(select).addEventListener("change", ()=>this.setCrownColorMapFromUI())
         );
+    }
+
+    render() {
+        this.renderer.autoClear = true;
+
+        this.renderer.render(this.scene, this.camera);
+
+        // Prevent canvas from being erased with next render call
+        this.renderer.autoClear = false;
+
+        this.renderer.render(this.uiScene, this.orthoCamera);
     }
 
     setBoleColorMapFromUI() {
@@ -88,6 +101,36 @@ class Api {
                 lut: lut,
                 attribute: attribute
             };
+
+            this.uiScene.remove(this.legendGroup);
+            this.legendGroup = new THREE.Group();
+            this.uiScene.add(this.legendGroup);
+
+            let labelParams = {
+                "title": attribute,
+                "um": "",
+                "ticks": 5
+            };
+
+            let legend;
+            const verticalLegend = true;
+            if (verticalLegend) {
+                legend = lut.setLegendOn();
+            } else {
+                legend = lut.setLegendOn({layout: "horizontal"});
+            }
+            this.legendGroup.add(legend);
+            let labels = lut.setLegendLabels(labelParams);
+            this.legendGroup.add(labels["title"]);
+            for (let i = 0; i < Object.keys(labels["ticks"]).length; i++) {
+                this.legendGroup.add(labels["ticks"][i]);
+                this.legendGroup.add(labels["lines"][i]);
+            }
+
+            this.uiScene.addEventListener("updateColor", function() {
+                lut.updateCanvas(legend.material.map.image);
+                legend.material.map.needsUpdate = true;
+            });
         }
         this.redraw();
     }
@@ -150,7 +193,7 @@ class Api {
     /** Redraw the patches */
     redraw() {
         this.patchManager.setYear(this.patchManager.currentYear);
-        this.renderer.render(this.scene, this.camera);
+        this.render();
     }
 
     /**
@@ -160,7 +203,7 @@ class Api {
      */
     updateMargins(patchMargins) {
         this.patchManager.updateMargins(patchMargins);
-        this.renderer.render(this.scene, this.camera);
+        this.render();
     }
 
     /**
@@ -169,7 +212,7 @@ class Api {
     prevYear() {
         this.patchManager.prevYear();
         this.timelineYearLabel.innerHTML = this.patchManager.currentYear;
-        this.renderer.render(this.scene, this.camera);
+        this.render();
     }
 
     /**
@@ -178,7 +221,7 @@ class Api {
     nextYear() {
         this.patchManager.nextYear();
         this.timelineYearLabel.innerHTML = this.patchManager.currentYear;
-        this.renderer.render(this.scene, this.camera);
+        this.render();
     }
 
 
@@ -226,7 +269,7 @@ class Api {
         canvas.height = height*scalingFactor;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(canvas.width, canvas.height);
-        this.renderer.render(this.scene, this.camera);
+        this.render();
     }
 
     /**
@@ -331,7 +374,7 @@ class Api {
     hidePFTLegend() {
         this.camera.remove(this.legend);
         this.legend = undefined;
-        this.renderer.render(this.scene, this.camera);
+        this.render();
     }
 
     /**
@@ -389,7 +432,7 @@ class Api {
             const visibleHeight = 2 * Math.tan(verticalFOV / 2) * distance;
             const visibleWidth = visibleHeight * this.camera.aspect;
             this.legend.position.x = -visibleWidth/2 + (margin*scale*this.legend.geometry.parameters.width/2);
-            this.renderer.render(this.scene, this.camera);
+            this.render();
         };
         positionToLeft();
 
@@ -579,7 +622,7 @@ class Api {
                     this.controls.target.copy(s.target);
                     this.controls.update();
                 }
-                this.renderer.render(this.scene, this.camera);
+                this.render();
                 capturer.capture(this.renderer.domElement);
                 progressBar.dataset.value = (100 * progress);
                 requestAnimationFrame(step);
@@ -593,7 +636,7 @@ class Api {
             this.controls.target.copy(s.target);
             this.controls.update();
         }
-        this.renderer.render(this.scene, this.camera);
+        this.render();
         capturer.capture(this.renderer.domElement);
 
         // Step through the rest of the trajectory

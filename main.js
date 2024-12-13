@@ -7,6 +7,8 @@ import {Api} from "./src/api.js";
 
 let camera, scene, renderer, controls;
 
+let uiScene, orthoCamera;
+
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
@@ -28,8 +30,18 @@ function init() {
 
     // Setup scene and camera
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const aspect = window.innerWidth / window.innerHeight;
+    camera = new THREE.PerspectiveCamera(55, aspect, 0.1, 1000);
     camera.position.set(2, 2, 10);
+
+    // Setup UI scene
+    uiScene = new THREE.Scene();
+    // camera sized to legend dimenions
+    //orthoCamera = new THREE.OrthographicCamera(-6, 6, 2, -2, 1, 10);
+    //orthoCamera.position.set(3, 0, 10);
+
+    orthoCamera = new THREE.OrthographicCamera( - 10, 10, 10/aspect, - 10/aspect, 1, 2 );
+    orthoCamera.position.set( -7, 0, 1 );
 
     // Needed to make objects attached to
     // the camera (legend) visible.
@@ -70,7 +82,7 @@ function init() {
                 // We can now remove this listener, since data is loaded
                 container.removeEventListener("click", openDataLoadDialog);
 
-                window.api = new Api(camera, scene, renderer, controls, patchManager);
+                window.api = new Api(camera, scene, orthoCamera, uiScene, renderer, controls, patchManager);
                 window.THREE = THREE;
                 onDataLoaded(patchManager);
             }
@@ -86,7 +98,7 @@ function init() {
             if (fileInput.files.length > 0) {
                 loadData(fileInput.files).then(
                     patchManager=>{
-                        window.api = new Api(camera, scene, renderer, controls, patchManager);
+                        window.api = new Api(camera, scene, orthoCamera, uiScene, renderer, controls, patchManager);
                         window.THREE = THREE;
                         onDataLoaded(patchManager);
                     }
@@ -216,10 +228,23 @@ function onDataLoaded(patchManager) {
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+
+    orthoCamera.top = 10/camera.aspect;
+    orthoCamera.bottom = -10/camera.aspect;
+    orthoCamera.updateProjectionMatrix();
+
     renderer.setSize(window.innerWidth, window.innerHeight);
+
     render();
 }
 
 function render() {
+    renderer.autoClear = true;
+
     renderer.render(scene, camera);
+
+    // Prevent canvas from being erased with next render call
+    renderer.autoClear = false;
+
+    renderer.render(uiScene, orthoCamera);
 }
