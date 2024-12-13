@@ -10,6 +10,19 @@
 		<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.2"></script>
 
 		<style>
+
+			.select .option-list a {
+				padding: 0 0.5rem 0 0.5rem;
+			}
+
+			.input input {
+				padding: 0 .2rem;
+			}
+
+			.paddedRibbonForm {
+				margin-left: 5px;
+				margin-right: 5px;
+			}
 			#cohortInfoTable {
 				display: block;
 				width: 100%;
@@ -133,24 +146,36 @@
 						<span class="caption">PFT editor</span>
 					</button>
 
-					<div class="group">
-						<input onchange="api.updateMargins(this.value)" style="width: 3em;" type="text" data-role="spinner" data-min-value="1" data-step="0.005" value="1.05" data-fixed="3">
-						<span class="title">Patch margin</span>
+					<div class="flex-column">
+						<div style="height: 24px;"><input onchange="api.setTreeDetail(this.checked)" type="checkbox" data-role="switch" data-caption="Detailed trees" id="detailedTrees"></div>
+						<div style="height: 24px;"><input onchange="api.setTerrainSmoothness(this.checked)" type="checkbox" data-role="switch" data-caption="Smooth terrain" id="smoothTerrain"></div>
+						<div style="height: 24px;"><input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch" data-caption="PFT legend"></div>
 					</div>
 
-					<div class="group flex-column" style="padding-bottom: 10px !important">
-						<div style="height: 18px;"><input onchange="api.setTreeDetail(this.checked)" type="checkbox" data-role="switch" data-caption="Detailed trees" id="detailedTrees"></div>
-						<div style="height: 18px;"><input onchange="api.setTerrainSmoothness(this.checked)" type="checkbox" data-role="switch" data-caption="Smooth terrain" id="smoothTerrain"></div>
-						<div style="height: 18px;"><input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch" data-caption="PFT legend"></div>
+					<div class="paddedRibbonForm" style="width: 12em;">
+						<label>Bole color</label>
+						<select class="input-small" id="boleColorSelect" data-role="select" data-prepend="Attribute"></select>
+						<select class="input-small" id="boleColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
 					</div>
 
-					<div class="group" title="Higher value means less detail (and better performance)">
+					<div class="paddedRibbonForm" style="width: 12em;">
+						<label>Crown color</label>
+						<select class="input-small" id="crownColorSelect" data-role="select" data-prepend="Attribute"></select>
+						<select class="input-small" id="crownColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
+					</div>
+
+					<div class="paddedRibbonForm" title="Higher value means less detail (and better performance)">
+						<label>Tree detail factor</label>
 						<input onchange="api.setDetailedTreeFactor(this.value)"
 						style="width: 3em;" type="text" data-role="spinner"
 						data-min-value="1" data-step="0.1" value="3"
 						data-fixed="3"
 						>
-						<span class="title">Tree detail factor</span>
+					</div>
+
+					<div class="paddedRibbonForm">
+						<label>Patch margin</label>
+						<input onchange="api.updateMargins(this.value)" style="width: 3em;" type="text" data-role="spinner" data-min-value="1" data-step="0.005" value="1.05" data-fixed="3">
 					</div>
 				</div>
 			</div>

@@ -63,6 +63,31 @@ async function loadData(files, patchManager = new PatchManager()) {
         }
     }
 
+    //Populate color scheme selects in UI
+
+    // Get list of attributes
+    const attributes = new Set();
+    for (const patch of patchManager.patches.values()) {
+        for (const cohort of patch.cohorts.values()) {
+            for (const t of cohort.timeSteps.values())  {
+                for (const prop in t) {
+                    attributes.add(prop);
+                }
+            }
+        }
+    }
+    attributes.delete("positions");
+
+    const data = {"PFT": undefined};
+
+    attributes.forEach(v => data[v] = v);
+
+    for (const s of ["#boleColorSelect", "#crownColorSelect"]) {
+        // eslint-disable-next-line no-undef
+        const select = $(s).data("select");
+        select.data(data);
+    }
+
     return patchManager;
 }
 

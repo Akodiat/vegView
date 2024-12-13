@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import {notify, exportGLTF, saveString} from "./utils.js";
 import {HTMLMesh} from "../libs/interactive/HTMLMesh.js";
-import {Lut} from "../libs/math/Lut.js";
+import {Lut, ColorMapKeywords} from "../libs/math/Lut.js";
 
 class Api {
     /**
@@ -20,6 +20,39 @@ class Api {
         this.controls = controls;
         this.patchManager = patchManager;
         this.timelineYearLabel = document.getElementById("timelineYearLabel");
+
+        const data = {};
+        for (const v in ColorMapKeywords) {
+            data[v] = v;
+        }
+
+        // Populate color map selects
+        for (const s of ["#boleColorMapSelect", "#crownColorMapSelect"]) {
+            // eslint-disable-next-line no-undef
+            const select = $(s).data("select");
+            select.data(data);
+        }
+
+        ["boleColorSelect", "boleColorMapSelect"].forEach(select=>
+            document.getElementById(select).addEventListener("change", ()=>this.setBoleColorMapFromUI())
+        );
+        ["crownColorSelect", "crownColorMapSelect"].forEach(select=>
+            document.getElementById(select).addEventListener("change", ()=>this.setCrownColorMapFromUI())
+        );
+    }
+
+    setBoleColorMapFromUI() {
+        const attributeSelect = document.getElementById("boleColorSelect");
+        const colorMapSelect = document.getElementById("boleColorMapSelect");
+        this.setBoleColorMap(attributeSelect.value, colorMapSelect.value);
+        colorMapSelect.disabled = attributeSelect.value === "PFT";
+    }
+
+    setCrownColorMapFromUI() {
+        const attributeSelect = document.getElementById("crownColorSelect");
+        const colorMapSelect = document.getElementById("crownColorMapSelect");
+        this.setCrownColorMap(attributeSelect.value, colorMapSelect.value);
+        colorMapSelect.disabled = attributeSelect.value === "PFT";
     }
 
     /**
@@ -27,13 +60,12 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
      */
-    setBoleColorScheme(attribute, colorMap="rainbow") {
-        if (attribute === undefined) {
-            this.patchManager.boleColorScheme = undefined;
-            return;
+    setBoleColorMap(attribute, colorMap="rainbow") {
+        if (attribute === undefined || attribute === "PFT") {
+            this.patchManager.boleColorMap = undefined;
         } else {
             const lut = this.calcLut(attribute, colorMap);
-            this.patchManager.boleColorScheme = {
+            this.patchManager.boleColorMap = {
                 lut: lut,
                 attribute: attribute
             };
@@ -47,12 +79,12 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Height"
      * @param {string} colorMap A matplotlib color map name
      */
-    setCrownColorScheme(attribute, colorMap="rainbow") {
-        if (attribute === undefined) {
-            this.patchManager.crownColorScheme = undefined;
+    setCrownColorMap(attribute, colorMap="rainbow") {
+        if (attribute === undefined || attribute === "PFT") {
+            this.patchManager.crownColorMap = undefined;
         } else {
             const lut = this.calcLut(attribute, colorMap);
-            this.patchManager.crownColorScheme = {
+            this.patchManager.crownColorMap = {
                 lut: lut,
                 attribute: attribute
             };
@@ -71,6 +103,13 @@ class Api {
                 }
             }
         }
+
+        // Lut cannot define color if they are the same
+        if (max === min) {
+            max++;
+            min--;
+        }
+
         const lut = new Lut(colorMap);
         lut.setMin(min);
         lut.setMax(max);

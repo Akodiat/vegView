@@ -258,16 +258,16 @@ class PatchManager {
                     crownColor = cohort.instancedCrowns.material.color;
                     boleColor = cohort.instancedBoles.material.color;
                 } else {
-                    if (this.crownColorScheme) {
-                        crownColor = this.crownColorScheme.lut.getColor(
-                            cohortData[this.crownColorScheme.attribute]
+                    if (this.crownColorMap) {
+                        crownColor = this.crownColorMap.lut.getColor(
+                            cohortData[this.crownColorMap.attribute]
                         );
                     } else {
                         crownColor = this.pftConstants[cohortData.PFT].color.clone();
                     }
-                    if (this.boleColorScheme) {
-                        boleColor = this.boleColorScheme.lut.getColor(
-                            cohortData[this.boleColorScheme.attribute]
+                    if (this.boleColorMap) {
+                        boleColor = this.boleColorMap.lut.getColor(
+                            cohortData[this.boleColorMap.attribute]
                         );
                     } else {
                         boleColor = this.boleColor;
