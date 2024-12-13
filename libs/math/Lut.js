@@ -237,7 +237,8 @@ class Lut {
 
         const canvas = this.createCanvas();
 
-        document.body.appendChild( canvas );
+        // Why was this added?
+        //document.body.appendChild( canvas );
 
         this.legend.canvas = canvas;
 
