@@ -63,12 +63,16 @@ class Api {
             select.data(data);
         }
 
-        ["stemColorSelect", "stemColorMapSelect"].forEach(select=>
-            document.getElementById(select).addEventListener("change", ()=>this.setStemColorMapFromUI())
-        );
-        ["crownColorSelect", "crownColorMapSelect"].forEach(select=>
-            document.getElementById(select).addEventListener("change", ()=>this.setCrownColorMapFromUI())
-        );
+        [
+            "ColorSelect",
+            "ColorMapSelect",
+            "ColorLegendLabel",
+            "ColorLegendXPos",
+            "ColorLegendYPos"
+        ].forEach(idSuffix=> {
+            document.getElementById("stem"+idSuffix).addEventListener("change", ()=>this.setStemColorMapFromUI());
+            document.getElementById("crown"+idSuffix).addEventListener("change", ()=>this.setCrownColorMapFromUI());
+        });
     }
 
     render() {
@@ -85,74 +89,98 @@ class Api {
     setStemColorMapFromUI() {
         const attributeSelect = document.getElementById("stemColorSelect");
         const colorMapSelect = document.getElementById("stemColorMapSelect");
-        this.setStemColorMap(attributeSelect.value, colorMapSelect.value);
+
+        const colorLegendLabel = document.getElementById("stemColorLegendLabel");
+        const colorLegendXPos = document.getElementById("stemColorLegendXPos");
+        const colorLegendYPos = document.getElementById("stemColorLegendYPos");
+        this.setStemColorMap(
+            attributeSelect.value,
+            colorMapSelect.value,
+            new THREE.Vector2(
+                Number.parseFloat(colorLegendXPos.value),
+                Number.parseFloat(colorLegendYPos.value)
+            ),
+            colorLegendLabel.value
+        );
         colorMapSelect.disabled = attributeSelect.value === "PFT";
     }
 
     setCrownColorMapFromUI() {
         const attributeSelect = document.getElementById("crownColorSelect");
         const colorMapSelect = document.getElementById("crownColorMapSelect");
-        this.setCrownColorMap(attributeSelect.value, colorMapSelect.value);
+
+        const colorLegendLabel = document.getElementById("crownColorLegendLabel");
+        const colorLegendXPos = document.getElementById("crownColorLegendXPos");
+        const colorLegendYPos = document.getElementById("crownColorLegendYPos");
+        this.setCrownColorMap(
+            attributeSelect.value,
+            colorMapSelect.value,
+            new THREE.Vector2(
+                Number.parseFloat(colorLegendXPos.value),
+                Number.parseFloat(colorLegendYPos.value)
+            ),
+            colorLegendLabel.value
+        );
         colorMapSelect.disabled = attributeSelect.value === "PFT";
     }
 
     /**
-     * Color stems by a data attribute. Call without arguments to clear.
+     * Color stems or crowns by a data attribute.
+     * @param {string} target Either "stem" or "crown"
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
+     * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
+     * @param {string} legendLabel Legend label
+     * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
      */
-    setStemColorMap(attribute, colorMap="rainbow") {
-        if (attribute === undefined || attribute === "PFT") {
-            this.patchManager.stemColorMap = undefined;
-        } else {
-            const lut = this.calcLut(attribute, colorMap);
-            this.patchManager.stemColorMap = {
-                lut: lut,
-                attribute: attribute
-            };
+    setColorMap(
+        target, attribute, colorMap = "rainbow",
+        legendPosition = new THREE.Vector2(),
+        legendLabel = undefined,
+        verticalLegend = false,
+    ) {
+        if (target === undefined) {
+            console.error(`Target ${target} unknown, must be "stem" or "crown"!`);
         }
-        this.redraw();
-    }
-
-
-    /**
-     * Color crowns by a data attribute. Call without arguments to clear.
-     * @param {string} attribute Data column from the input file, e.g. "Height"
-     * @param {string} colorMap A matplotlib color map name
-     */
-    setCrownColorMap(attribute, colorMap="rainbow") {
         if (attribute === undefined || attribute === "PFT") {
-            this.patchManager.crownColorMap = undefined;
+            this.patchManager[target+"ColorMap"] = undefined;
         } else {
             const lut = this.calcLut(attribute, colorMap);
-            this.patchManager.crownColorMap = {
+            this.patchManager[target+"ColorMap"] = {
                 lut: lut,
                 attribute: attribute
             };
 
-            this.uiScene.remove(this.legendGroup);
-            this.legendGroup = new THREE.Group();
-            this.uiScene.add(this.legendGroup);
+            this.uiScene.remove(this[target+"LegendGroup"]);
+            this[target+"LegendGroup"] = new THREE.Group();
+            this.uiScene.add(this[target+"LegendGroup"]);
+
+            // Set normalised position of the legend
+            this[target+"LegendGroup"].position.x = legendPosition.x * this.orthoCamera.right;
+            this[target+"LegendGroup"].position.y = legendPosition.y * this.orthoCamera.right;
+
+            if (legendLabel === undefined || legendLabel === "") {
+                legendLabel = `${target} color (${attribute})`;
+            }
 
             let labelParams = {
-                "title": attribute,
-                "um": "",
+                "title": legendLabel,
+                //"um": "Stem",
                 "ticks": 5
             };
 
             let legend;
-            const verticalLegend = true;
             if (verticalLegend) {
                 legend = lut.setLegendOn();
             } else {
                 legend = lut.setLegendOn({layout: "horizontal"});
             }
-            this.legendGroup.add(legend);
+            this[target+"LegendGroup"].add(legend);
             let labels = lut.setLegendLabels(labelParams);
-            this.legendGroup.add(labels["title"]);
+            this[target+"LegendGroup"].add(labels["title"]);
             for (let i = 0; i &lt; Object.keys(labels["ticks"]).length; i++) {
-                this.legendGroup.add(labels["ticks"][i]);
-                this.legendGroup.add(labels["lines"][i]);
+                this[target+"LegendGroup"].add(labels["ticks"][i]);
+                this[target+"LegendGroup"].add(labels["lines"][i]);
             }
 
             this.uiScene.addEventListener("updateColor", function() {
@@ -161,6 +189,39 @@ class Api {
             });
         }
         this.redraw();
+    }
+
+    /**
+     * Color stems by a data attribute. Call without arguments to clear.
+     * @param {string} attribute Data column from the input file, e.g. "Diam"
+     * @param {string} colorMap A matplotlib color map name
+     * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
+     * @param {string} legendLabel Legend label
+     * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
+     */
+    setStemColorMap(
+        attribute, colorMap="rainbow",
+        legendPosition=new THREE.Vector2(),
+        legendLabel = undefined,
+        verticalLegend = false
+    ) {
+        this.setColorMap("stem", attribute, colorMap, legendPosition, legendLabel, verticalLegend);
+    }
+
+    /**
+     * Color crowns by a data attribute. Call without arguments to clear.
+     * @param {string} attribute Data column from the input file, e.g. "Height"
+     * @param {string} colorMap A matplotlib color map name
+     * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
+     * @param {string} legendLabel Legend label
+     * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
+     */
+    setCrownColorMap(attribute, colorMap="rainbow",
+        legendPosition=new THREE.Vector2(),
+        legendLabel = undefined,
+        verticalLegend = false
+    ) {
+        this.setColorMap("crown", attribute, colorMap, legendPosition, legendLabel, verticalLegend);
     }
 
     calcLut(attribute, colorMap="rainbow") {
@@ -688,7 +749,7 @@ export {Api};</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Jan 17 2025 11:58:39 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Jan 17 2025 15:25:30 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

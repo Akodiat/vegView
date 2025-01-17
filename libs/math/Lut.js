@@ -27,7 +27,6 @@ const defaultLabelParameters = {
     fontsize: 24,
     fontface: "Arial",
     title: "",
-    um: "",
     ticks: 0,
     decimal: 2,
     notation: "standard"
@@ -348,8 +347,6 @@ class Lut {
 
         this.legend.labels.title = parameters.title || defaultLabelParameters.title;
 
-        this.legend.labels.um = parameters.um || defaultLabelParameters.um;
-
         this.legend.labels.ticks = parameters.ticks || defaultLabelParameters.ticks;
 
         this.legend.labels.decimal = parameters.decimal || defaultLabelParameters.decimal;
@@ -369,7 +366,7 @@ class Lut {
 
         contextTitle.fillStyle = "rgba( 0, 0, 0, 1.0 )";
 
-        contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness );
+        contextTitle.fillText( this.legend.labels.title.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness );
 
         const txtTitle = new CanvasTexture( canvasTitle );
         txtTitle.minFilter = LinearFilter;

@@ -154,14 +154,64 @@
 
 					<div class="paddedRibbonForm" style="width: 12em;">
 						<label>Stem color</label>
+						<span class="ribbon-split dropdown-toggle" style="right: 0; position: absolute;">
+							<span class="icon">
+								<span class="mif-cog"></span>
+							</span>
+						</span>
 						<select class="input-small" id="stemColorSelect" data-role="select" data-prepend="Attribute"></select>
 						<select class="input-small" id="stemColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
+                        <ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
+							<div class="row mb-2">
+								<label class="cell-sm-2">Label</label>
+								<div class="cell-sm-10">
+									<input type="text" data-role="input" id="stemColorLegendLabel" onclick="event.stopPropagation();">
+								</div>
+							</div>
+							<div class="row mb-2">
+								<label class="cell-sm-2">x</label>
+								<div class="cell-sm-10">
+									<input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0.5" data-fixed="2" id="stemColorLegendXPos"></input>
+								</div>
+							</div>
+							<div class="row mb-2">
+								<label class="cell-sm-2">y</label>
+								<div class="cell-sm-10">
+									<input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0" data-fixed="2" id="stemColorLegendYPos"></input>
+								</div>
+							</div>
+                        </ul>
 					</div>
 
 					<div class="paddedRibbonForm" style="width: 12em;">
 						<label>Crown color</label>
+						<span class="ribbon-split dropdown-toggle" style="right: 0; position: absolute;">
+							<span class="icon">
+								<span class="mif-cog"></span>
+							</span>
+						</span>
 						<select class="input-small" id="crownColorSelect" data-role="select" data-prepend="Attribute"></select>
 						<select class="input-small" id="crownColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
+						<ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
+							<div class="row mb-2">
+								<label class="cell-sm-2">Label</label>
+								<div class="cell-sm-10">
+									<input type="text" data-role="input" id="crownColorLegendLabel" onclick="event.stopPropagation();">
+								</div>
+							</div>
+							<div class="row mb-2">
+								<label class="cell-sm-2">x</label>
+								<div class="cell-sm-10">
+									<input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="-0.5" data-fixed="2" id="crownColorLegendXPos"></input>
+								</div>
+							</div>
+							<div class="row mb-2">
+								<label class="cell-sm-2">y</label>
+								<div class="cell-sm-10">
+									<input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0" data-fixed="2" id="crownColorLegendYPos"></input>
+								</div>
+							</div>
+                        </ul>
 					</div>
 
 					<div class="paddedRibbonForm" title="Higher value means less detail (and better performance)">

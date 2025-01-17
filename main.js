@@ -41,7 +41,7 @@ function init() {
     //orthoCamera.position.set(3, 0, 10);
 
     orthoCamera = new THREE.OrthographicCamera( - 10, 10, 10/aspect, - 10/aspect, 1, 2 );
-    orthoCamera.position.set( -7, 0, 1 );
+    orthoCamera.position.set( 0, 0, 1 );
 
     // Needed to make objects attached to
     // the camera (legend) visible.
