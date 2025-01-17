@@ -93,7 +93,7 @@ class CohortTimestep {
     // Age: Age of cohort
     // Pos: Center position of cohort [0//1]
     // Height: Height of tree
-    // Boleht: Bole height of tree
+    // Boleht: Bole (stem) height of tree
     // Diam: Diameter of stem (m)
     // CrownA: Crown area (m2)
     // DensI: Density of trees in cohort (trees m//2)

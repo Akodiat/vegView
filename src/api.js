@@ -29,14 +29,14 @@ class Api {
         }
 
         // Populate color map selects
-        for (const s of ["#boleColorMapSelect", "#crownColorMapSelect"]) {
+        for (const s of ["#stemColorMapSelect", "#crownColorMapSelect"]) {
             // eslint-disable-next-line no-undef
             const select = $(s).data("select");
             select.data(data);
         }
 
-        ["boleColorSelect", "boleColorMapSelect"].forEach(select=>
-            document.getElementById(select).addEventListener("change", ()=>this.setBoleColorMapFromUI())
+        ["stemColorSelect", "stemColorMapSelect"].forEach(select=>
+            document.getElementById(select).addEventListener("change", ()=>this.setStemColorMapFromUI())
         );
         ["crownColorSelect", "crownColorMapSelect"].forEach(select=>
             document.getElementById(select).addEventListener("change", ()=>this.setCrownColorMapFromUI())
@@ -54,10 +54,10 @@ class Api {
         this.renderer.render(this.uiScene, this.orthoCamera);
     }
 
-    setBoleColorMapFromUI() {
-        const attributeSelect = document.getElementById("boleColorSelect");
-        const colorMapSelect = document.getElementById("boleColorMapSelect");
-        this.setBoleColorMap(attributeSelect.value, colorMapSelect.value);
+    setStemColorMapFromUI() {
+        const attributeSelect = document.getElementById("stemColorSelect");
+        const colorMapSelect = document.getElementById("stemColorMapSelect");
+        this.setStemColorMap(attributeSelect.value, colorMapSelect.value);
         colorMapSelect.disabled = attributeSelect.value === "PFT";
     }
 
@@ -69,16 +69,16 @@ class Api {
     }
 
     /**
-     * Color boles by a data attribute. Call without arguments to clear.
+     * Color stems by a data attribute. Call without arguments to clear.
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
      */
-    setBoleColorMap(attribute, colorMap="rainbow") {
+    setStemColorMap(attribute, colorMap="rainbow") {
         if (attribute === undefined || attribute === "PFT") {
-            this.patchManager.boleColorMap = undefined;
+            this.patchManager.stemColorMap = undefined;
         } else {
             const lut = this.calcLut(attribute, colorMap);
-            this.patchManager.boleColorMap = {
+            this.patchManager.stemColorMap = {
                 lut: lut,
                 attribute: attribute
             };

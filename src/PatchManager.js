@@ -25,7 +25,7 @@ class PatchManager {
         this.currentYear = undefined;
         this.years = new Set();
         this.usedPFTs = new Set();
-        this.boleColor = new THREE.Color(0x8c654a);
+        this.stemColor = new THREE.Color(0x8c654a);
         this.crownColor = new THREE.Color(0x426628);
         this.patchMargins = 1.05;
         this.detailedTreeFactor = 3;
@@ -253,10 +253,10 @@ class PatchManager {
                 cohort.instancedCrowns.material.needsUpdate = true;
                 cohort.instancedBoles.material.needsUpdate = true;
 
-                let crownColor, boleColor;
+                let crownColor, stemColor;
                 if (this.detailedTrees) {
                     crownColor = cohort.instancedCrowns.material.color;
-                    boleColor = cohort.instancedBoles.material.color;
+                    stemColor = cohort.instancedBoles.material.color;
                 } else {
                     if (this.crownColorMap) {
                         crownColor = this.crownColorMap.lut.getColor(
@@ -265,12 +265,12 @@ class PatchManager {
                     } else {
                         crownColor = this.pftConstants[cohortData.PFT].color.clone();
                     }
-                    if (this.boleColorMap) {
-                        boleColor = this.boleColorMap.lut.getColor(
-                            cohortData[this.boleColorMap.attribute]
+                    if (this.stemColorMap) {
+                        stemColor = this.stemColorMap.lut.getColor(
+                            cohortData[this.stemColorMap.attribute]
                         );
                     } else {
-                        boleColor = this.boleColor;
+                        stemColor = this.stemColor;
                     }
                 }
 
@@ -303,7 +303,7 @@ class PatchManager {
                             this.detailedTrees? 1 : cohortData.Boleht,
                             this.detailedTrees? 1 : cohortData.Diam
                         ),
-                        color: boleColor
+                        color: stemColor
                     };
                     updateInstance(cohort.instancedBoles, boleElem, iTree, mTemp);
 

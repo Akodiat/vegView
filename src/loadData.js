@@ -82,7 +82,7 @@ async function loadData(files, patchManager = new PatchManager()) {
 
     attributes.forEach(v => data[v] = v);
 
-    for (const s of ["#boleColorSelect", "#crownColorSelect"]) {
+    for (const s of ["#stemColorSelect", "#crownColorSelect"]) {
         // eslint-disable-next-line no-undef
         const select = $(s).data("select");
         select.data(data);
