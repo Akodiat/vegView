@@ -68,7 +68,8 @@ class Api {
             "ColorMapSelect",
             "ColorLegendLabel",
             "ColorLegendXPos",
-            "ColorLegendYPos"
+            "ColorLegendYPos",
+            "ColorLegendVertical"
         ].forEach(idSuffix=> {
             document.getElementById("stem"+idSuffix).addEventListener("change", ()=>this.setStemColorMapFromUI());
             document.getElementById("crown"+idSuffix).addEventListener("change", ()=>this.setCrownColorMapFromUI());
@@ -93,6 +94,7 @@ class Api {
         const colorLegendLabel = document.getElementById("stemColorLegendLabel");
         const colorLegendXPos = document.getElementById("stemColorLegendXPos");
         const colorLegendYPos = document.getElementById("stemColorLegendYPos");
+        const colorLegendVertical = document.getElementById("stemColorLegendVertical");
         this.setStemColorMap(
             attributeSelect.value,
             colorMapSelect.value,
@@ -100,7 +102,8 @@ class Api {
                 Number.parseFloat(colorLegendXPos.value),
                 Number.parseFloat(colorLegendYPos.value)
             ),
-            colorLegendLabel.value
+            colorLegendLabel.value,
+            colorLegendVertical.checked
         );
         colorMapSelect.disabled = attributeSelect.value === "PFT";
     }
@@ -112,6 +115,7 @@ class Api {
         const colorLegendLabel = document.getElementById("crownColorLegendLabel");
         const colorLegendXPos = document.getElementById("crownColorLegendXPos");
         const colorLegendYPos = document.getElementById("crownColorLegendYPos");
+        const colorLegendVertical = document.getElementById("crownColorLegendVertical");
         this.setCrownColorMap(
             attributeSelect.value,
             colorMapSelect.value,
@@ -119,7 +123,8 @@ class Api {
                 Number.parseFloat(colorLegendXPos.value),
                 Number.parseFloat(colorLegendYPos.value)
             ),
-            colorLegendLabel.value
+            colorLegendLabel.value,
+            colorLegendVertical.checked
         );
         colorMapSelect.disabled = attributeSelect.value === "PFT";
     }
@@ -130,7 +135,7 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label
+     * @param {string} legendLabel Legend label (enclose LaTeX math expressions in $-signs)
      * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
      */
     setColorMap(
@@ -160,7 +165,7 @@ class Api {
             this[target+"LegendGroup"].position.y = legendPosition.y * this.orthoCamera.right;
 
             if (legendLabel === undefined || legendLabel === "") {
-                legendLabel = `${target} color (${attribute})`;
+                legendLabel = `${attribute} (${target} color)`;
             }
 
             let labelParams = {
@@ -176,7 +181,7 @@ class Api {
                 legend = lut.setLegendOn({layout: "horizontal"});
             }
             this[target+"LegendGroup"].add(legend);
-            let labels = lut.setLegendLabels(labelParams);
+            let labels = lut.setLegendLabels(labelParams, undefined, ()=>this.render());
             this[target+"LegendGroup"].add(labels["title"]);
             for (let i = 0; i &lt; Object.keys(labels["ticks"]).length; i++) {
                 this[target+"LegendGroup"].add(labels["ticks"][i]);
@@ -196,7 +201,7 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label
+     * @param {string} legendLabel Legend label  (enclose LaTeX math expressions in $-signs)
      * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
      */
     setStemColorMap(
@@ -213,7 +218,7 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Height"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label
+     * @param {string} legendLabel Legend label (enclose LaTeX math expressions in $-signs)
      * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
      */
     setCrownColorMap(attribute, colorMap="rainbow",
@@ -749,7 +754,7 @@ export {Api};</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Jan 17 2025 15:25:30 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Mon Jan 20 2025 13:08:26 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
