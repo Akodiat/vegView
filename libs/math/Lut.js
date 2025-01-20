@@ -20,7 +20,10 @@ import {
 const defaultLegendParameters = {
     layout: "vertical",
     position: new Vector3(),
-    dimensions: { width: 0.5, height: 3 }
+    dimensions: {
+        width: 0.5,
+        height: 3
+    }
 };
 
 const defaultLabelParameters = {
@@ -32,13 +35,23 @@ const defaultLabelParameters = {
     notation: "standard"
 };
 
-const defaultBackgroundColor = { r: 255, g: 100, b: 100, a: 0.8 };
-const defaultBorderColor = { r: 255, g: 0, b: 0, a: 1.0 };
+const defaultBackgroundColor = {
+    r: 255,
+    g: 100,
+    b: 100,
+    a: 0.8
+};
+const defaultBorderColor = {
+    r: 255,
+    g: 0,
+    b: 0,
+    a: 1.0
+};
 const defaultBorderThickness = 4;
 
 class Lut {
 
-    constructor( colormap, count = 32 ) {
+    constructor(colormap, count = 32) {
 
         this.isLut = true;
 
@@ -48,15 +61,15 @@ class Lut {
         this.minV = 0;
         this.maxV = 1;
 
-        this.setColorMap( colormap, count );
+        this.setColorMap(colormap, count);
 
     }
 
-    set( value ) {
+    set(value) {
 
-        if ( value.isLut === true ) {
+        if (value.isLut === true) {
 
-            this.copy( value );
+            this.copy(value);
 
         }
 
@@ -64,7 +77,7 @@ class Lut {
 
     }
 
-    setMin( min ) {
+    setMin(min) {
 
         this.minV = min;
 
@@ -72,7 +85,7 @@ class Lut {
 
     }
 
-    setMax( max ) {
+    setMax(max) {
 
         this.maxV = max;
 
@@ -80,9 +93,9 @@ class Lut {
 
     }
 
-    setColorMap( colormap, count = 32 ) {
+    setColorMap(colormap, count = 32) {
 
-        this.map = ColorMapKeywords[ colormap ] || ColorMapKeywords.rainbow;
+        this.map = ColorMapKeywords[colormap] || ColorMapKeywords.rainbow;
         this.n = count;
 
         const step = 1.0 / this.n;
@@ -93,27 +106,27 @@ class Lut {
 
         // sample at 0
 
-        this.lut.push( new Color( this.map[ 0 ][ 1 ] ) );
+        this.lut.push(new Color(this.map[0][1]));
 
         // sample at 1/n, ..., (n-1)/n
 
-        for ( let i = 1; i < count; i ++ ) {
+        for (let i = 1; i < count; i++) {
 
             const alpha = i * step;
 
-            for ( let j = 0; j < this.map.length - 1; j ++ ) {
+            for (let j = 0; j < this.map.length - 1; j++) {
 
-                if ( alpha > this.map[ j ][ 0 ] && alpha <= this.map[ j + 1 ][ 0 ] ) {
+                if (alpha > this.map[j][0] && alpha <= this.map[j + 1][0]) {
 
-                    const min = this.map[ j ][ 0 ];
-                    const max = this.map[ j + 1 ][ 0 ];
+                    const min = this.map[j][0];
+                    const max = this.map[j + 1][0];
 
-                    minColor.setHex( this.map[ j ][ 1 ], LinearSRGBColorSpace );
-                    maxColor.setHex( this.map[ j + 1 ][ 1 ], LinearSRGBColorSpace );
+                    minColor.setHex(this.map[j][1], LinearSRGBColorSpace);
+                    maxColor.setHex(this.map[j + 1][1], LinearSRGBColorSpace);
 
-                    const color = new Color().lerpColors( minColor, maxColor, ( alpha - min ) / ( max - min ) );
+                    const color = new Color().lerpColors(minColor, maxColor, (alpha - min) / (max - min));
 
-                    this.lut.push( color );
+                    this.lut.push(color);
 
                 }
 
@@ -123,13 +136,13 @@ class Lut {
 
         // sample at 1
 
-        this.lut.push( new Color( this.map[ this.map.length - 1 ][ 1 ] ) );
+        this.lut.push(new Color(this.map[this.map.length - 1][1]));
 
         return this;
 
     }
 
-    copy( lut ) {
+    copy(lut) {
 
         this.lut = lut.lut;
         this.map = lut.map;
@@ -141,21 +154,21 @@ class Lut {
 
     }
 
-    getColor( alpha ) {
+    getColor(alpha) {
 
-        alpha = MathUtils.clamp( alpha, this.minV, this.maxV );
+        alpha = MathUtils.clamp(alpha, this.minV, this.maxV);
 
-        alpha = ( alpha - this.minV ) / ( this.maxV - this.minV );
+        alpha = (alpha - this.minV) / (this.maxV - this.minV);
 
-        const colorPosition = Math.round( alpha * this.n );
+        const colorPosition = Math.round(alpha * this.n);
 
-        return this.lut[ colorPosition ];
+        return this.lut[colorPosition];
 
     }
 
-    addColorMap( name, arrayOfColors ) {
+    addColorMap(name, arrayOfColors) {
 
-        ColorMapKeywords[ name ] = arrayOfColors;
+        ColorMapKeywords[name] = arrayOfColors;
 
         return this;
 
@@ -167,17 +180,19 @@ class Lut {
         canvas.width = 1;
         canvas.height = this.n;
 
-        this.updateCanvas( canvas );
+        this.updateCanvas(canvas);
 
         return canvas;
 
     }
 
-    updateCanvas( canvas ) {
+    updateCanvas(canvas) {
 
-        const ctx = canvas.getContext( "2d", { alpha: false } );
+        const ctx = canvas.getContext("2d", {
+            alpha: false
+        });
 
-        const imageData = ctx.getImageData( 0, 0, 1, this.n );
+        const imageData = ctx.getImageData(0, 0, 1, this.n);
 
         const data = imageData.data;
 
@@ -189,24 +204,24 @@ class Lut {
         const maxColor = new Color();
         const finalColor = new Color();
 
-        for ( let i = 1; i >= 0; i -= step ) {
+        for (let i = 1; i >= 0; i -= step) {
 
-            for ( let j = this.map.length - 1; j >= 0; j -- ) {
+            for (let j = this.map.length - 1; j >= 0; j--) {
 
-                if ( i < this.map[ j ][ 0 ] && i >= this.map[ j - 1 ][ 0 ] ) {
+                if (i < this.map[j][0] && i >= this.map[j - 1][0]) {
 
-                    const min = this.map[ j - 1 ][ 0 ];
-                    const max = this.map[ j ][ 0 ];
+                    const min = this.map[j - 1][0];
+                    const max = this.map[j][0];
 
-                    minColor.setHex( this.map[ j - 1 ][ 1 ], LinearSRGBColorSpace );
-                    maxColor.setHex( this.map[ j ][ 1 ], LinearSRGBColorSpace );
+                    minColor.setHex(this.map[j - 1][1], LinearSRGBColorSpace);
+                    maxColor.setHex(this.map[j][1], LinearSRGBColorSpace);
 
-                    finalColor.lerpColors( minColor, maxColor, ( i - min ) / ( max - min ) );
+                    finalColor.lerpColors(minColor, maxColor, (i - min) / (max - min));
 
-                    data[ k * 4 ] = Math.round( finalColor.r * 255 );
-                    data[ k * 4 + 1 ] = Math.round( finalColor.g * 255 );
-                    data[ k * 4 + 2 ] = Math.round( finalColor.b * 255 );
-                    data[ k * 4 + 3 ] = 255;
+                    data[k * 4] = Math.round(finalColor.r * 255);
+                    data[k * 4 + 1] = Math.round(finalColor.g * 255);
+                    data[k * 4 + 2] = Math.round(finalColor.b * 255);
+                    data[k * 4 + 3] = 255;
 
                     k += 1;
 
@@ -216,7 +231,7 @@ class Lut {
 
         }
 
-        ctx.putImageData( imageData, 0, 0 );
+        ctx.putImageData(imageData, 0, 0);
 
         return canvas;
 
@@ -241,21 +256,24 @@ class Lut {
 
         this.legend.canvas = canvas;
 
-        this.legend.texture = new Texture( canvas );
+        this.legend.texture = new Texture(canvas);
         this.legend.texture.needsUpdate = true;
 
-        this.legend.legendGeometry = new PlaneGeometry( this.legend.dimensions.width, this.legend.dimensions.height );
-        this.legend.legendMaterial = new MeshBasicMaterial( { map: this.legend.texture, side: DoubleSide } );
+        this.legend.legendGeometry = new PlaneGeometry(this.legend.dimensions.width, this.legend.dimensions.height);
+        this.legend.legendMaterial = new MeshBasicMaterial({
+            map: this.legend.texture,
+            side: DoubleSide
+        });
 
-        this.legend.mesh = new Mesh( this.legend.legendGeometry, this.legend.legendMaterial );
+        this.legend.mesh = new Mesh(this.legend.legendGeometry, this.legend.legendMaterial);
 
-        if ( this.legend.layout == "horizontal" ) {
+        if (this.legend.layout == "horizontal") {
 
-            this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
+            this.legend.mesh.rotation.z = -90 * (Math.PI / 180);
 
         }
 
-        this.legend.mesh.position.copy( this.legend.position );
+        this.legend.mesh.position.copy(this.legend.position);
 
         return this.legend.mesh;
 
@@ -271,19 +289,19 @@ class Lut {
 
     setLegendLayout(layout) {
 
-        if ( ! this.legend ) {
+        if (!this.legend) {
 
             return false;
 
         }
 
-        if ( this.legend.layout == layout ) {
+        if (this.legend.layout == layout) {
 
             return false;
 
         }
 
-        if ( layout != "horizontal" && layout != "vertical" ) {
+        if (layout != "horizontal" && layout != "vertical") {
 
             return false;
 
@@ -291,15 +309,15 @@ class Lut {
 
         this.layout = layout;
 
-        if ( layout == "horizontal" ) {
+        if (layout == "horizontal") {
 
-            this.legend.mesh.rotation.z = 90 * ( Math.PI / 180 );
+            this.legend.mesh.rotation.z = 90 * (Math.PI / 180);
 
         }
 
-        if ( layout == "vertical" ) {
+        if (layout == "vertical") {
 
-            this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
+            this.legend.mesh.rotation.z = -90 * (Math.PI / 180);
 
         }
 
@@ -307,15 +325,15 @@ class Lut {
 
     }
 
-    setLegendPosition( position ) {
+    setLegendPosition(position) {
 
-        if ( position.isVector3 ) {
+        if (position.isVector3) {
 
-            this.legend.position.copy( position );
+            this.legend.position.copy(position);
 
         } else {
 
-            this.legend.position.set( position.x, position.y, position.z );
+            this.legend.position.set(position.x, position.y, position.z);
 
         }
 
@@ -323,15 +341,15 @@ class Lut {
 
     }
 
-    setLegendLabels( parameters, callback ) {
+    setLegendLabels(parameters, callback, render) {
 
-        if ( ! this.legend ) {
+        if (!this.legend) {
 
             return false;
 
         }
 
-        if ( typeof parameters === "function" ) {
+        if (typeof parameters === "function") {
 
             callback = parameters;
             parameters = undefined;
@@ -342,99 +360,128 @@ class Lut {
         this.legend.labels = {};
 
         this.legend.labels.fontsize = parameters.fontsize || defaultLabelParameters.fontsize;
-
         this.legend.labels.fontface = parameters.fontface || defaultLabelParameters.fontface;
-
         this.legend.labels.title = parameters.title || defaultLabelParameters.title;
-
         this.legend.labels.ticks = parameters.ticks || defaultLabelParameters.ticks;
-
         this.legend.labels.decimal = parameters.decimal || defaultLabelParameters.decimal;
-
         this.legend.labels.notation = parameters.notation || defaultLabelParameters.notation;
 
-        const canvasTitle = document.createElement( "canvas" );
-        const contextTitle = canvasTitle.getContext( "2d" );
+        const canvasTitle = document.createElement("canvas");
+        const contextTitle = canvasTitle.getContext("2d");
 
+        /*
         contextTitle.font = "Normal " + this.legend.labels.fontsize * 1.2 + "px " + this.legend.labels.fontface;
-
         contextTitle.fillStyle = "rgba(" + defaultBackgroundColor.r + "," + defaultBackgroundColor.g + "," + defaultBackgroundColor.b + "," + defaultBackgroundColor.a + ")";
-
         contextTitle.strokeStyle = "rgba(" + defaultBorderColor.r + "," + defaultBorderColor.g + "," + defaultBorderColor.b + "," + defaultBorderColor.a + ")";
-
         contextTitle.lineWidth = defaultBorderThickness;
-
         contextTitle.fillStyle = "rgba( 0, 0, 0, 1.0 )";
+        */
+        let wrapper = MathJax.tex2svg(`\\text{${this.legend.labels.title}}`, {em: 64, ex: 32, display: false});
+        let output = {svg: "", img: ""};
+        let mjOut = wrapper.getElementsByTagName("svg")[0];
+        output.svg = mjOut.outerHTML;
+        var image = new Image();
+        image.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(output.svg)));
 
-        contextTitle.fillText( this.legend.labels.title.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness );
 
-        const txtTitle = new CanvasTexture( canvasTitle );
+        //contextTitle.fillText(this.legend.labels.title.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness);
+
+        const txtTitle = new CanvasTexture(canvasTitle);
         txtTitle.minFilter = LinearFilter;
 
-        const spriteMaterialTitle = new SpriteMaterial( { map: txtTitle } );
+        const spriteMaterialTitle = new SpriteMaterial({
+            map: txtTitle
+        });
 
-        const spriteTitle = new Sprite( spriteMaterialTitle );
+        const spriteTitle = new Sprite(spriteMaterialTitle);
 
-        spriteTitle.scale.set( 2, 1, 1.0 );
+        image.onload = function() {
+            const scaleFactor = 2;
+            contextTitle.drawImage(image, 0, 0,
+                scaleFactor * image.width,
+                scaleFactor * image.height
+            );
+            output.img = canvasTitle.toDataURL("image/png");
 
-        if ( this.legend.layout == "vertical" ) {
+            const txtTitle = new CanvasTexture(canvasTitle);
+            txtTitle.minFilter = LinearFilter;
 
-            spriteTitle.position.set( this.legend.position.x + this.legend.dimensions.width, this.legend.position.y + ( this.legend.dimensions.height * 0.45 ), this.legend.position.z );
+            spriteTitle.material = new SpriteMaterial({
+                map: txtTitle
+            });
+
+            if (render !== undefined) {
+                render();
+            }
+        };
+
+        spriteTitle.scale.set(2, 1, 1.0);
+
+        if (this.legend.layout == "vertical") {
+
+            spriteTitle.position.set(
+                this.legend.position.x + this.legend.dimensions.width,
+                this.legend.position.y + (this.legend.dimensions.height * 0.5),
+                this.legend.position.z
+            );
 
         }
 
-        if ( this.legend.layout == "horizontal" ) {
+        if (this.legend.layout == "horizontal") {
 
-            spriteTitle.position.set( this.legend.position.x * 1.015, this.legend.position.y + ( this.legend.dimensions.height * 0.03 ), this.legend.position.z );
+            spriteTitle.position.set(
+                this.legend.position.x - this.legend.dimensions.width,
+                this.legend.position.y,
+                this.legend.position.z);
 
         }
 
         let ticks, lines;
         let topPositionX, topPositionY, bottomPositionX, bottomPositionY;
 
-        if ( this.legend.labels.ticks > 0 ) {
+        if (this.legend.labels.ticks > 0) {
 
             ticks = {};
             lines = {};
 
-            if ( this.legend.layout == "vertical" ) {
+            if (this.legend.layout == "vertical") {
 
-                topPositionY = this.legend.position.y + ( this.legend.dimensions.height * 0.36 );
-                bottomPositionY = this.legend.position.y - ( this.legend.dimensions.height * 0.61 );
-
-            }
-
-            if ( this.legend.layout == "horizontal" ) {
-
-                topPositionX = this.legend.position.x + ( this.legend.dimensions.height * 0.75 );
-                bottomPositionX = this.legend.position.x - ( this.legend.dimensions.width * 1.2 );
+                topPositionY = this.legend.position.y + (this.legend.dimensions.height * 0.36);
+                bottomPositionY = this.legend.position.y - (this.legend.dimensions.height * 0.61);
 
             }
 
-            for ( let i = 0; i < this.legend.labels.ticks; i ++ ) {
+            if (this.legend.layout == "horizontal") {
 
-                let value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1 ) * i + this.minV;
+                topPositionX = this.legend.position.x + (this.legend.dimensions.height * 0.75);
+                bottomPositionX = this.legend.position.x - (this.legend.dimensions.width * 1.2);
 
-                if ( callback ) {
+            }
 
-                    value = callback( value );
+            for (let i = 0; i < this.legend.labels.ticks; i++) {
+
+                let value = (this.maxV - this.minV) / (this.legend.labels.ticks - 1) * i + this.minV;
+
+                if (callback) {
+
+                    value = callback(value);
 
                 } else {
 
-                    if ( this.legend.labels.notation == "scientific" ) {
+                    if (this.legend.labels.notation == "scientific") {
 
-                        value = value.toExponential( this.legend.labels.decimal );
+                        value = value.toExponential(this.legend.labels.decimal);
 
                     } else {
 
-                        value = value.toFixed( this.legend.labels.decimal );
+                        value = value.toFixed(this.legend.labels.decimal);
 
                     }
 
                 }
 
-                const canvasTick = document.createElement( "canvas" );
-                const contextTick = canvasTick.getContext( "2d" );
+                const canvasTick = document.createElement("canvas");
+                const contextTick = canvasTick.getContext("2d");
 
                 contextTick.font = "Normal " + this.legend.labels.fontsize + "px " + this.legend.labels.fontface;
 
@@ -446,34 +493,36 @@ class Lut {
 
                 contextTick.fillStyle = "rgba( 0, 0, 0, 1.0 )";
 
-                contextTick.fillText( value.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness );
+                contextTick.fillText(value.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness);
 
-                const txtTick = new CanvasTexture( canvasTick );
+                const txtTick = new CanvasTexture(canvasTick);
                 txtTick.minFilter = LinearFilter;
 
-                const spriteMaterialTick = new SpriteMaterial( { map: txtTick } );
+                const spriteMaterialTick = new SpriteMaterial({
+                    map: txtTick
+                });
 
-                const spriteTick = new Sprite( spriteMaterialTick );
+                const spriteTick = new Sprite(spriteMaterialTick);
 
-                spriteTick.scale.set( 2, 1, 1.0 );
+                spriteTick.scale.set(2, 1, 1.0);
 
-                if ( this.legend.layout == "vertical" ) {
+                if (this.legend.layout == "vertical") {
 
-                    const position = bottomPositionY + ( topPositionY - bottomPositionY ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) );
+                    const position = bottomPositionY + (topPositionY - bottomPositionY) * ((value - this.minV) / (this.maxV - this.minV));
 
-                    spriteTick.position.set( this.legend.position.x + ( this.legend.dimensions.width * 2.7 ), position, this.legend.position.z );
+                    spriteTick.position.set(this.legend.position.x + (this.legend.dimensions.width * 2.7), position, this.legend.position.z);
 
                 }
 
-                if ( this.legend.layout == "horizontal" ) {
+                if (this.legend.layout == "horizontal") {
 
-                    const position = bottomPositionX + ( topPositionX - bottomPositionX ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) );
+                    const position = bottomPositionX + (topPositionX - bottomPositionX) * ((value - this.minV) / (this.maxV - this.minV));
 
                     let offset;
 
-                    if ( this.legend.labels.ticks > 5 ) {
+                    if (this.legend.labels.ticks > 5) {
 
-                        if ( i % 2 === 0 ) {
+                        if (i % 2 === 0) {
 
                             offset = 1.7;
 
@@ -489,57 +538,61 @@ class Lut {
 
                     }
 
-                    spriteTick.position.set( position, this.legend.position.y - this.legend.dimensions.width * offset, this.legend.position.z );
+                    spriteTick.position.set(position, this.legend.position.y - this.legend.dimensions.width * offset, this.legend.position.z);
 
                 }
 
-                const material = new LineBasicMaterial( { color: 0x000000, linewidth: 2 } );
+                const material = new LineBasicMaterial({
+                    color: 0x000000,
+                    linewidth: 2
+                });
 
                 const points = [];
 
 
-                if ( this.legend.layout == "vertical" ) {
+                if (this.legend.layout == "vertical") {
 
-                    const linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) * 0.99 );
+                    const linePosition = (this.legend.position.y - (this.legend.dimensions.height * 0.5) + 0.01) + (this.legend.dimensions.height) * ((value - this.minV) / (this.maxV - this.minV) * 0.99);
 
-                    points.push( new Vector3( this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition, this.legend.position.z ) );
+                    points.push(new Vector3(this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition, this.legend.position.z));
 
-                    points.push( new Vector3( this.legend.position.x + this.legend.dimensions.width * 0.7, linePosition, this.legend.position.z ) );
-
-                }
-
-                if ( this.legend.layout == "horizontal" ) {
-
-                    const linePosition = ( this.legend.position.x - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) * 0.99 );
-
-                    points.push( new Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.55, this.legend.position.z ) );
-
-                    points.push( new Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.7, this.legend.position.z ) );
+                    points.push(new Vector3(this.legend.position.x + this.legend.dimensions.width * 0.7, linePosition, this.legend.position.z));
 
                 }
 
-                const geometry = new BufferGeometry().setFromPoints( points );
+                if (this.legend.layout == "horizontal") {
 
-                const line = new Line( geometry, material );
+                    const linePosition = (this.legend.position.x - (this.legend.dimensions.height * 0.5) + 0.01) + (this.legend.dimensions.height) * ((value - this.minV) / (this.maxV - this.minV) * 0.99);
 
-                lines[ i ] = line;
-                ticks[ i ] = spriteTick;
+                    points.push(new Vector3(linePosition, this.legend.position.y - this.legend.dimensions.width * 0.55, this.legend.position.z));
+
+                    points.push(new Vector3(linePosition, this.legend.position.y - this.legend.dimensions.width * 0.7, this.legend.position.z));
+
+                }
+
+                const geometry = new BufferGeometry().setFromPoints(points);
+
+                const line = new Line(geometry, material);
+
+                lines[i] = line;
+                ticks[i] = spriteTick;
 
             }
 
         }
 
-        return { "title": spriteTitle, "ticks": ticks, "lines": lines };
+        return {
+            "title": spriteTitle,
+            "ticks": ticks,
+            "lines": lines
+        };
 
     }
-
 
 }
 
 const ColorMapKeywords = {
 
-    "rainbow":    [ [ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ],  [ 1.0, 0xFF0000 ] ],
-    "cooltowarm": [ [ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ],  [ 1.0, 0xB40426 ] ],
     "blackbody" : [ [ 0.0, 0x000000 ], [ 0.2, 0x780000 ], [ 0.5, 0xE63200 ], [ 0.8, 0xFFFF00 ],  [ 1.0, 0xFFFFFF ] ],
     "grayscale" : [ [ 0.0, 0x000000 ], [ 0.2, 0x404040 ], [ 0.5, 0x7F7F80 ], [ 0.8, 0xBFBFBF ],  [ 1.0, 0xFFFFFF ] ],
     "viridis":	[ [ 0.0, 0x440154 ], [ 0.25, 0x414487 ], [ 0.5, 0x2a788e ], [ 0.75, 0x22a884 ],  [ 1.0, 0x7ad151 ] ],
@@ -590,6 +643,7 @@ const ColorMapKeywords = {
     "RdYlBu":	[ [ 0.0, 0xa50026 ], [ 0.25, 0xf46d43 ], [ 0.5, 0xfee090 ], [ 0.75, 0xe0f3f8 ],  [ 1.0, 0x74add1 ] ],
     "RdYlGn":	[ [ 0.0, 0xa50026 ], [ 0.25, 0xf46d43 ], [ 0.5, 0xfee08b ], [ 0.75, 0xd9ef8b ],  [ 1.0, 0x66bd63 ] ],
     "Spectral":	[ [ 0.0, 0x9e0142 ], [ 0.25, 0xf46d43 ], [ 0.5, 0xfee08b ], [ 0.75, 0xe6f598 ],  [ 1.0, 0x66c2a5 ] ],
+    "cooltowarm": [ [ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ],  [ 1.0, 0xB40426 ] ],
     "coolwarm":	[ [ 0.0, 0x3b4cc0 ], [ 0.25, 0x7b9ff9 ], [ 0.5, 0xc0d4f5 ], [ 0.75, 0xf2cbb7 ],  [ 1.0, 0xee8468 ] ],
     "bwr":	[ [ 0.0, 0x0000ff ], [ 0.25, 0x6666ff ], [ 0.5, 0xccccff ], [ 0.75, 0xffcccc ],  [ 1.0, 0xff6666 ] ],
     "seismic":	[ [ 0.0, 0x00004c ], [ 0.25, 0x0000db ], [ 0.5, 0x9999ff ], [ 0.75, 0xff9999 ],  [ 1.0, 0xe60000 ] ],
@@ -606,6 +660,7 @@ const ColorMapKeywords = {
     "cubehelix":	[ [ 0.0, 0x000000 ], [ 0.25, 0x163d4e ], [ 0.5, 0x54792f ], [ 0.75, 0xd07e93 ],  [ 1.0, 0xc1caf3 ] ],
     "brg":	[ [ 0.0, 0x0000ff ], [ 0.25, 0x660099 ], [ 0.5, 0xcc0033 ], [ 0.75, 0xcc3300 ],  [ 1.0, 0x669900 ] ],
     "gist_rainbow":	[ [ 0.0, 0xff0029 ], [ 0.25, 0xffea00 ], [ 0.5, 0x00ff00 ], [ 0.75, 0x00ecff ],  [ 1.0, 0x2a00ff ] ],
+    "rainbow":    [ [ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ],  [ 1.0, 0xFF0000 ] ],
     "rainbow_mpl":	[ [ 0.0, 0x8000ff ], [ 0.25, 0x1996f3 ], [ 0.5, 0x4df3ce ], [ 0.75, 0xb2f396 ],  [ 1.0, 0xff964f ] ],
     "jet":	[ [ 0.0, 0x000080 ], [ 0.25, 0x004cff ], [ 0.5, 0x29ffce ], [ 0.75, 0xceff29 ],  [ 1.0, 0xff6800 ] ],
     "nipy_spectral":	[ [ 0.0, 0x000000 ], [ 0.25, 0x0000dd ], [ 0.5, 0x00aa88 ], [ 0.75, 0x00ff00 ],  [ 1.0, 0xff9900 ] ],

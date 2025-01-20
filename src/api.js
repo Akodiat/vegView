@@ -40,7 +40,8 @@ class Api {
             "ColorMapSelect",
             "ColorLegendLabel",
             "ColorLegendXPos",
-            "ColorLegendYPos"
+            "ColorLegendYPos",
+            "ColorLegendVertical"
         ].forEach(idSuffix=> {
             document.getElementById("stem"+idSuffix).addEventListener("change", ()=>this.setStemColorMapFromUI());
             document.getElementById("crown"+idSuffix).addEventListener("change", ()=>this.setCrownColorMapFromUI());
@@ -65,6 +66,7 @@ class Api {
         const colorLegendLabel = document.getElementById("stemColorLegendLabel");
         const colorLegendXPos = document.getElementById("stemColorLegendXPos");
         const colorLegendYPos = document.getElementById("stemColorLegendYPos");
+        const colorLegendVertical = document.getElementById("stemColorLegendVertical");
         this.setStemColorMap(
             attributeSelect.value,
             colorMapSelect.value,
@@ -72,7 +74,8 @@ class Api {
                 Number.parseFloat(colorLegendXPos.value),
                 Number.parseFloat(colorLegendYPos.value)
             ),
-            colorLegendLabel.value
+            colorLegendLabel.value,
+            colorLegendVertical.checked
         );
         colorMapSelect.disabled = attributeSelect.value === "PFT";
     }
@@ -84,6 +87,7 @@ class Api {
         const colorLegendLabel = document.getElementById("crownColorLegendLabel");
         const colorLegendXPos = document.getElementById("crownColorLegendXPos");
         const colorLegendYPos = document.getElementById("crownColorLegendYPos");
+        const colorLegendVertical = document.getElementById("crownColorLegendVertical");
         this.setCrownColorMap(
             attributeSelect.value,
             colorMapSelect.value,
@@ -91,7 +95,8 @@ class Api {
                 Number.parseFloat(colorLegendXPos.value),
                 Number.parseFloat(colorLegendYPos.value)
             ),
-            colorLegendLabel.value
+            colorLegendLabel.value,
+            colorLegendVertical.checked
         );
         colorMapSelect.disabled = attributeSelect.value === "PFT";
     }
@@ -132,7 +137,7 @@ class Api {
             this[target+"LegendGroup"].position.y = legendPosition.y * this.orthoCamera.right;
 
             if (legendLabel === undefined || legendLabel === "") {
-                legendLabel = `${target} color (${attribute})`;
+                legendLabel = `${attribute} (${target} color)`;
             }
 
             let labelParams = {
@@ -148,7 +153,7 @@ class Api {
                 legend = lut.setLegendOn({layout: "horizontal"});
             }
             this[target+"LegendGroup"].add(legend);
-            let labels = lut.setLegendLabels(labelParams);
+            let labels = lut.setLegendLabels(labelParams, undefined, ()=>this.render());
             this[target+"LegendGroup"].add(labels["title"]);
             for (let i = 0; i < Object.keys(labels["ticks"]).length; i++) {
                 this[target+"LegendGroup"].add(labels["ticks"][i]);

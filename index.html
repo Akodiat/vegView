@@ -1,318 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>vegView</title>
+    <head>
+        <title>vegView</title>
 
-		<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+        <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
 
-		<script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
-		<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3"></script>
-		<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.2"></script>
 
-		<style>
+        <script>
+            window.MathJax = {
+                SVG: {
+                    useGlobalCache: false
+                },
+            };
+          </script>
 
-			.select .option-list a {
-				padding: 0 0.5rem 0 0.5rem;
-			}
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js"></script>
 
-			.input input {
-				padding: 0 .2rem;
-			}
+        <style>
 
-			.paddedRibbonForm {
-				margin-left: 5px;
-				margin-right: 5px;
-			}
-			#cohortInfoTable {
-				display: block;
-				width: 100%;
-				max-height: calc(100vh - 380px);
-				overflow-y: auto;
-				overflow-x: clip;
-			}
-			.vega-bindings {
-				display: none;
-			}
+            .select .option-list a {
+                padding: 0 0.5rem 0 0.5rem;
+            }
 
-			#timelineContainer {
-				background-color: rgba(255, 255, 255, 0.808);
-				position: fixed; bottom: 0; display: none;
-				padding: 8px;
-				width: 100%;
-				z-index: 1;
-			}
+            .input input {
+                padding: 0 .2rem;
+            }
 
-			.ribbon-menu {
-				position: absolute;
-				width: 100%;
-				z-index: 1;
-			}
-			.ribbon-menu .tabs-holder {
-				background-color: #f5f6f7cf;
-			}
+            .paddedRibbonForm {
+                margin-left: 5px;
+                margin-right: 5px;
+            }
+            #cohortInfoTable {
+                display: block;
+                width: 100%;
+                max-height: calc(100vh - 380px);
+                overflow-y: auto;
+                overflow-x: clip;
+            }
+            .vega-bindings {
+                display: none;
+            }
 
-			.row {
-				margin: unset;
-			}
+            #timelineContainer {
+                background-color: rgba(255, 255, 255, 0.808);
+                position: fixed; bottom: 0; display: none;
+                padding: 8px;
+                width: 100%;
+                z-index: 1;
+            }
 
-			.plotSelect {
-				width: 200px;
-			}
-		</style>
+            .ribbon-menu {
+                position: absolute;
+                width: 100%;
+                z-index: 1;
+            }
+            .ribbon-menu .tabs-holder {
+                background-color: #f5f6f7cf;
+            }
 
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+            .row {
+                margin: unset;
+            }
 
-		<html data-theme="light"></html>
-	</head>
-	<body style="margin: 0">
-		<div class="dialog" data-role="dialog" id="dataLoadDialog">
-			<div class="dialog-title">Load data</div>
-			<div class="dialog-content">
-				<label for="fileInput">Upload data here:
-					<input type="file" id="fileInput" data-role="file" data-mode="drop" accept=".out" multiple/>
-				</label>
-				<p>
-					A vegetation structure file, e.g. "veg_struct.out" is expected, but you can also add additional data, such as "cpool.out" and "lai.out", by uploading multiple files.
-				</p>
-			</div>
-			<div class="dialog-actions">
-				<button class="button js-dialog-close">Cancel</button>
-				<button class="button primary js-dialog-close" id="dataLoadButton">Load</button>
-			</div>
-		</div>
-		<aside class="sidebar pos-absolute z-2" data-role="sidebar" data-toggle="#sidebar-toggle-2" data-shift=".shifted-content">
-			<div class="sidebar-header bg-grayMouse">
-				<span class="title fg-white">VegView</span>
-				<span class="subtitle fg-white">A vegetation model viewer for LPJ-GUESS<br>Developed by Joakim Bohlin, InfraVis</span>
-			</div>
-			<ul class="sidebar-menu">
-				<li><a href="https://web.nateko.lu.se/lpj-guess/"><span class="mif-home icon"></span>LPJ-GUESS</a></li>
-				<li><a href="./docs/"><span class="mif-book-reference icon"></span>Documentation</a></li>
-				<li><a href="https://github.com/Akodiat/vegView"><span class="mif-github icon"></span>Source code</a></li>
-			</ul>
-		</aside>
-		<nav data-role="ribbonmenu" class="shifted-content">
-			<ul class="tabs-holder">
-				<li class="static" id="sidebar-toggle-2"><a href="#">About</a></li>
-				<li><a href="#section-file">File</a></li>
-				<li><a href="#section-view">View</a></li>
-			</ul>
+            .plotSelect {
+                width: 200px;
+            }
+        </style>
 
-			<div class="content-holder">
-				<div class="section" id="section-file">
-					<button class="ribbon-button primary" onclick="Metro.dialog.open('#dataLoadDialog')">
-						<span class="mif-folder-open mif-4x"></span>
-						<span class="caption">Load data</span>
-					</button>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-						<button class="ribbon-button" onclick="api.exportImage()" title="Save current view as an image">
-							<span class="mif-photo-camera mif-2x"></span>
-							<span class="caption">Image</span>
-						</button>
-						<button class="ribbon-button dropdown-toggle">
-						</button>
-						<ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
-							<label>Scaling factor: </label>
-							<input style="width: 2em;" type="text" data-role="spinner" class="input-small" value="2" id="exportImageScalingFactor"
-								title="Factor with which to scale the current canvas." min=1
-							>
-						</ul>
+        <html data-theme="light"></html>
+    </head>
+    <body style="margin: 0">
+        <div class="dialog" data-role="dialog" id="dataLoadDialog">
+            <div class="dialog-title">Load data</div>
+            <div class="dialog-content">
+                <label for="fileInput">Upload data here:
+                    <input type="file" id="fileInput" data-role="file" data-mode="drop" accept=".out" multiple/>
+                </label>
+                <p>
+                    A vegetation structure file, e.g. "veg_struct.out" is expected, but you can also add additional data, such as "cpool.out" and "lai.out", by uploading multiple files.
+                </p>
+            </div>
+            <div class="dialog-actions">
+                <button class="button js-dialog-close">Cancel</button>
+                <button class="button primary js-dialog-close" id="dataLoadButton">Load</button>
+            </div>
+        </div>
+        <aside class="sidebar pos-absolute z-2" data-role="sidebar" data-toggle="#sidebar-toggle-2" data-shift=".shifted-content">
+            <div class="sidebar-header bg-grayMouse">
+                <span class="title fg-white">VegView</span>
+                <span class="subtitle fg-white">A vegetation model viewer for LPJ-GUESS<br>Developed by Joakim Bohlin, InfraVis</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="https://web.nateko.lu.se/lpj-guess/"><span class="mif-home icon"></span>LPJ-GUESS</a></li>
+                <li><a href="./docs/"><span class="mif-book-reference icon"></span>Documentation</a></li>
+                <li><a href="https://github.com/Akodiat/vegView"><span class="mif-github icon"></span>Source code</a></li>
+            </ul>
+        </aside>
+        <nav data-role="ribbonmenu" class="shifted-content">
+            <ul class="tabs-holder">
+                <li class="static" id="sidebar-toggle-2"><a href="#">About</a></li>
+                <li><a href="#section-file">File</a></li>
+                <li><a href="#section-view">View</a></li>
+            </ul>
 
+            <div class="content-holder">
+                <div class="section" id="section-file">
+                    <button class="ribbon-button primary" onclick="Metro.dialog.open('#dataLoadDialog')">
+                        <span class="mif-folder-open mif-4x"></span>
+                        <span class="caption">Load data</span>
+                    </button>
 
-					<button class="ribbon-button" onclick="api.exportGLTF()">
-						<span class="mif-download mif-2x"></span>
-						<span class="caption">glTF</span>
-					</button>
-
-					<button class="ribbon-button" onclick="api.showVideoExportWindow()">
-						<span class="mif-video-camera mif-2x"></span>
-						<span class="caption">Video</span>
-					</button>
-
-					<button class="ribbon-button" onclick="api.exportCSV()">
-						<span class="mif-file-text mif-2x"></span>
-						<span class="caption">CSV</span>
-					</button>
-
-
-				</div>
-				<div class="section" id="section-view">
-
-					<button class="ribbon-button" onclick="api.showPFTEditor()">
-						<span class="icon">
-							<span class="mif-list"></span>
-						</span>
-						<span class="caption">PFT editor</span>
-					</button>
-
-					<div class="flex-column">
-						<div style="height: 24px;"><input onchange="api.setTreeDetail(this.checked)" type="checkbox" data-role="switch" data-caption="Detailed trees" id="detailedTrees"></div>
-						<div style="height: 24px;"><input onchange="api.setTerrainSmoothness(this.checked)" type="checkbox" data-role="switch" data-caption="Smooth terrain" id="smoothTerrain"></div>
-						<div style="height: 24px;"><input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch" data-caption="PFT legend"></div>
-					</div>
-
-					<div class="paddedRibbonForm" style="width: 12em;">
-						<label>Stem color</label>
-						<span class="ribbon-split dropdown-toggle" style="right: 0; position: absolute;">
-							<span class="icon">
-								<span class="mif-cog"></span>
-							</span>
-						</span>
-						<select class="input-small" id="stemColorSelect" data-role="select" data-prepend="Attribute"></select>
-						<select class="input-small" id="stemColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
+                        <button class="ribbon-button" onclick="api.exportImage()" title="Save current view as an image">
+                            <span class="mif-photo-camera mif-2x"></span>
+                            <span class="caption">Image</span>
+                        </button>
+                        <button class="ribbon-button dropdown-toggle">
+                        </button>
                         <ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
-							<div class="row mb-2">
-								<label class="cell-sm-2">Label</label>
-								<div class="cell-sm-10">
-									<input type="text" data-role="input" id="stemColorLegendLabel" onclick="event.stopPropagation();">
-								</div>
-							</div>
-							<div class="row mb-2">
-								<label class="cell-sm-2">x</label>
-								<div class="cell-sm-10">
-									<input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0.5" data-fixed="2" id="stemColorLegendXPos"></input>
-								</div>
-							</div>
-							<div class="row mb-2">
-								<label class="cell-sm-2">y</label>
-								<div class="cell-sm-10">
-									<input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0" data-fixed="2" id="stemColorLegendYPos"></input>
-								</div>
-							</div>
+                            <label>Scaling factor: </label>
+                            <input style="width: 2em;" type="text" data-role="spinner" class="input-small" value="2" id="exportImageScalingFactor"
+                                title="Factor with which to scale the current canvas." min=1
+                            >
                         </ul>
-					</div>
 
-					<div class="paddedRibbonForm" style="width: 12em;">
-						<label>Crown color</label>
-						<span class="ribbon-split dropdown-toggle" style="right: 0; position: absolute;">
-							<span class="icon">
-								<span class="mif-cog"></span>
-							</span>
-						</span>
-						<select class="input-small" id="crownColorSelect" data-role="select" data-prepend="Attribute"></select>
-						<select class="input-small" id="crownColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
-						<ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
-							<div class="row mb-2">
-								<label class="cell-sm-2">Label</label>
-								<div class="cell-sm-10">
-									<input type="text" data-role="input" id="crownColorLegendLabel" onclick="event.stopPropagation();">
-								</div>
-							</div>
-							<div class="row mb-2">
-								<label class="cell-sm-2">x</label>
-								<div class="cell-sm-10">
-									<input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="-0.5" data-fixed="2" id="crownColorLegendXPos"></input>
-								</div>
-							</div>
-							<div class="row mb-2">
-								<label class="cell-sm-2">y</label>
-								<div class="cell-sm-10">
-									<input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0" data-fixed="2" id="crownColorLegendYPos"></input>
-								</div>
-							</div>
+
+                    <button class="ribbon-button" onclick="api.exportGLTF()">
+                        <span class="mif-download mif-2x"></span>
+                        <span class="caption">glTF</span>
+                    </button>
+
+                    <button class="ribbon-button" onclick="api.showVideoExportWindow()">
+                        <span class="mif-video-camera mif-2x"></span>
+                        <span class="caption">Video</span>
+                    </button>
+
+                    <button class="ribbon-button" onclick="api.exportCSV()">
+                        <span class="mif-file-text mif-2x"></span>
+                        <span class="caption">CSV</span>
+                    </button>
+
+
+                </div>
+                <div class="section" id="section-view">
+
+                    <button class="ribbon-button" onclick="api.showPFTEditor()">
+                        <span class="icon">
+                            <span class="mif-list"></span>
+                        </span>
+                        <span class="caption">PFT editor</span>
+                    </button>
+
+                    <div class="flex-column">
+                        <div style="height: 24px;"><input onchange="api.setTreeDetail(this.checked)" type="checkbox" data-role="switch" data-caption="Detailed trees" id="detailedTrees"></div>
+                        <div style="height: 24px;"><input onchange="api.setTerrainSmoothness(this.checked)" type="checkbox" data-role="switch" data-caption="Smooth terrain" id="smoothTerrain"></div>
+                        <div style="height: 24px;"><input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch" data-caption="PFT legend"></div>
+                    </div>
+
+                    <div class="paddedRibbonForm" style="width: 12em;">
+                        <label>Stem color</label>
+                        <span class="ribbon-split dropdown-toggle" style="right: 0; position: absolute;">
+                            <span class="icon">
+                                <span class="mif-cog"></span>
+                            </span>
+                        </span>
+                        <select class="input-small" id="stemColorSelect" data-role="select" data-prepend="Attribute"></select>
+                        <select class="input-small" id="stemColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
+                        <ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">Label</label>
+                                <div class="cell-sm-10">
+                                    <input type="text" data-role="input" id="stemColorLegendLabel" onclick="event.stopPropagation();">
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">x</label>
+                                <div class="cell-sm-10">
+                                    <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0.5" data-fixed="2" id="stemColorLegendXPos"></input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">y</label>
+                                <div class="cell-sm-10">
+                                    <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0" data-fixed="2" id="stemColorLegendYPos"></input>
+                                </div>
+                            </div>
+
+                            <input type="checkbox" data-role="switch" data-caption="Vertical" id="stemColorLegendVertical" data-caption-position="left">
                         </ul>
-					</div>
+                    </div>
 
-					<div class="paddedRibbonForm" title="Higher value means less detail (and better performance)">
-						<label>Tree detail factor</label>
-						<input onchange="api.setDetailedTreeFactor(this.value)"
-						style="width: 3em;" type="text" data-role="spinner"
-						data-min-value="1" data-step="0.1" value="3"
-						data-fixed="3"
-						>
-					</div>
+                    <div class="paddedRibbonForm" style="width: 12em;">
+                        <label>Crown color</label>
+                        <span class="ribbon-split dropdown-toggle" style="right: 0; position: absolute;">
+                            <span class="icon">
+                                <span class="mif-cog"></span>
+                            </span>
+                        </span>
+                        <select class="input-small" id="crownColorSelect" data-role="select" data-prepend="Attribute"></select>
+                        <select class="input-small" id="crownColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
+                        <ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">Label</label>
+                                <div class="cell-sm-10">
+                                    <input type="text" data-role="input" id="crownColorLegendLabel" onclick="event.stopPropagation();">
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">x</label>
+                                <div class="cell-sm-10">
+                                    <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="-0.5" data-fixed="2" id="crownColorLegendXPos"></input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">y</label>
+                                <div class="cell-sm-10">
+                                    <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0" data-fixed="2" id="crownColorLegendYPos"></input>
+                                </div>
+                            </div>
+                            <input type="checkbox" data-role="switch" data-caption="Vertical" id="crownColorLegendVertical" data-caption-position="left">
+                        </ul>
+                    </div>
 
-					<div class="paddedRibbonForm">
-						<label>Patch margin</label>
-						<input onchange="api.updateMargins(this.value)" style="width: 3em;" type="text" data-role="spinner" data-min-value="1" data-step="0.005" value="1.05" data-fixed="3">
-					</div>
-				</div>
-			</div>
-		</nav>
+                    <div class="paddedRibbonForm" title="Higher value means less detail (and better performance)">
+                        <label>Tree detail factor</label>
+                        <input onchange="api.setDetailedTreeFactor(this.value)"
+                        style="width: 3em;" type="text" data-role="spinner"
+                        data-min-value="1" data-step="0.1" value="3"
+                        data-fixed="3"
+                        >
+                    </div>
 
-		<div id="timelineContainer">
-			<details open style="display: contents;">
-				<summary title="Plot"></summary>
-				<div class="grid">
-					<div class="row">
-						<label for="yFieldSelect">Property
-							<select id="yFieldSelect" data-role="select" class="plotSelect">
-								<option value="BNE">BNE</option>
-								<option value="BINE">BINE</option>
-								<option value="BNS">BNS</option>
-								<option value="TeNE">TeNE</option>
-								<option value="TeBS">TeBS</option>
-								<option value="IBS">IBS</option>
-								<option value="TeBE">TeBE</option>
-								<option value="TrBE">TrBE</option>
-								<option value="TrIBE">TrIBE</option>
-								<option value="TrBR">TrBR</option>
-								<option value="C3G">C3G</option>
-								<option value="C4G">C4G</option>
-								<option value="VegC">VegC</option>
-								<option value="LitterC">LitterC</option>
-								<option value="SoilC">SoilC</option>
-								<option selected value="Height">Height of tree</option>
-								<option value="Diam">Diameter of stem</option>
-								<option value="Cmass">Total C mass of cohort</option>
-								<option value="Age">Age of cohort</option>
-								<option value="CrownA">Crown area</option>
-								<option value="GPPns">Gross Primary Production with N stress</option>
-								<option value="GPPno">Gross Primary Production with no stress</option>
-								<option value="GPP">Gross Primary Production</option>
-							</select>
-						</label>
-						<label for="aggregateSelect">Aggregation
-							<select id="aggregateSelect" data-role="select" class="plotSelect">
-								<option selected value="average">Average</option>
-								<option value="median">Median</option>
-								<option value="max">Max</option>
-								<option value="min">Min</option>
-								<option value="sum">Sum</option>
-								<option >None</option>
-							</select>
-						</label>
-						<label for="colorFieldSelect">Group by
-							<select id="colorFieldSelect" data-role="select"  class="plotSelect">
-								<option value="PID" selected>Patch ID</option>
-								<option value="IID">Cohort ID</option>
-								<option value="PFT">Plant Functional Type ID</option>
-							</select>
-						</label>
-					</div>
-				</div>
-				<div id="plot" style="width: 100%; display: flex;"></div>
-			</details>
-			<label for="timeline" style="text-align: right;">Current year:
-				<span id="timelineYearLabel">1992</span>
-			</label>
-			<button class="button secondary cycle" onclick="api.prevYear()">
-				<span class="mif-previous icon"></span>
-			</button>
-			<button class="button primary cycle" id="trajectoryStartButton" onclick="api.playTrajectory()">
-				<span class="mif-play icon"></span>
-			</button>
-			<button class="button secondary cycle" onclick="api.nextYear()">
-				<span class="mif-next icon"></span>
-			</button>
-		</div>
-		<div id="container"></div>
+                    <div class="paddedRibbonForm">
+                        <label>Patch margin</label>
+                        <input onchange="api.updateMargins(this.value)" style="width: 3em;" type="text" data-role="spinner" data-min-value="1" data-step="0.005" value="1.05" data-fixed="3">
+                    </div>
+                </div>
+            </div>
+        </nav>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+        <div id="timelineContainer">
+            <details open style="display: contents;">
+                <summary title="Plot"></summary>
+                <div class="grid">
+                    <div class="row">
+                        <label for="yFieldSelect">Property
+                            <select id="yFieldSelect" data-role="select" class="plotSelect">
+                                <option value="BNE">BNE</option>
+                                <option value="BINE">BINE</option>
+                                <option value="BNS">BNS</option>
+                                <option value="TeNE">TeNE</option>
+                                <option value="TeBS">TeBS</option>
+                                <option value="IBS">IBS</option>
+                                <option value="TeBE">TeBE</option>
+                                <option value="TrBE">TrBE</option>
+                                <option value="TrIBE">TrIBE</option>
+                                <option value="TrBR">TrBR</option>
+                                <option value="C3G">C3G</option>
+                                <option value="C4G">C4G</option>
+                                <option value="VegC">VegC</option>
+                                <option value="LitterC">LitterC</option>
+                                <option value="SoilC">SoilC</option>
+                                <option selected value="Height">Height of tree</option>
+                                <option value="Diam">Diameter of stem</option>
+                                <option value="Cmass">Total C mass of cohort</option>
+                                <option value="Age">Age of cohort</option>
+                                <option value="CrownA">Crown area</option>
+                                <option value="GPPns">Gross Primary Production with N stress</option>
+                                <option value="GPPno">Gross Primary Production with no stress</option>
+                                <option value="GPP">Gross Primary Production</option>
+                            </select>
+                        </label>
+                        <label for="aggregateSelect">Aggregation
+                            <select id="aggregateSelect" data-role="select" class="plotSelect">
+                                <option selected value="average">Average</option>
+                                <option value="median">Median</option>
+                                <option value="max">Max</option>
+                                <option value="min">Min</option>
+                                <option value="sum">Sum</option>
+                                <option >None</option>
+                            </select>
+                        </label>
+                        <label for="colorFieldSelect">Group by
+                            <select id="colorFieldSelect" data-role="select"  class="plotSelect">
+                                <option value="PID" selected>Patch ID</option>
+                                <option value="IID">Cohort ID</option>
+                                <option value="PFT">Plant Functional Type ID</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div id="plot" style="width: 100%; display: flex;"></div>
+            </details>
+            <label for="timeline" style="text-align: right;">Current year:
+                <span id="timelineYearLabel">1992</span>
+            </label>
+            <button class="button secondary cycle" onclick="api.prevYear()">
+                <span class="mif-previous icon"></span>
+            </button>
+            <button class="button primary cycle" id="trajectoryStartButton" onclick="api.playTrajectory()">
+                <span class="mif-play icon"></span>
+            </button>
+            <button class="button secondary cycle" onclick="api.nextYear()">
+                <span class="mif-next icon"></span>
+            </button>
+        </div>
+        <div id="container"></div>
 
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "./libs/three.module.js"
-				}
-			}
-		</script>
+        <!-- Import maps polyfill -->
+        <!-- Remove this when import maps will be widely supported -->
+        <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="libs/CCapture.all.min.js"></script>
-		<script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
-		<script type="module" src="main.js"></script>
-	</body>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "./libs/three.module.js"
+                }
+            }
+        </script>
+
+        <script src="libs/CCapture.all.min.js"></script>
+        <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
+        <script type="module" src="main.js"></script>
+    </body>
 </html>
