@@ -121,6 +121,7 @@ class Api {
         }
         if (attribute === undefined || attribute === "PFT") {
             this.patchManager[target+"ColorMap"] = undefined;
+            this.uiScene.remove(this[target+"LegendGroup"]);
         } else {
             const lut = this.calcLut(attribute, colorMap);
             this.patchManager[target+"ColorMap"] = {
