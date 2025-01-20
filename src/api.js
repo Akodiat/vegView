@@ -107,7 +107,7 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label
+     * @param {string} legendLabel Legend label (enclose LaTeX math expressions in $-signs)
      * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
      */
     setColorMap(
@@ -174,7 +174,7 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label
+     * @param {string} legendLabel Legend label (enclose LaTeX math expressions in $-signs)
      * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
      */
     setStemColorMap(
@@ -191,7 +191,7 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Height"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label
+     * @param {string} legendLabel Legend label (enclose LaTeX math expressions in $-signs)
      * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
      */
     setCrownColorMap(attribute, colorMap="rainbow",
