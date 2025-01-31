@@ -74,20 +74,28 @@ function init() {
     render();
 
     // Load data when file is uploaded
-    const fileInput = document.getElementById("fileInput");
-    const dataLoadButton = document.getElementById("dataLoadButton");
-    dataLoadButton.onclick = () => {
-        loadData(fileInput.files).then(
+    function onFileUpload(files) {
+        loadData(files).then(
             patchManager=>{
                 // We can now remove this listener, since data is loaded
                 container.removeEventListener("click", openDataLoadDialog);
+
+                // Reset cursor (it was a pointer because of the click listener)
+                container.style.cursor = "auto";
+
+                // Also remove the "no data" message
+                document.getElementById("noDataMessage").style.display = "none";
 
                 window.api = new Api(camera, scene, orthoCamera, uiScene, renderer, controls, patchManager);
                 window.THREE = THREE;
                 onDataLoaded(patchManager);
             }
         );
-    };
+    }
+
+    const fileInput = document.getElementById("fileInput");
+    const dataLoadButton = document.getElementById("dataLoadButton");
+    dataLoadButton.onclick = () => onFileUpload(fileInput.files);
 
     // The browser remembers the last input, so this is a shortcut to just
     // load whatever is in the fileInput without going through the Open
@@ -96,13 +104,7 @@ function init() {
         switch (keyEvent.code) {
         case "Enter":
             if (fileInput.files.length > 0) {
-                loadData(fileInput.files).then(
-                    patchManager=>{
-                        window.api = new Api(camera, scene, orthoCamera, uiScene, renderer, controls, patchManager);
-                        window.THREE = THREE;
-                        onDataLoaded(patchManager);
-                    }
-                );
+                onFileUpload(fileInput.files);
                 keyEvent.preventDefault();
             }
             break;

@@ -21,6 +21,20 @@
 
         <style>
 
+            #noDataMessage {
+                font-size: large;
+                position: absolute;
+                bottom: 50%;
+                color: gray;
+                text-align: center;
+                width: 100%;
+                z-index: -1;
+            }
+
+            #container {
+                cursor: pointer;
+            }
+
             .select .option-list a {
                 padding: 0 0.5rem 0 0.5rem;
             }
@@ -310,7 +324,10 @@
                 <span class="mif-next icon"></span>
             </button>
         </div>
+
         <div id="container"></div>
+
+        <div id="noDataMessage">No data loaded</div>
 
         <!-- Import maps polyfill -->
         <!-- Remove this when import maps will be widely supported -->
