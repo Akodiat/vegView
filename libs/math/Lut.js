@@ -366,38 +366,27 @@ class Lut {
         this.legend.labels.decimal = parameters.decimal || defaultLabelParameters.decimal;
         this.legend.labels.notation = parameters.notation || defaultLabelParameters.notation;
 
-        const canvasTitle = document.createElement("canvas");
-        const contextTitle = canvasTitle.getContext("2d");
 
-        /*
-        contextTitle.font = "Normal " + this.legend.labels.fontsize * 1.2 + "px " + this.legend.labels.fontface;
-        contextTitle.fillStyle = "rgba(" + defaultBackgroundColor.r + "," + defaultBackgroundColor.g + "," + defaultBackgroundColor.b + "," + defaultBackgroundColor.a + ")";
-        contextTitle.strokeStyle = "rgba(" + defaultBorderColor.r + "," + defaultBorderColor.g + "," + defaultBorderColor.b + "," + defaultBorderColor.a + ")";
-        contextTitle.lineWidth = defaultBorderThickness;
-        contextTitle.fillStyle = "rgba( 0, 0, 0, 1.0 )";
-        */
-        let wrapper = MathJax.tex2svg(`\\text{${this.legend.labels.title}}`, {em: 64, ex: 32, display: false});
+        // eslint-disable-next-line no-undef
+        let wrapper = MathJax.tex2svg(`\\text{${this.legend.labels.title}}`, {em: 32, ex: 16, display: false});
         let output = {svg: "", img: ""};
         let mjOut = wrapper.getElementsByTagName("svg")[0];
         output.svg = mjOut.outerHTML;
         var image = new Image();
         image.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(output.svg)));
 
+        let spriteTitle = new Sprite();
 
-        //contextTitle.fillText(this.legend.labels.title.toString(), defaultBorderThickness, this.legend.labels.fontsize + defaultBorderThickness);
-
-        const txtTitle = new CanvasTexture(canvasTitle);
-        txtTitle.minFilter = LinearFilter;
-
-        const spriteMaterialTitle = new SpriteMaterial({
-            map: txtTitle
-        });
-
-        const spriteTitle = new Sprite(spriteMaterialTitle);
-
-        image.onload = function() {
-            const scaleFactor = 2;
+        image.onload = ()=>{
+            const scaleFactor = 4;
+            const canvasTitle = document.createElement("canvas");
+            canvasTitle.height = scaleFactor * image.naturalHeight;
+            canvasTitle.width = scaleFactor * image.naturalWidth;
+            const contextTitle = canvasTitle.getContext("2d");
             contextTitle.drawImage(image, 0, 0,
+                image.width,
+                image.height,
+                0, 0,
                 scaleFactor * image.width,
                 scaleFactor * image.height
             );
@@ -409,32 +398,31 @@ class Lut {
             spriteTitle.material = new SpriteMaterial({
                 map: txtTitle
             });
+            spriteTitle.scale.set(
+                image.width/(image.height*scaleFactor),
+                1/scaleFactor,
+                1
+            );
+
+            if (this.legend.layout == "vertical") {
+                spriteTitle.position.set(
+                    this.legend.position.x,
+                    this.legend.position.y + (this.legend.dimensions.height * 0.5) + spriteTitle.scale.y,
+                    this.legend.position.z
+                );
+            }
+
+            if (this.legend.layout == "horizontal") {
+                spriteTitle.position.set(
+                    this.legend.position.x,
+                    this.legend.position.y + this.legend.dimensions.width,
+                    this.legend.position.z);
+            }
 
             if (render !== undefined) {
                 render();
             }
         };
-
-        spriteTitle.scale.set(2, 1, 1.0);
-
-        if (this.legend.layout == "vertical") {
-
-            spriteTitle.position.set(
-                this.legend.position.x + this.legend.dimensions.width,
-                this.legend.position.y + (this.legend.dimensions.height * 0.5),
-                this.legend.position.z
-            );
-
-        }
-
-        if (this.legend.layout == "horizontal") {
-
-            spriteTitle.position.set(
-                this.legend.position.x - this.legend.dimensions.width,
-                this.legend.position.y,
-                this.legend.position.z);
-
-        }
 
         let ticks, lines;
         let topPositionX, topPositionY, bottomPositionX, bottomPositionY;
