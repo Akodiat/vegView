@@ -171,9 +171,13 @@
                     </button>
 
                     <div class="flex-column">
-                        <div style="height: 24px;"><input onchange="api.setTreeDetail(this.checked)" type="checkbox" data-role="switch" data-caption="Detailed trees" id="detailedTrees"></div>
-                        <div style="height: 24px;"><input onchange="api.setTerrainSmoothness(this.checked)" type="checkbox" data-role="switch" data-caption="Smooth terrain" id="smoothTerrain"></div>
-                        <div style="height: 24px;"><input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch" data-caption="PFT legend"></div>
+                        <div><input onchange="api.setTreeDetail(this.checked)" type="checkbox" data-role="switch" data-caption="Detailed trees" id="detailedTrees"></div>
+                        <div><input onchange="api.setTerrainSmoothness(this.checked)" type="checkbox" data-role="switch" data-caption="Smooth terrain" id="smoothTerrain"></div>
+                    </div>
+
+                    <div class="flex-column">
+                        <div><input onchange="api.setPFTLegendVisibility(this.checked)" type="checkbox" data-role="switch" data-caption="PFT legend"></div>
+                        <div><input onchange="api.setLaiOpacity(this.checked)" type="checkbox" data-role="switch" data-caption="LAI opacity"></div>
                     </div>
 
                     <div class="paddedRibbonForm" style="width: 12em;">

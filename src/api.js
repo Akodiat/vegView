@@ -66,6 +66,16 @@ class Api {
         this.renderer.render(this.uiScene, this.orthoCamera);
     }
 
+    /**
+     * Enable or disable crown opacity according to the LAI property, such that
+     * opacity = 1-exp(-0.5*LAI) and 0 == fully transparent.
+     * @param {boolean} value Set to true to enable, false to disable
+     */
+    setLaiOpacity(value) {
+        this.patchManager.laiOpacityEnabled = value;
+        this.redraw();
+    }
+
     setStemColorMapFromUI() {
         const getVal = id => document.getElementById(id).value;
         const checked = id => document.getElementById(id).checked;
