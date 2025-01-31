@@ -185,27 +185,49 @@
                         </span>
                         <select class="input-small" id="stemColorSelect" data-role="select" data-prepend="Attribute"></select>
                         <select class="input-small" id="stemColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
-                        <ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
+                        <ul class="ribbon-dropdown" data-role="dropdown" data-duration="100" onclick="event.stopPropagation();" ondblclick="event.stopPropagation();">
+                            <p>Title</p>
+                            <input type="text" data-role="input" id="stemColorLegendLabel">
                             <div class="row mb-2">
-                                <label class="cell-sm-2">Label</label>
-                                <div class="cell-sm-10">
-                                    <input type="text" data-role="input" id="stemColorLegendLabel" onclick="event.stopPropagation();">
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <label class="cell-sm-2">x</label>
-                                <div class="cell-sm-10">
+                                <label class="cell-sm-4">x</label>
+                                <div class="cell-sm-8">
                                     <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0.5" data-fixed="2" id="stemColorLegendXPos"></input>
                                 </div>
                             </div>
                             <div class="row mb-2">
-                                <label class="cell-sm-2">y</label>
-                                <div class="cell-sm-10">
+                                <label class="cell-sm-4">y</label>
+                                <div class="cell-sm-8">
                                     <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0" data-fixed="2" id="stemColorLegendYPos"></input>
                                 </div>
                             </div>
-
+                            <div class="row mb-2">
+                                <label class="cell-sm-4">Ticks</label>
+                                <div class="cell-sm-8">
+                                    <input class="input-small" data-role="spinner" data-min-value="2" data-max-value="15" data-step="1" value="5" id="stemColorLegendTicks"></input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-4">Decimals</label>
+                                <div class="cell-sm-8">
+                                    <input class="input-small" data-role="spinner" data-min-value="0" data-max-value="10" data-step="1" value="2" id="stemColorLegendDecimals"></input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">Min</label>
+                                <input class="cell-sm-3" id="stemColorLegendMinAuto" type="checkbox" data-role="checkbox" data-caption="Auto" checked onchange="document.getElementById('stemColorLegendMin').disabled = this.checked">
+                                <div class="cell-sm-7">
+                                    <input class="input-small" data-role="spinner" data-step="0.1" data-fixed="2" value="0" id="stemColorLegendMin" disabled></input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">Max</label>
+                                <input class="cell-sm-3" id="stemColorLegendMaxAuto" type="checkbox" data-role="checkbox" data-caption="Auto" checked onchange="document.getElementById('stemColorLegendMax').disabled = this.checked">
+                                <div class="cell-sm-7">
+                                    <input class="input-small" data-role="spinner" data-step="0.1" data-fixed="2" value="0" id="stemColorLegendMax" disabled></input>
+                                </div>
+                            </div>
                             <input type="checkbox" data-role="switch" data-caption="Vertical" id="stemColorLegendVertical" data-caption-position="left">
+                            <input type="checkbox" data-role="switch" data-caption="Scientific" id="stemColorLegendScientific" data-caption-position="left">
                         </ul>
                     </div>
 
@@ -218,26 +240,49 @@
                         </span>
                         <select class="input-small" id="crownColorSelect" data-role="select" data-prepend="Attribute"></select>
                         <select class="input-small" id="crownColorMapSelect" data-role="select" data-prepend="Color map" disabled></select>
-                        <ul class="ribbon-dropdown" data-role="dropdown" data-duration="100">
+                        <ul class="ribbon-dropdown" data-role="dropdown" data-duration="100" onclick="event.stopPropagation();" ondblclick="event.stopPropagation();">
+                            <p>Title</p>
+                            <input type="text" data-role="input" id="crownColorLegendLabel">
                             <div class="row mb-2">
-                                <label class="cell-sm-2">Label</label>
-                                <div class="cell-sm-10">
-                                    <input type="text" data-role="input" id="crownColorLegendLabel" onclick="event.stopPropagation();">
+                                <label class="cell-sm-4">x</label>
+                                <div class="cell-sm-8">
+                                    <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0.5" data-fixed="2" id="crownColorLegendXPos"></input>
                                 </div>
                             </div>
                             <div class="row mb-2">
-                                <label class="cell-sm-2">x</label>
-                                <div class="cell-sm-10">
-                                    <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="-0.5" data-fixed="2" id="crownColorLegendXPos"></input>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <label class="cell-sm-2">y</label>
-                                <div class="cell-sm-10">
+                                <label class="cell-sm-4">y</label>
+                                <div class="cell-sm-8">
                                     <input class="input-small" data-role="spinner" data-min-value="-1" data-max-value="1" data-step="0.1" value="0" data-fixed="2" id="crownColorLegendYPos"></input>
                                 </div>
                             </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-4">Ticks</label>
+                                <div class="cell-sm-8">
+                                    <input class="input-small" data-role="spinner" data-min-value="2" data-max-value="15" data-step="1" value="5" id="crownColorLegendTicks"></input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-4">Decimals</label>
+                                <div class="cell-sm-8">
+                                    <input class="input-small" data-role="spinner" data-min-value="0" data-max-value="10" data-step="1" value="2" id="crownColorLegendDecimals"></input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">Min</label>
+                                <input class="cell-sm-3" id="crownColorLegendMinAuto" type="checkbox" data-role="checkbox" data-caption="Auto" checked onchange="document.getElementById('crownColorLegendMin').disabled = this.checked">
+                                <div class="cell-sm-7">
+                                    <input class="input-small" data-role="spinner" data-step="0.1" data-fixed="2" value="0" id="crownColorLegendMin" disabled></input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <label class="cell-sm-2">Max</label>
+                                <input class="cell-sm-3" id="crownColorLegendMaxAuto" type="checkbox" data-role="checkbox" data-caption="Auto" checked onchange="document.getElementById('crownColorLegendMax').disabled = this.checked">
+                                <div class="cell-sm-7">
+                                    <input class="input-small" data-role="spinner" data-step="0.1" data-fixed="2" value="0" id="crownColorLegendMax" disabled></input>
+                                </div>
+                            </div>
                             <input type="checkbox" data-role="switch" data-caption="Vertical" id="crownColorLegendVertical" data-caption-position="left">
+                            <input type="checkbox" data-role="switch" data-caption="Scientific" id="crownColorLegendScientific" data-caption-position="left">
                         </ul>
                     </div>
 

@@ -359,13 +359,12 @@ class Lut {
         parameters = parameters || defaultLabelParameters;
         this.legend.labels = {};
 
-        this.legend.labels.fontsize = parameters.fontsize || defaultLabelParameters.fontsize;
-        this.legend.labels.fontface = parameters.fontface || defaultLabelParameters.fontface;
-        this.legend.labels.title = parameters.title || defaultLabelParameters.title;
-        this.legend.labels.ticks = parameters.ticks || defaultLabelParameters.ticks;
-        this.legend.labels.decimal = parameters.decimal || defaultLabelParameters.decimal;
-        this.legend.labels.notation = parameters.notation || defaultLabelParameters.notation;
-
+        this.legend.labels.fontsize = parameters.fontsize === undefined ? defaultLabelParameters.fontsize: parameters.fontsize;
+        this.legend.labels.fontface = parameters.fontface === undefined ? defaultLabelParameters.fontface: parameters.fontface;
+        this.legend.labels.title = parameters.title === undefined ? defaultLabelParameters.title: parameters.title;
+        this.legend.labels.ticks = parameters.ticks === undefined ? defaultLabelParameters.ticks: parameters.ticks;
+        this.legend.labels.decimal = parameters.decimal === undefined ? defaultLabelParameters.decimal: parameters.decimal;
+        this.legend.labels.notation = parameters.notation === undefined ? defaultLabelParameters.notation: parameters.notation;
 
         // eslint-disable-next-line no-undef
         let wrapper = MathJax.tex2svg(`\\text{${this.legend.labels.title}}`, {em: 32, ex: 16, display: false});

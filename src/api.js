@@ -41,7 +41,14 @@ class Api {
             "ColorLegendLabel",
             "ColorLegendXPos",
             "ColorLegendYPos",
-            "ColorLegendVertical"
+            "ColorLegendTicks",
+            "ColorLegendDecimals",
+            "ColorLegendMin",
+            "ColorLegendMinAuto",
+            "ColorLegendMax",
+            "ColorLegendMaxAuto",
+            "ColorLegendVertical",
+            "ColorLegendScientific"
         ].forEach(idSuffix=> {
             document.getElementById("stem"+idSuffix).addEventListener("change", ()=>this.setStemColorMapFromUI());
             document.getElementById("crown"+idSuffix).addEventListener("change", ()=>this.setCrownColorMapFromUI());
@@ -60,45 +67,53 @@ class Api {
     }
 
     setStemColorMapFromUI() {
-        const attributeSelect = document.getElementById("stemColorSelect");
+        const getVal = id => document.getElementById(id).value;
+        const checked = id => document.getElementById(id).checked;
         const colorMapSelect = document.getElementById("stemColorMapSelect");
 
-        const colorLegendLabel = document.getElementById("stemColorLegendLabel");
-        const colorLegendXPos = document.getElementById("stemColorLegendXPos");
-        const colorLegendYPos = document.getElementById("stemColorLegendYPos");
-        const colorLegendVertical = document.getElementById("stemColorLegendVertical");
         this.setStemColorMap(
-            attributeSelect.value,
-            colorMapSelect.value,
+            getVal("stemColorSelect"),
+            getVal("stemColorMapSelect"),
             new THREE.Vector2(
-                Number.parseFloat(colorLegendXPos.value),
-                Number.parseFloat(colorLegendYPos.value)
+                Number.parseFloat(getVal("stemColorLegendXPos")),
+                Number.parseFloat(getVal("stemColorLegendYPos"))
             ),
-            colorLegendLabel.value,
-            colorLegendVertical.checked
+            {
+                "title": getVal("stemColorLegendLabel"),
+                "ticks": Number.parseInt(getVal("stemColorLegendTicks")),
+                "decimal" : Number.parseInt(getVal("stemColorLegendDecimals")),
+                "notation": checked("stemColorLegendScientific") ? "scientific" : undefined
+            },
+            checked("stemColorLegendVertical"),
+            checked("stemColorLegendMinAuto") ? undefined : Number.parseFloat(getVal("stemColorLegendMin")),
+            checked("stemColorLegendMaxAuto") ? undefined : Number.parseFloat(getVal("stemColorLegendMax")),
         );
-        colorMapSelect.disabled = attributeSelect.value === "PFT";
+        colorMapSelect.disabled = getVal("stemColorSelect") === "PFT";
     }
 
     setCrownColorMapFromUI() {
-        const attributeSelect = document.getElementById("crownColorSelect");
+        const getVal = id => document.getElementById(id).value;
+        const checked = id => document.getElementById(id).checked;
         const colorMapSelect = document.getElementById("crownColorMapSelect");
 
-        const colorLegendLabel = document.getElementById("crownColorLegendLabel");
-        const colorLegendXPos = document.getElementById("crownColorLegendXPos");
-        const colorLegendYPos = document.getElementById("crownColorLegendYPos");
-        const colorLegendVertical = document.getElementById("crownColorLegendVertical");
         this.setCrownColorMap(
-            attributeSelect.value,
-            colorMapSelect.value,
+            getVal("crownColorSelect"),
+            getVal("crownColorMapSelect"),
             new THREE.Vector2(
-                Number.parseFloat(colorLegendXPos.value),
-                Number.parseFloat(colorLegendYPos.value)
+                Number.parseFloat(getVal("crownColorLegendXPos")),
+                Number.parseFloat(getVal("crownColorLegendYPos"))
             ),
-            colorLegendLabel.value,
-            colorLegendVertical.checked
+            {
+                "title": getVal("crownColorLegendLabel"),
+                "ticks": Number.parseInt(getVal("crownColorLegendTicks")),
+                "decimal" : Number.parseInt(getVal("crownColorLegendDecimals")),
+                "notation": checked("crownColorLegendScientific") ? "scientific" : undefined
+            },
+            checked("crownColorLegendVertical"),
+            checked("crownColorLegendMinAuto") ? undefined : Number.parseFloat(getVal("crownColorLegendMin")),
+            checked("crownColorLegendMaxAuto") ? undefined : Number.parseFloat(getVal("crownColorLegendMax")),
         );
-        colorMapSelect.disabled = attributeSelect.value === "PFT";
+        colorMapSelect.disabled = getVal("crownColorSelect") === "PFT";
     }
 
     /**
@@ -107,14 +122,17 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label (enclose LaTeX math expressions in $-signs)
-     * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
+     * @param {{ticks: number, decimal: number, title: string}} labelParams Legend parameters. "ticks" controls number of ticks, "decimal", the number of decimals shown, "title" the legend title (enclose LaTeX math expressions in $-signs). Set notation = "scientific" for exponentials.
+     * @param {number} minValue Minimum value for the color map (leave undefined to calculate automatically)
+     * @param {number} maxValue Minimum value for the color map (leave undefined to calculate automatically)
      */
     setColorMap(
         target, attribute, colorMap = "rainbow",
         legendPosition = new THREE.Vector2(),
-        legendLabel = undefined,
+        labelParams = {"ticks": 5},
         verticalLegend = false,
+        minValue,
+        maxValue
     ) {
         if (target === undefined) {
             console.error(`Target ${target} unknown, must be "stem" or "crown"!`);
@@ -123,7 +141,7 @@ class Api {
             this.patchManager[target+"ColorMap"] = undefined;
             this.uiScene.remove(this[target+"LegendGroup"]);
         } else {
-            const lut = this.calcLut(attribute, colorMap);
+            const lut = this.calcLut(attribute, colorMap, minValue, maxValue);
             this.patchManager[target+"ColorMap"] = {
                 lut: lut,
                 attribute: attribute
@@ -137,15 +155,9 @@ class Api {
             this[target+"LegendGroup"].position.x = legendPosition.x * this.orthoCamera.right;
             this[target+"LegendGroup"].position.y = legendPosition.y * this.orthoCamera.right;
 
-            if (legendLabel === undefined || legendLabel === "") {
-                legendLabel = `${attribute} (${target} color)`;
+            if (labelParams.title === undefined || labelParams.title === "") {
+                labelParams.title = `${attribute} (${target} color)`;
             }
-
-            let labelParams = {
-                "title": legendLabel,
-                //"um": "Stem",
-                "ticks": 5
-            };
 
             let legend;
             if (verticalLegend) {
@@ -174,16 +186,20 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Diam"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label (enclose LaTeX math expressions in $-signs)
+     * @param {{ticks: number, decimal: number, title: string}} labelParams Legend parameters. "ticks" controls number of ticks, "decimal", the number of decimals shown, "title" the legend title (enclose LaTeX math expressions in $-signs). Set notation = "scientific" for exponentials.
      * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
+     * @param {number} minValue Minimum value for the color map (leave undefined to calculate automatically)
+     * @param {number} maxValue Minimum value for the color map (leave undefined to calculate automatically)
      */
     setStemColorMap(
         attribute, colorMap="rainbow",
         legendPosition=new THREE.Vector2(),
-        legendLabel = undefined,
-        verticalLegend = false
+        labelParams = {"ticks": 5},
+        verticalLegend = false,
+        minValue,
+        maxValue
     ) {
-        this.setColorMap("stem", attribute, colorMap, legendPosition, legendLabel, verticalLegend);
+        this.setColorMap("stem", attribute, colorMap, legendPosition, labelParams, verticalLegend, minValue, maxValue);
     }
 
     /**
@@ -191,31 +207,48 @@ class Api {
      * @param {string} attribute Data column from the input file, e.g. "Height"
      * @param {string} colorMap A matplotlib color map name
      * @param {THREE.Vector2} legendPosition Position of the legend, where (0,0) is the center of the canvas and one unit is the horisontal distance from the center to the canvas edge.
-     * @param {string} legendLabel Legend label (enclose LaTeX math expressions in $-signs)
+     * @param {{ticks: number, decimal: number, title: string}} labelParams Legend parameters. "ticks" controls number of ticks, "decimal", the number of decimals shown, "title" the legend title (enclose LaTeX math expressions in $-signs). Set notation = "scientific" for exponentials.
      * @param {boolean} verticalLegend If set to true, the legend will be vertical, otherwise horisontal.
+     * @param {number} minValue Minimum value for the color map (leave undefined to calculate automatically)
+     * @param {number} maxValue Minimum value for the color map (leave undefined to calculate automatically)
      */
     setCrownColorMap(attribute, colorMap="rainbow",
         legendPosition=new THREE.Vector2(),
-        legendLabel = undefined,
-        verticalLegend = false
+        labelParams = {"ticks": 5},
+        verticalLegend = false,
+        minValue,
+        maxValue
     ) {
-        this.setColorMap("crown", attribute, colorMap, legendPosition, legendLabel, verticalLegend);
+        this.setColorMap("crown", attribute, colorMap, legendPosition, labelParams, verticalLegend, minValue, maxValue);
     }
 
-    calcLut(attribute, colorMap="rainbow") {
-        let max = -Infinity;
-        let min = Infinity;
-        for (const patch of this.patchManager.patches.values()) {
-            for (const cohort of patch.cohorts.values()) {
-                for (const t of cohort.timeSteps.values())  {
-                    max = Math.max(t[attribute], max);
-                    min = Math.min(t[attribute], min);
+    calcLut(attribute, colorMap="rainbow", min, max) {
+        if (max === undefined || min === undefined) {
+            let calcMax = -Infinity;
+            let calcMin  = Infinity;
+            for (const patch of this.patchManager.patches.values()) {
+                for (const cohort of patch.cohorts.values()) {
+                    for (const t of cohort.timeSteps.values())  {
+                        if (max === undefined) {
+                            calcMax = Math.max(t[attribute], calcMax);
+                        }
+                        if (min === undefined) {
+                            calcMin = Math.min(t[attribute], calcMin);
+                        }
+                    }
                 }
+            }
+            if (max === undefined) {
+                max = calcMax;
+            }
+            if (min === undefined) {
+                min = calcMin;
             }
         }
 
         // Lut cannot define color if they are the same
         if (max === min) {
+            console.warn(`Max (${max}) and min (${min}) value for ${attribute} attribute are equal!`);
             max++;
             min--;
         }
