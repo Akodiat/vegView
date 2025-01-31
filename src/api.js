@@ -137,7 +137,7 @@ class Api {
      * @param {number} maxValue Minimum value for the color map (leave undefined to calculate automatically)
      */
     setColorMap(
-        target, attribute, colorMap = "rainbow",
+        target, attribute, colorMap = "coolwarm",
         legendPosition = new THREE.Vector2(),
         labelParams = {"ticks": 5},
         verticalLegend = false,
@@ -202,7 +202,7 @@ class Api {
      * @param {number} maxValue Minimum value for the color map (leave undefined to calculate automatically)
      */
     setStemColorMap(
-        attribute, colorMap="rainbow",
+        attribute, colorMap="coolwarm",
         legendPosition=new THREE.Vector2(),
         labelParams = {"ticks": 5},
         verticalLegend = false,
@@ -222,7 +222,7 @@ class Api {
      * @param {number} minValue Minimum value for the color map (leave undefined to calculate automatically)
      * @param {number} maxValue Minimum value for the color map (leave undefined to calculate automatically)
      */
-    setCrownColorMap(attribute, colorMap="rainbow",
+    setCrownColorMap(attribute, colorMap="coolwarm",
         legendPosition=new THREE.Vector2(),
         labelParams = {"ticks": 5},
         verticalLegend = false,
