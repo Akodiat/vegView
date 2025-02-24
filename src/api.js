@@ -498,7 +498,7 @@ class Api {
      * @param {number} distance Distance from camera
      * @param {number} margin Margin from edge
      */
-    showPFTLegend(legendPosition = new THREE.Vector2(), scale = 0.25, fontSize="4em", distance = 1) {
+    showPFTLegend(legendPosition = new THREE.Vector2(-1, 0), scale = 0.25, fontSize="4em", distance = 1) {
         const rows = this.patchManager.pftConstants.map(
             c=>`<tr>
                 <td>${MathJax.tex2mml(`\\text{${c.name}}`, {display: false})}</td>
@@ -539,13 +539,13 @@ class Api {
         this.camera.add(this.legend);
         this.legend.position.z = -distance;
 
-        // Position to the left of the view
+        // Position to the legend, making sure it stays within the canvas for position values <= 1
         const position = ()=>{
             const verticalFOV = THREE.MathUtils.degToRad(this.camera.fov);
             const visibleHeight = 2 * Math.tan(verticalFOV / 2) * distance;
             const visibleWidth = visibleHeight * this.camera.aspect;
-            this.legend.position.x = legendPosition.x * visibleWidth/2;
-            this.legend.position.y = legendPosition.y * visibleHeight/2;
+            this.legend.position.x = legendPosition.x * visibleWidth/2 - (Math.sign(legendPosition.x)*scale*this.legend.geometry.parameters.width/2);
+            this.legend.position.y = legendPosition.y * visibleHeight/2 - (Math.sign(legendPosition.y)*scale*this.legend.geometry.parameters.height/2);
             this.render();
         };
         position();
