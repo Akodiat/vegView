@@ -3,6 +3,8 @@ import {notify, exportGLTF, saveString} from "./utils.js";
 import {HTMLMesh} from "../libs/interactive/HTMLMesh.js";
 import {Lut, ColorMapKeywords} from "../libs/math/Lut.js";
 
+/*global MathJax*/
+
 class Api {
     /**
      * An api object is included in the global scope so that it can be called
@@ -490,15 +492,16 @@ class Api {
     /**
      * Show a PFT legend in the scene. An HTML mesh is used instead of a normal
      * HTML element so that the legend can be visible in exported images
+     * @param {THREE.Vector2} position Legend position (where (0,0) is the center of the screen and (1,1) is the upper-left corner).
      * @param {number} scale Scale down (and use a large font size) to gain resolution
      * @param {number} fontSize Increase (and use a smaller scale) to gain resolution
      * @param {number} distance Distance from camera
      * @param {number} margin Margin from edge
      */
-    showPFTLegend(scale = 0.25, fontSize="4em", distance = 1, margin = 1.05) {
+    showPFTLegend(legendPosition = new THREE.Vector2(), scale = 0.25, fontSize="4em", distance = 1) {
         const rows = this.patchManager.pftConstants.map(
             c=>`<tr>
-                <td>${c.name}</td>
+                <td>${MathJax.tex2mml(`\\text{${c.name}}`, {display: false})}</td>
                 <td style="width: 150px; background:#${c.color.getHexString()}"></td>
             </tr>`
         ).filter((c,i)=>this.patchManager.usedPFTs.has(i));
@@ -537,17 +540,18 @@ class Api {
         this.legend.position.z = -distance;
 
         // Position to the left of the view
-        const positionToLeft = ()=>{
+        const position = ()=>{
             const verticalFOV = THREE.MathUtils.degToRad(this.camera.fov);
             const visibleHeight = 2 * Math.tan(verticalFOV / 2) * distance;
             const visibleWidth = visibleHeight * this.camera.aspect;
-            this.legend.position.x = -visibleWidth/2 + (margin*scale*this.legend.geometry.parameters.width/2);
+            this.legend.position.x = legendPosition.x * visibleWidth/2;
+            this.legend.position.y = legendPosition.y * visibleHeight/2;
             this.render();
         };
-        positionToLeft();
+        position();
 
         // Update position on window resize
-        window.addEventListener("resize", positionToLeft);
+        window.addEventListener("resize", position);
     }
 
     /**
