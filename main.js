@@ -32,7 +32,7 @@ function init() {
     scene = new THREE.Scene();
     const aspect = window.innerWidth / window.innerHeight;
     camera = new THREE.PerspectiveCamera(55, aspect, 0.1, 1000);
-    camera.position.set(2, 2, 10);
+    camera.position.set(-50, 50, -50);
 
     // Setup UI scene
     uiScene = new THREE.Scene();
