@@ -277,6 +277,7 @@ class PatchManager {
                 const nTrees = cohortData.DensI * cohort.maxTreeCount;
                 for (let iTree=0; iTree<cohort.maxTreeCount; iTree++) {
                     if (iTree >= nTrees) {
+                        // Hide extra trees (draw empty elements)
                         updateInstance(cohort.instancedBoles, emptyElem, iTree, mTemp);
                         updateInstance(cohort.instancedCrowns, emptyElem, iTree, mTemp);
                         continue;
@@ -305,6 +306,8 @@ class PatchManager {
                         ),
                         color: stemColor
                     };
+
+                    // Update tree bole geometry instance
                     updateInstance(cohort.instancedBoles, boleElem, iTree, mTemp);
 
                     let crownHeight = 0;
@@ -329,6 +332,7 @@ class PatchManager {
                         ),
                         color: crownColor
                     };
+                    // Update tree crown geometry instance
                     updateInstance(cohort.instancedCrowns, crownElem, iTree, mTemp);
                 }
             }
