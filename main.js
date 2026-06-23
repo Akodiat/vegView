@@ -93,9 +93,23 @@ function init() {
         );
     }
 
+    // Setup file input
     const fileInput = document.getElementById("fileInput");
     const dataLoadButton = document.getElementById("dataLoadButton");
     dataLoadButton.onclick = () => onFileUpload(fileInput.files);
+
+    // Setup button to load some example data
+    const exampleDataButton = document.getElementById("exampleDataButton");
+    const exampleDataFilename = "veg_struct_4.out";
+    exampleDataButton.onclick = () => fetch(
+        "example_data/" + exampleDataFilename
+    ).then(res => res.text().then(text=>{
+        onFileUpload([new File(
+            [text],
+            exampleDataFilename,
+            {type: "text/plain"}
+        )]);
+    }));
 
     // The browser remembers the last input, so this is a shortcut to just
     // load whatever is in the fileInput without going through the Open
