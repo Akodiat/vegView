@@ -8,7 +8,7 @@ A vegetation model viewer for [LPJ-GUESS](https://web.nateko.lu.se/lpj-guess).
 Developed by Joakim Bohlin, InfraVis
 
 ## Getting started
-The application is already live at [akodiat.github.io/vegView/](https://akodiat.github.io/vegView/), so you should only need to click the link.
+The application is already live at [infravis.github.io/vegView/](https://infravis.github.io/vegView/), so you should only need to click the link.
 
 To upload, select `File`, `Load data` and browse for the data file on your computer. A vegetation structure file, e.g. `veg_struct.out` is expected, but you can also add additional data, such as `cpool.out` and `lai.out`, by uploading multiple files at the same time (Ctrl-click to select multiple files). Finally, click the `Load` button to load the data.
 
@@ -42,7 +42,7 @@ Once the static server is running, go to [localhost:8000](http://localhost:8000)
 
 ## Documentation
 
-Code documentation is found at [akodiat.github.io/vegView/docs](https://akodiat.github.io/vegView/docs).
+Code documentation is found at [infravis.github.io/vegView/docs](https://infravis.github.io/vegView/docs).
 
 To compile the documentation (and generate the `docs/` directory), call `jsdoc` with the included config in the repository root:
 ```sh
@@ -55,7 +55,7 @@ The VegView API can be accessed through the [web developer console](https://webm
 
 All relevant functions and objects are found as members of the `api` object, e.g. `api.camera`, `api.patchManager`, `api.nextYear()`, `api.exportCSV(delimiter)`.
 
-More information can be found [in the documentation](https://akodiat.github.io/vegView/docs/Api.html).
+More information can be found [in the documentation](https://infravis.github.io/vegView/docs/Api.html).
 As noted above, it is also good to have the [Three.js documentation](https://threejs.org/docs/#manual/en/introduction/Creating-a-scene) at hand.
 
 ## Color map
